@@ -20,6 +20,23 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-23 — @neevmodh
+- URGENT — Health-a-thon 2026 Round 1 is due **Sep 25** (not the full MVP, but written solution
+  concept + methodology; real MVP is Nov 8 after shortlist). Track = Maternal & Women's Health,
+  User = Patient/Caregiver, Use case = Patient Education & Digital Engagement.
+- Opened milestone `R0: Round 1 Submission` and filed 12 issues (#65-#76, label `sprint-0`) split
+  3 ways: seed knowledge + minimal RAG script + safety pre-check + submission doc (me), minimal
+  /chat + ANC visit-schedule endpoints (Bhavya), minimal chat UI + visit card + demo polish (Raj)
+- Full plan saved at the roadmap doc referenced in this conversation — single demo scenario: 2nd
+  trimester patient asks a nutrition+Ayurveda question, gets a cited answer, sees her next ANC
+  visit from the FOGSI 8-contact schedule
+- Related issue(s): #65-#76
+- Status: in-progress
+- Notes: **Everyone drop other work and prioritize their R0 issues until Sep 25.** M1/M2/M3
+  backlog resumes only if shortlisted (Oct 3). Clinical Lead (BAMS/MS-Gynaec) must sign off on the
+  Garbhini Paricharya verses and ANC schedule before they go in the demo or write-up (#R0 checkpoint
+  issue). Exact submission form/platform not yet confirmed — check healthathon.reskilll.com.
+
+### 2026-09-23 — @neevmodh
 - Moved the Ayurveda source PDF (`Prasuti-Tantra-by-Dr-premvati-Tiwari.pdf`) into `knowledge/ayurveda/`
 - Audited docs/FEATURES.md against the 56 existing issues and filed 8 more to close gaps:
   #57 intent classification, #58 multi-domain response segmentation, #59 lifestyle engine (backend),
