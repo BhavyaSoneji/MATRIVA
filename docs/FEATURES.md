@@ -116,3 +116,24 @@ Knowledge management · Evaluation dashboard
 | RAG / Safety / LLM / Evidence / Ingestion / Evaluation / Testing / Review | @neevmodh |
 | Backend (API, DB, services) | @BhavyaSoneji |
 | Frontend (Next.js UI) | @Rajodedra |
+
+## Feature → Issue Coverage Map
+
+All 64 issues on the tracker, grouped by feature area. Every line item in sections 1-13 above maps
+to at least one issue below.
+
+| Feature area | Issues |
+|---|---|
+| User & Account | #27 Auth, #28 Onboarding APIs, #37 Privacy (consent/export/delete), #44 Sign up/login UI, #45 Onboarding UI, #53 Profile/privacy UI |
+| Pregnancy Profile & Personalization | #25 DB models, #28 Onboarding APIs, #31 Pregnancy stage engine, #11 Personalized query rewriting, #64 Conversation memory |
+| AI Assistant / Conversational | #29 /chat endpoint, #57 Intent classification, #60 Conversation memory, #47 Chat UI, #64 Suggested questions & feedback UI |
+| Knowledge & RAG Pipeline | #1 Schema, #2 Parsing, #3 Chunking, #4 Quality checks, #5 Embeddings+pgvector, #6 Hybrid retrieval, #7 Reranking, #8 Context packet, #9 Groq generation, #10 Citation validation, #58 Multi-domain decomposition |
+| Evidence & Source Attribution | #1 Schema (evidence fields), #15 Ayurveda provenance, #33 Ayurveda source API, #62 Knowledge search & sources API, #52 Sources/Evidence Explorer UI |
+| Safety Layer | #12 Pre-check, #13 Post-check, #14 Prompt injection defense, #38 Fail-closed error handling |
+| Recommendation Engine | #30 Recommendation engine, #51 Recommendations/saved-items UI |
+| Food & Regional Engine | #32 Food/regional engine, #48 Nutrition/lifestyle UI, #49 Ayurveda/traditional UI |
+| Lifestyle Engine | #59 Lifestyle engine (backend), #48 Nutrition/lifestyle UI |
+| Admin / Knowledge Management | #34 Admin docs API, #35 Admin safety rules API, #54 Admin dashboard UI |
+| Evaluation & Testing | #16 Retrieval eval, #17 Generation eval, #18 Safety eval, #19 Hallucination tests, #20 Full 12-case suite, #36 Evaluation run API, #55 Evaluation dashboard UI |
+| Frontend Pages (17) | #41 Scaffold, #42 Design system, #43-#55 individual pages |
+| Platform / Cross-cutting | #23 FastAPI scaffold, #24 Docker Compose, #26 Migrations/seed, #39 Observability, #40 Prod Docker, #56 Frontend deploy, #61 Security hardening (rate limiting/validation/audit logs), #63 Feedback API, #21 CODEOWNERS/branch protection, #22 CI pipeline |

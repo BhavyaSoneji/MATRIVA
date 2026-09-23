@@ -19,6 +19,18 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-09-23 — @neevmodh
+- Moved the Ayurveda source PDF (`Prasuti-Tantra-by-Dr-premvati-Tiwari.pdf`) into `knowledge/ayurveda/`
+- Audited docs/FEATURES.md against the 56 existing issues and filed 8 more to close gaps:
+  #57 intent classification, #58 multi-domain response segmentation, #59 lifestyle engine (backend),
+  #60 security hardening, #61 knowledge search & sources API, #62 feedback API,
+  #63 conversation memory (session vs profile), #64 suggested questions & feedback UI
+- Added a Feature → Issue coverage map to docs/FEATURES.md so every feature traces to an issue number
+- Related issue(s): #57-#64
+- Status: done
+- Notes: total backlog is now 64 issues across M1/M2/M3, all feature areas from FEATURES.md have
+  at least one tracking issue.
+
 ### 2025-09-23 — @neevmodh
 - Created docs/FEATURES.md (full functionality list) and this PROGRESS.md
 - Filed 56 GitHub issues across 3 milestones (M1/M2/M3), labeled and assigned per workstream
