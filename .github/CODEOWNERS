@@ -1,0 +1,16 @@
+# RAG / AI / evaluation / testing / overall review
+/backend/app/rag/            @neevmodh
+/backend/app/safety/         @neevmodh
+/backend/app/llm/            @neevmodh
+/backend/app/evidence/       @neevmodh
+/ingestion/                  @neevmodh
+/evaluation/                 @neevmodh
+/.github/                    @neevmodh
+
+# Backend
+/backend/                    @BhavyaSoneji
+/database/                   @BhavyaSoneji
+/docker-compose.yml          @BhavyaSoneji
+
+# Frontend
+/frontend/                   @Rajodedra
