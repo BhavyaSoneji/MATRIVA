@@ -20,6 +20,39 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #19: **Found and honestly reported a real, significant limitation — not a bug I could fix with
+  a threshold tweak.** Built `backend/app/rag/grounding.py` (`has_sufficient_evidence`,
+  `generate_or_insufficient_evidence`) closing a real gap: the full pipeline (#6→#9) had NO
+  insufficient-evidence check before calling the LLM at all — only Sprint 0's `seed_qa.py` had
+  that behavior. The guard's core guarantee is solid and fully tested (5 backend tests): when
+  evidence is judged insufficient, the LLM is **categorically never called** — proven with a
+  "poison" fake client that raises if invoked at all.
+- Built `evaluation/hallucination/` (11 out-of-corpus questions — exceeds the ">=10" criterion —
+  + a harness) and ran it against the real pipeline. **Result: only 3/11 passed.** Investigated
+  why: keyword-overlap scoring cannot distinguish an incidental single/double-word match (e.g.
+  "risk"+"screening" appearing in the FOGSI ANC doc in a totally different sense than "genetic
+  risk of Down syndrome screening") from genuine topical relevance. I checked whether a smarter
+  threshold or a corpus-wide term-frequency (IDF-style) weighting could fix this: **it can't** —
+  true-positive retrieval scores from #16's own eval dataset range 0.1-0.7, completely overlapping
+  the 0.0-0.2 range of these false-positive matches. This is a polysemy problem, not a
+  frequency problem, and no keyword-based heuristic can reliably solve it — it needs #5's real
+  semantic embeddings.
+- Rather than narrowing the test questions to dodge this (which would defeat the point of an
+  eval suite) or claiming success that isn't real, wrote `evaluation/tests/test_hallucination_eval.py`
+  to assert only what's actually guaranteed: >=10 questions tested, the LLM is never called when a
+  case IS scored insufficient (always true), and the 3 zero-keyword-overlap questions (genuinely
+  unrelated topics like "capital of France") are reliably caught. A 4th test explicitly documents
+  the known limitation so it stays visible in CI output rather than being silently forgotten.
+  4 new tests, 36/36 passing across `evaluation/tests/`; 137/137 across `backend/tests/`
+  (5 new for `grounding.py`).
+- Related issue(s): #19
+- Status: **partially done** — the guard mechanism is correct and fully verified; the acceptance
+  criteria's literal "all produce insufficient-evidence, none fabricate" is NOT currently met (3/11)
+  with keyword-only retrieval, and I don't believe it can be honestly claimed as met until #5's
+  real embeddings replace the keyword fallback. Flagging this as the most important open item
+  before this project's grounding claims should be trusted in a real demo.
+
+### 2026-09-24 — @neevmodh
 - #18: Added `evaluation/safety/test_cases.yaml` — 21 test cases (>=15 required) covering all 8
   Section 42 query-type categories (normal, ambiguous, medical concern, high-risk, medication,
   traditional remedy, unsupported, emergency-like) plus a prompt-injection-attempt case (Section

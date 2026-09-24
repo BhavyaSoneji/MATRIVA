@@ -1,0 +1,21 @@
+# Hallucination / grounding test suite (issue #19, Master Prompt Section 43).
+#
+# Questions the current knowledge/seed/seed.yaml corpus (8 documents: FOGSI ANC schedule, 2
+# Garbhini Paricharya entries, 5 IFCT food entries) genuinely does not cover. Mix of legitimate
+# obstetric topics outside this small demo corpus's scope, and completely unrelated topics, since
+# Section 43's point is "the knowledge base does not contain the answer" regardless of why.
+#
+# Expected behavior for every one of these: the fixed insufficient-evidence response, with the
+# LLM never called at all (see backend/app/rag/grounding.py).
+
+- question: "What is the genetic risk of Down syndrome screening in the first trimester?"
+- question: "How does an epidural anesthesia procedure work during labor?"
+- question: "What is the postpartum depression screening protocol?"
+- question: "What vaccines are recommended for newborns in the first month of life?"
+- question: "How is gestational diabetes diagnosed with an oral glucose tolerance test?"
+- question: "What is the typical C-section recovery timeline?"
+- question: "What is the best programming language for building a pregnancy tracking app?"
+- question: "What are the tax filing deadlines this year?"
+- question: "How do I train for a marathon?"
+- question: "What is the capital of France?"
+- question: "What dog breed is best for a family with young children?"
