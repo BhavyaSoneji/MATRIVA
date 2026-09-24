@@ -13,12 +13,26 @@ from app.llm import groq_client
 from app.llm.groq_client import GenerationError, generate_from_packet
 from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
 from app.rag.context_packet import build_context_packet
+from app.rag.multi_domain import MULTI_DOMAIN_PROMPT_ADDENDUM
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
 _REQUEST = httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions")
 
 
 def make_packet():
     return build_context_packet("What should I eat?", [], safety_result={"risk_category": "SAFE_GENERAL"})
+
+
+def make_chunk(chunk_id: str, domain: Domain) -> KnowledgeChunk:
+    return KnowledgeChunk(
+        chunk_id=chunk_id,
+        document_id=f"doc-{chunk_id}",
+        source_id="src-1",
+        domain=domain,
+        evidence_level=EvidenceLevel.SUPPORTED,
+        content=f"content for {chunk_id}",
+        chunk_index=0,
+    )
 
 
 def make_response(content: str):
@@ -130,3 +144,37 @@ def test_non_retryable_api_status_error_fails_immediately() -> None:
     with pytest.raises(GenerationError, match="non-retryable"):
         generate_from_packet(make_packet(), client=client, max_retries=3)
     assert len(completions.calls) == 1  # no retry attempted
+
+
+def test_multi_domain_addendum_added_when_ayurveda_plus_other_domain_retrieved() -> None:
+    packet = build_context_packet(
+        "question",
+        [
+            (make_chunk("c1", Domain.AYURVEDA), 1.0),
+            (make_chunk("c2", Domain.NUTRITION), 0.9),
+        ],
+        safety_result={"risk_category": "SAFE_GENERAL"},
+    )
+    completions = FakeCompletions(responses=[make_response("answer")])
+    client = FakeClient(completions)
+
+    generate_from_packet(packet, client=client)
+
+    system_message = completions.calls[0]["messages"][0]["content"]
+    assert MULTI_DOMAIN_PROMPT_ADDENDUM in system_message
+
+
+def test_no_multi_domain_addendum_when_single_domain_retrieved() -> None:
+    packet = build_context_packet(
+        "question",
+        [(make_chunk("c1", Domain.NUTRITION), 1.0)],
+        safety_result={"risk_category": "SAFE_GENERAL"},
+    )
+    completions = FakeCompletions(responses=[make_response("answer")])
+    client = FakeClient(completions)
+
+    generate_from_packet(packet, client=client)
+
+    system_message = completions.calls[0]["messages"][0]["content"]
+    assert MULTI_DOMAIN_PROMPT_ADDENDUM not in system_message
+    assert system_message == SOURCE_GROUNDED_SYSTEM_PROMPT

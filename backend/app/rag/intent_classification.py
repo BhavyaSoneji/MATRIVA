@@ -18,6 +18,8 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Any
 
+from app.rag.keyword_search import contains_phrase
+
 
 class ChatIntent(StrEnum):
     NUTRITION = "NUTRITION"
@@ -81,8 +83,7 @@ _GENERAL_KEYWORDS = ["pregnant", "pregnancy", "expecting a baby", "hello", "hi t
 
 
 def _score(query: str, keywords: list[str]) -> int:
-    lowered = query.lower()
-    return sum(1 for kw in keywords if kw in lowered)
+    return sum(1 for kw in keywords if contains_phrase(query, kw))
 
 
 def classify_intent(query: str, safety_result: dict[str, Any] | None = None) -> ChatIntent:

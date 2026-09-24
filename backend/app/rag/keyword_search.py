@@ -19,3 +19,13 @@ def tokenize(text: str) -> set[str]:
 
 def keyword_overlap_score(query: str, text: str) -> int:
     return len(tokenize(query) & tokenize(text))
+
+
+def contains_phrase(text: str, phrase: str) -> bool:
+    """Word-boundary substring match: `phrase` must appear as whole words in
+    `text`, not as a raw substring. Prevents false positives like "eat"
+    matching inside "weather" (plain `phrase in text` would wrongly match).
+    Works for both single words and multi-word phrases.
+    """
+    pattern = r"\b" + re.escape(phrase.lower()) + r"\b"
+    return re.search(pattern, text.lower()) is not None

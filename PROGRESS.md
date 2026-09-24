@@ -20,6 +20,37 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #58: Added `backend/app/rag/multi_domain.py` — `detect_domains(query)` (multi-label domain
+  detection across all 5 domains, unlike #57's single-label intent classifier), feeding
+  `multi_domain_retrieval_filter(query)` into #6's `hybrid_retrieve` domain filter. On the
+  generation side, `requires_segmentation(evidence_domains)` detects when retrieved evidence
+  spans both AYURVEDA and a non-Ayurveda domain, and `groq_client.generate_from_packet` (#9) now
+  appends a `MULTI_DOMAIN_PROMPT_ADDENDUM` to the system prompt in that case, instructing the LLM
+  to separate MODERN MEDICAL INFORMATION / TRADITIONAL/AYURVEDIC INFORMATION / EVIDENCE STATUS
+  rather than blending them (Section 31). `validate_segmentation(response)` is a structural
+  post-check confirming the required headers actually appear.
+- **Found and fixed a real substring-matching bug while testing this** — naive `phrase in text`
+  matching let "eat" (a NUTRITION keyword) match inside "weather" ("wEATher"), misclassifying "What's
+  the weather like today?" as a NUTRITION-domain query. Added `contains_phrase()` (word-boundary
+  regex) to `keyword_search.py` and switched both `intent_classification.py` (#57) and
+  `multi_domain.py` to use it.
+- **Same bug existed in #67's safety pre-check** — "fits" (a convulsions red-flag) would match
+  inside "benefits" or "outfits", incorrectly escalating ordinary questions like "what are the
+  benefits of prenatal yoga" to the urgent-care fallback. Fixed `pre_check.py` with its own
+  local word-boundary helper (kept it self-contained rather than importing from `app.rag`, per
+  Section 19's "safety MUST be an independent module"). Also added `backend/tests/test_pre_check.py`
+  — #67 had never had a real pytest file, only the ad hoc `__main__` demo script.
+- 23 new tests (7 pre_check, 12 multi_domain, plus 2 new groq_client segmentation-trigger tests).
+  85/85 passing across `backend/tests/`.
+- Related issue(s): #58 (also touches #57, #67)
+- Status: done
+- Notes: worth a wider audit — any other keyword-matching code added this sprint could have the
+  same class of bug if it used plain `in` substring checks instead of `contains_phrase`. I checked
+  `keyword_search.tokenize`-based matching (word-set based, not substring, so unaffected) and the
+  new #10/#11 modules (no raw substring keyword matching there). This closes out all of my
+  currently-scoped M2 rag-ai issues except the safety (#12-#15) and evaluation (#16-#20) tracks.
+
+### 2026-09-24 — @neevmodh
 - #57: Added `backend/app/rag/intent_classification.py` — `classify_intent(query, safety_result)`,
   a keyword-based classifier over all 14 Section 30 categories (NUTRITION, EXERCISE, LIFESTYLE,
   MENTAL_WELLBEING, ANTENATAL_CARE, PREGNANCY_DEVELOPMENT, AYURVEDA, TRADITIONAL_PRACTICE, FOOD,

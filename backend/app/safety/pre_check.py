@@ -51,6 +51,12 @@ def _normalize(text: str) -> str:
     return re.sub(r"\s+", " ", text.lower()).strip()
 
 
+def _contains_phrase(text: str, phrase: str) -> bool:
+    """Word-boundary match so a short phrase like "fits" doesn't false-
+    positive inside an unrelated word like "benefits" or "outfits"."""
+    return re.search(r"\b" + re.escape(phrase) + r"\b", text) is not None
+
+
 def precheck(query: str) -> dict[str, Any]:
     """Run the thin safety pre-check on a raw user query.
 
@@ -69,7 +75,7 @@ def precheck(query: str) -> dict[str, Any]:
     matched = [
         category
         for category, phrases in RED_FLAGS.items()
-        if any(phrase in normalized for phrase in phrases)
+        if any(_contains_phrase(normalized, phrase) for phrase in phrases)
     ]
 
     if matched:
