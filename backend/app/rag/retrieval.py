@@ -34,6 +34,12 @@ KEYWORD_WEIGHT = 0.1  # small boost relative to vector similarity, not a replace
 class RetrievalResult:
     chunks: list[tuple[KnowledgeChunk, float]]
     used_fallback: bool
+    # "keyword" scores are word-overlap counts (0 for zero overlap); "vector"
+    # scores are cosine similarities, which are rarely exactly 0 even for
+    # unrelated text. #19's grounding guard needs to know which mode
+    # produced these scores, since a fixed "> 0.0" threshold that's correct
+    # for keyword scoring silently stops working for vector scoring.
+    scoring_mode: str = "keyword"
 
 
 def apply_metadata_filters(
@@ -88,9 +94,11 @@ def hybrid_retrieve(
     """
     if vector_store is not None and query_embedding is not None:
         pool = vector_store.query(query_embedding, k=pool_size)
+        scoring_mode = "vector"
     elif candidate_chunks is not None:
         scores = candidate_scores or {}
         pool = [(chunk, float(scores.get(chunk.chunk_id, 0.0))) for chunk in candidate_chunks]
+        scoring_mode = "keyword"
     else:
         raise ValueError("Provide either (vector_store + query_embedding) or candidate_chunks")
 
@@ -114,7 +122,9 @@ def hybrid_retrieve(
         result_pool = scored
 
     result_pool.sort(key=lambda pair: pair[1], reverse=True)
-    return RetrievalResult(chunks=result_pool[:k], used_fallback=used_fallback)
+    return RetrievalResult(
+        chunks=result_pool[:k], used_fallback=used_fallback, scoring_mode=scoring_mode
+    )
 
 
 # --- SQLAlchemy/API retrieval adapter -------------------------------------

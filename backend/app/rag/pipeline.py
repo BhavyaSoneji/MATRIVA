@@ -29,11 +29,19 @@ from app.llm.generator import GenerationResult, generate_grounded_answer
 from app.llm.groq_client import Groq, generate_from_packet
 from app.rag.context_packet import ContextPacket, build_context_packet
 from app.rag.grounding import INSUFFICIENT_EVIDENCE_RESPONSE, has_sufficient_evidence
-from app.rag.multi_domain import multi_domain_retrieval_filter
+from app.rag.multi_domain import (
+    multi_domain_retrieval_filter,
+    requires_segmentation,
+    validate_segmentation,
+)
 from app.rag.reranking import UserContext, rerank
 from app.rag.retrieval import RetrievedChunk, hybrid_retrieve, retrieve_chunks
 from app.safety.classifier import SafetyClassification, classify
-from app.safety.post_check import PostCheckReport, validate_and_finalize
+from app.safety.post_check import (
+    SAFE_FALLBACK_RESPONSE,
+    PostCheckReport,
+    validate_and_finalize,
+)
 from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk, SourceType
 
 DEFAULT_K = 5
@@ -94,7 +102,7 @@ def answer_query(
     # relevance, so a reranked score is never exactly 0 even for a
     # completely unrelated query -- checking sufficiency post-rerank would
     # make the Section 43 grounding gate never trigger at all.
-    if not has_sufficient_evidence(retrieval.chunks):
+    if not has_sufficient_evidence(retrieval.chunks, scoring_mode=retrieval.scoring_mode):
         packet = build_context_packet(query, [], safety_result=safety_result_dict)
         return PipelineResult(
             query=query,
@@ -105,9 +113,28 @@ def answer_query(
         )
 
     reranked = rerank(retrieval.chunks, profile)
-    packet = build_context_packet(query, reranked, safety_result=safety_result_dict)
+    packet = build_context_packet(
+        query, reranked, safety_result=safety_result_dict, user_context=profile
+    )
 
     raw_answer = generate_from_packet(packet, client=client)
+
+    # Section 31: if the retrieved evidence spans AYURVEDA + another domain,
+    # the response MUST actually separate MODERN/TRADITIONAL/EVIDENCE STATUS
+    # sections -- groq_client only asks the LLM to do this via a prompt
+    # addendum, so this is the check that verifies compliance rather than
+    # trusting the model. Fail closed, same as every other check here.
+    if requires_segmentation(packet.evidence_summary.domains) and not validate_segmentation(
+        raw_answer
+    ).is_segmented:
+        return PipelineResult(
+            query=query,
+            safety_result=safety_result,
+            short_circuited=False,
+            answer=SAFE_FALLBACK_RESPONSE,
+            context_packet=packet,
+        )
+
     citation_result = validate_citations_against_packet(raw_answer, packet)
     final_answer, post_check_report = validate_and_finalize(raw_answer, packet, safety_result)
 

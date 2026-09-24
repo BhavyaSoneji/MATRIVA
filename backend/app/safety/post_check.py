@@ -62,16 +62,25 @@ class PostCheckReport:
     details: dict[str, list[str]] = field(default_factory=dict)
 
 
+_SENTENCE_SPLIT_RE = re.compile(r"(?<=[.!?])\s+")
+_CITATION_MARKER_RE = re.compile(r"\[([A-Za-z0-9_\-]+)\]")
+
+
 def detect_unsupported_medical_claims(response: str, context_packet: ContextPacket) -> list[str]:
-    """Flags medical-claim-shaped language with zero verified citations
-    backing it -- a claim asserted with no grounding at all."""
-    claim_hits = _contains_any(response, _MEDICAL_CLAIM_PHRASES)
-    if not claim_hits:
-        return []
-    citation_result = validate_citations_against_packet(response, context_packet)
-    if not citation_result.verified_citation_ids:
-        return claim_hits
-    return []
+    """Flags medical-claim-shaped language with no verified citation backing
+    THAT specific claim. Checked per-sentence, not against the response as a
+    whole -- a citation anywhere in the response must not be allowed to
+    excuse an unrelated, uncited claim elsewhere in the same response."""
+    verified_ids = set(validate_citations_against_packet(response, context_packet).verified_citation_ids)
+    hits: list[str] = []
+    for sentence in _SENTENCE_SPLIT_RE.split(response):
+        claim_hits = _contains_any(sentence, _MEDICAL_CLAIM_PHRASES)
+        if not claim_hits:
+            continue
+        sentence_citation_ids = set(_CITATION_MARKER_RE.findall(sentence))
+        if not (sentence_citation_ids & verified_ids):
+            hits.extend(claim_hits)
+    return hits
 
 
 def detect_dangerous_recommendations(response: str) -> list[str]:
@@ -80,18 +89,29 @@ def detect_dangerous_recommendations(response: str) -> list[str]:
     return _contains_any(response, _DANGEROUS_RECOMMENDATION_PHRASES)
 
 
+# HIGH_RISK/URGENT_ESCALATION never reach this check in practice -- #12's
+# classifier short-circuits before generation for those (pipeline.py never
+# calls run_post_check on them). MEDICAL_REVIEW is the category that
+# actually DOES proceed to generation and still needs escalation language
+# (Section 20's prose: medication/contraindication/diagnosis questions
+# "require professional medical attention"), so it must be included here or
+# this check is silently unreachable dead code.
+_CATEGORIES_REQUIRING_ESCALATION = (
+    RiskCategory.HIGH_RISK,
+    RiskCategory.URGENT_ESCALATION,
+    RiskCategory.MEDICAL_REVIEW,
+)
+
+
 def detect_missing_escalation(
     response: str, pre_check_result: SafetyClassification | None
 ) -> bool:
-    """If the pre-check flagged HIGH_RISK/URGENT_ESCALATION, the response
-    must actually contain escalation language -- returns True (problem) if
-    escalation was required but absent."""
+    """If the pre-check flagged a category requiring professional guidance,
+    the response must actually contain escalation language -- returns True
+    (problem) if escalation was required but absent."""
     if pre_check_result is None:
         return False
-    if pre_check_result.risk_category not in (
-        RiskCategory.HIGH_RISK,
-        RiskCategory.URGENT_ESCALATION,
-    ):
+    if pre_check_result.risk_category not in _CATEGORIES_REQUIRING_ESCALATION:
         return False
     return not _contains_any(response, _ESCALATION_LANGUAGE)
 

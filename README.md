@@ -11,6 +11,7 @@ to professional medical care instead of answering them as ordinary wellness ques
 
 Full implementation spec: [`Master Prompt.txt`](./Master%20Prompt.txt)
 Full feature list: [`docs/FEATURES.md`](./docs/FEATURES.md)
+Government guidance & policy alignment: [`docs/COMPLIANCE.md`](./docs/COMPLIANCE.md)
 Live progress log: [`PROGRESS.md`](./PROGRESS.md)
 
 ---

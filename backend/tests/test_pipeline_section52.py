@@ -101,7 +101,13 @@ class PoisonClient:
 
 # TEST 1: General pregnancy information
 def test_1_general_pregnancy_information() -> None:
-    client = FakeClient("Eat a balanced diet [src-second-tri].")
+    # This tiny 5-chunk CORPUS at k=5 always retrieves the Ayurveda chunk
+    # too, so segmentation is required for every query against it -- the
+    # fake response must include the required headers, same as test_6.
+    client = FakeClient(
+        "MODERN MEDICAL INFORMATION\nEat a balanced diet [src-second-tri].\n\n"
+        "TRADITIONAL/AYURVEDIC INFORMATION\n...\n\nEVIDENCE STATUS\n..."
+    )
     result = answer_query("What should I generally eat during pregnancy?", candidate_chunks=CORPUS, client=client)
     assert not result.short_circuited
     assert result.citation_result.is_clean
@@ -122,7 +128,11 @@ def test_2_stage_specific_question() -> None:
 
 # TEST 3: Dietary preference
 def test_3_dietary_preference() -> None:
-    client = FakeClient("Moong dal and paneer are good vegetarian protein sources [src-vegetarian].")
+    client = FakeClient(
+        "MODERN MEDICAL INFORMATION\n...\n\nTRADITIONAL/AYURVEDIC INFORMATION\n"
+        "Moong dal and paneer are good vegetarian protein sources [src-vegetarian].\n\n"
+        "EVIDENCE STATUS\n..."
+    )
     result = answer_query("What vegetarian protein sources are good during pregnancy?", candidate_chunks=CORPUS, client=client)
     assert not result.short_circuited
     assert result.citation_result.verified_citation_ids
@@ -237,3 +247,39 @@ def test_12_no_relevant_retrieval_result() -> None:
     )
     assert result.answer == INSUFFICIENT_EVIDENCE_RESPONSE
     assert result.context_packet is not None
+
+
+# --- regression tests for code-review findings --------------------------------
+
+def test_profile_is_actually_forwarded_to_the_llm_prompt() -> None:
+    """Regression: profile was passed to rerank() (affecting ranking only)
+    but never to build_context_packet()'s user_context, so the LLM prompt's
+    USER CONTEXT section silently stayed empty regardless of what profile
+    the caller supplied."""
+    client = FakeClient(
+        "MODERN MEDICAL INFORMATION\n...\n\nTRADITIONAL/AYURVEDIC INFORMATION\n...\n\nEVIDENCE STATUS\n..."
+    )
+    result = answer_query(
+        "What should I generally eat during pregnancy?",
+        candidate_chunks=CORPUS,
+        profile=UserContext(pregnancy_stage="second_trimester", region="Gujarat"),
+        client=client,
+    )
+    assert result.context_packet.user_context["pregnancy_stage"] == "second_trimester"
+    assert result.context_packet.user_context["region"] == "Gujarat"
+
+
+def test_response_without_required_segmentation_headers_is_replaced_with_fallback() -> None:
+    """Regression: validate_segmentation() existed but was never called
+    anywhere -- a blended, unsegmented response for a multi-domain query
+    would pass straight through to the user."""
+    from app.safety.post_check import SAFE_FALLBACK_RESPONSE
+
+    unsegmented_client = FakeClient("Ghee and moong dal are both fine to eat during pregnancy.")
+    result = answer_query(
+        "What does Ayurveda say about pregnancy diet?",
+        candidate_chunks=CORPUS,
+        client=unsegmented_client,
+    )
+    assert result.answer != "Ghee and moong dal are both fine to eat during pregnancy."
+    assert result.answer == SAFE_FALLBACK_RESPONSE

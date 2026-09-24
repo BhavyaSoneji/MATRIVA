@@ -167,11 +167,14 @@ def _check_pregnancy_relevance(document: KnowledgeDocument) -> CheckResult:
 def _check_safety_relevance(document: KnowledgeDocument) -> CheckResult:
     # If content mentions an obstetric danger sign (#67's red-flag list) but
     # isn't tagged, flag it -- a reviewer should confirm the safety_tags.
+    # Word-boundary matching, not plain substring: "fits" (convulsions) must
+    # not match inside "benefits"/"outfits" -- the exact false-positive bug
+    # already fixed in classifier.py/pre_check.py/prompt_injection.py.
     normalized = normalize_for_hash(document.content)
     matched = [
         category
         for category, phrases in RED_FLAGS.items()
-        if any(phrase in normalized for phrase in phrases)
+        if any(re.search(r"\b" + re.escape(phrase) + r"\b", normalized) for phrase in phrases)
     ]
     if not matched:
         return CheckResult("safety_relevance", Severity.WARN, True, "no danger-sign terms found")

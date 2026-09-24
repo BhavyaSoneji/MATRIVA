@@ -24,19 +24,33 @@ INSUFFICIENT_EVIDENCE_RESPONSE = (
     "I don't have enough evidence in the available knowledge base to answer that reliably."
 )
 
-# 0.0 is the right threshold for keyword-overlap scoring (#6's fallback path
-# when no live embeddings are available): a score of exactly 0 means no
-# keyword overlap at all. Once #5's real embeddings are wired into
-# hybrid_retrieve's vector path, this threshold should be revisited --
-# cosine similarity scores are rarely exactly 0 for unrelated text, so a
-# small positive threshold would likely be needed instead.
+# 0.0 is the right threshold for "keyword" scoring (#6's fallback path when
+# no live embeddings are available): a score of exactly 0 means no keyword
+# overlap at all. It is NOT a safe default for "vector" scoring -- cosine
+# similarity is rarely exactly 0 for unrelated text, so this threshold would
+# silently stop guarding anything once real embeddings are wired in.
+# DEFAULT_MIN_SCORE_BY_MODE keys off #6's RetrievalResult.scoring_mode so the
+# right threshold is picked automatically instead of relying on every caller
+# to remember to override it.
 DEFAULT_MIN_SCORE = 0.0
+_VECTOR_MIN_SCORE = 0.75  # cosine similarity floor; revisit once real embeddings are live and this can be tuned against actual data
+DEFAULT_MIN_SCORE_BY_MODE = {"keyword": DEFAULT_MIN_SCORE, "vector": _VECTOR_MIN_SCORE}
 
 
 def has_sufficient_evidence(
-    scored_chunks: list[tuple[KnowledgeChunk, float]], min_score: float = DEFAULT_MIN_SCORE
+    scored_chunks: list[tuple[KnowledgeChunk, float]],
+    min_score: float | None = None,
+    scoring_mode: str = "keyword",
 ) -> bool:
-    """True if at least one retrieved chunk clears the relevance bar."""
+    """True if at least one retrieved chunk clears the relevance bar.
+
+    `scoring_mode` picks the right default threshold ("keyword" vs "vector",
+    see DEFAULT_MIN_SCORE_BY_MODE) -- pass #6's RetrievalResult.scoring_mode
+    here rather than relying on the keyword-only default. `min_score`
+    overrides the mode-based default explicitly when given.
+    """
+    if min_score is None:
+        min_score = DEFAULT_MIN_SCORE_BY_MODE.get(scoring_mode, DEFAULT_MIN_SCORE)
     return any(score > min_score for _chunk, score in scored_chunks)
 
 
@@ -44,13 +58,14 @@ def generate_or_insufficient_evidence(
     context_packet: ContextPacket,
     scored_chunks: list[tuple[KnowledgeChunk, float]],
     *,
-    min_score: float = DEFAULT_MIN_SCORE,
+    min_score: float | None = None,
+    scoring_mode: str = "keyword",
     client: Groq | None = None,
     **generate_kwargs,
 ) -> str:
     """Section 43's guarantee: if evidence is insufficient, return the fixed
     response WITHOUT calling the LLM at all -- the model never gets a chance
     to fill the gap from general knowledge."""
-    if not has_sufficient_evidence(scored_chunks, min_score=min_score):
+    if not has_sufficient_evidence(scored_chunks, min_score=min_score, scoring_mode=scoring_mode):
         return INSUFFICIENT_EVIDENCE_RESPONSE
     return generate_from_packet(context_packet, client=client, **generate_kwargs)

@@ -32,7 +32,7 @@ from app.rag.context_packet import ContextPacket
 from app.rag.multi_domain import MULTI_DOMAIN_PROMPT_ADDENDUM, requires_segmentation
 from app.safety.prompt_injection import INJECTION_DEFENSE_ADDENDUM
 
-DEFAULT_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_MODEL = "openai/gpt-oss-120b"
 DEFAULT_TIMEOUT_SECONDS = 30.0
 DEFAULT_MAX_RETRIES = 3
 RETRY_BACKOFF_SECONDS = 1.0
@@ -92,6 +92,8 @@ def generate_from_packet(
                 messages=messages,  # type: ignore[arg-type]  # plain dicts match the SDK's TypedDict shape at runtime
                 temperature=temperature,
             )
+            if not completion.choices:
+                raise GenerationError("Groq response had no choices (empty response)")
             content = completion.choices[0].message.content
             if content is None:
                 raise GenerationError("Groq response had no content (empty choice)")

@@ -165,3 +165,34 @@ def test_missing_escalation_triggers_fallback_via_validate_and_finalize() -> Non
     result, report = validate_and_finalize("Just take it easy, nothing to worry about.", packet, pre_check)
     assert result == SAFE_FALLBACK_RESPONSE
     assert "missing_escalation" in report.failed_checks
+
+
+# --- regression tests for code-review findings --------------------------------
+
+def test_medical_review_category_also_requires_escalation_language() -> None:
+    """Regression: detect_missing_escalation was structurally unreachable
+    because pipeline.py only ever calls run_post_check for categories other
+    than HIGH_RISK/URGENT_ESCALATION (those short-circuit earlier). It must
+    cover MEDICAL_REVIEW too, since that's the category that actually
+    reaches this check in practice."""
+    pre_check = SafetyClassification(risk_category=RiskCategory.MEDICAL_REVIEW)
+    assert detect_missing_escalation("Here is some general advice about diet.", pre_check) is True
+    assert detect_missing_escalation("Please consult your doctor about this.", pre_check) is False
+
+
+def test_citation_for_one_claim_does_not_excuse_an_uncited_claim_elsewhere() -> None:
+    """Regression: a verified citation anywhere in the response must not
+    excuse a DIFFERENT, uncited claim elsewhere in the same response."""
+    chunk = make_chunk("c1")
+    packet = make_packet([chunk])
+    response = "Studies show prenatal yoga is beneficial [c1]. You have anemia and this will cure it immediately."
+    hits = detect_unsupported_medical_claims(response, packet)
+    assert hits  # the second, uncited sentence must still be flagged
+
+
+def test_claim_sentence_with_its_own_citation_is_not_flagged() -> None:
+    chunk = make_chunk("c1")
+    packet = make_packet([chunk])
+    response = "Studies show prenatal yoga is beneficial [c1]. You have improved flexibility from yoga [c1]."
+    hits = detect_unsupported_medical_claims(response, packet)
+    assert hits == []

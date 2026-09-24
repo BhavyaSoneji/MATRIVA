@@ -112,8 +112,13 @@ def build_context_packet(
     for chunk, _score in scored_chunks:
         chunk_tokens = _token_count(chunk.content)
         if included and running_tokens + chunk_tokens > max_tokens:
+            # Stop entirely rather than skipping past this chunk to check
+            # smaller ones further down the ranking -- scored_chunks is
+            # best-first, so once one doesn't fit, every remaining chunk is
+            # lower-ranked and must be dropped too, per this function's own
+            # "drop lowest-ranked first" contract.
             truncated = True
-            continue
+            break
         running_tokens += chunk_tokens
         included.append(
             SourceEntry(
