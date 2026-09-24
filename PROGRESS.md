@@ -19,6 +19,23 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-09-24 — @neevmodh
+- #65: Added `knowledge/seed/seed.yaml` — 1 FOGSI/WHO ANC-schedule excerpt, 2 Garbhini Paricharya
+  entries, 5 IFCT food entries, in the real schema shape (issue #1 fields)
+- #66: Added `backend/app/rag/seed_qa.py` — `answer_question(query)` does keyword-overlap
+  retrieval over the seed file + Groq call with the Section 58 source-grounded prompt, returns
+  `{answer, sources[], evidence_label}`; callable by Bhavya's `/chat` (#69)
+- Related issue(s): #65, #66
+- Status: in-progress
+- Notes: the Ayurveda source PDF (`knowledge/ayurveda/Prasuti-Tantra...pdf`) is a scanned image
+  with no text layer, so I could not pull verbatim verses from it. The 2 Garbhini Paricharya
+  entries use the standard Charaka Samhita Sharirasthana Ch.8 teaching (no invented citations)
+  but are flagged `review_status: PENDING_CLINICAL_REVIEW` — **do not surface them in the demo
+  or submission doc until #75 (Clinical Lead sign-off) closes.** IFCT nutrient values are
+  approximate and flagged `PENDING_SOURCE_VERIFICATION` — verify against the actual IFCT 2017
+  tables before using them in anything client-facing. `seed_qa.py` needs `LLM_API_KEY` (or
+  `GROQ_API_KEY`) set to actually call Groq; retrieval-only path was tested without a key.
+
 ### 2026-09-23 — @neevmodh
 - URGENT — Health-a-thon 2026 Round 1 is due **Sep 25** (not the full MVP, but written solution
   concept + methodology; real MVP is Nov 8 after shortlist). Track = Maternal & Women's Health,

@@ -1,0 +1,193 @@
+# Hand-curated seed knowledge set for Health-a-thon Round 1 (issue #65).
+#
+# Field shape matches the real knowledge document schema (issue #1 / Master Prompt Section 9)
+# so this drops into the real ingestion pipeline later without rework:
+# document_id, title, content, domain, subdomain, source_id, source_type, publication_date,
+# version, language, region, pregnancy_stage, topic, evidence_level, review_status,
+# reviewed_by, reviewed_at, safety_tags.
+#
+# review_status values used here:
+#   ESTABLISHED_INTERNAL   - matches the schedule/spec the team already committed to in docs/
+#   PENDING_SOURCE_VERIFICATION - factual claim not yet checked against the primary document
+#   PENDING_CLINICAL_REVIEW - traditional/Ayurvedic content awaiting Clinical Lead sign-off (#75)
+#
+# Do NOT surface any PENDING_CLINICAL_REVIEW entry in the demo or submission doc until #75 closes.
+
+- document_id: seed-anc-fogsi-001
+  title: "FOGSI/WHO 8-Contact Antenatal Care Visit Schedule"
+  content: >
+    The FOGSI Good Clinical Practice Recommendations (GCPR) adopt the WHO 2016 antenatal-care
+    model of a minimum of 8 contacts across pregnancy, scheduled at gestational weeks:
+    12, 20, 26, 30, 34, 36, 38, 40, and 41. Each contact includes weight/BP checks, fetal growth
+    assessment, and screening appropriate to gestational age; earlier initiation (by week 12)
+    is associated with better identification of risk factors.
+  domain: MODERN_MEDICAL
+  subdomain: antenatal_care
+  source_id: fogsi-gcpr
+  source_type: medical_guideline
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: anc_visit_schedule
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: seed-ayurveda-garbhini-001
+  title: "Garbhini Paricharya - General Regimen Principle (Charaka Samhita, Sharirasthana Ch.8)"
+  content: >
+    Charaka Samhita's Garbhini Paricharya (antenatal regimen) teaches a month-wise (masanumasika)
+    approach to a pregnant woman's diet and conduct, generally advising avoidance of physical and
+    mental strain, and dietary support (including ghee and milk) in later months to support the
+    strength (bala) of mother and fetus.
+  domain: AYURVEDA
+  subdomain: garbhini_paricharya
+  source_id: charaka-samhita-sharirasthana-8
+  source_type: ayurvedic_classical_source
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: traditional_antenatal_regimen
+  evidence_level: TRADITIONAL
+  review_status: PENDING_CLINICAL_REVIEW
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [requires_clinical_review]
+
+- document_id: seed-ayurveda-garbhini-002
+  title: "Garbhini Paricharya - Second Trimester Dietary Emphasis (Charaka Samhita, Sharirasthana Ch.8)"
+  content: >
+    Classical Ayurvedic teaching for the second trimester (roughly months 4-6) emphasizes
+    nourishing, easily digestible food with adequate ghee/milk to support fetal growth and
+    maternal strength, alongside calm routine and avoidance of excessive exertion.
+  domain: AYURVEDA
+  subdomain: garbhini_paricharya
+  source_id: charaka-samhita-sharirasthana-8
+  source_type: ayurvedic_classical_source
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: second_trimester
+  topic: traditional_antenatal_regimen
+  evidence_level: TRADITIONAL
+  review_status: PENDING_CLINICAL_REVIEW
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [requires_clinical_review]
+
+- document_id: seed-ifct-moong-dal-001
+  title: "Moong Dal (Green Gram, split) - Nutrient Profile"
+  content: >
+    Approximate values per 100g edible portion: protein ~24g, iron ~4mg, folate present.
+    A commonly recommended pregnancy-friendly source of vegetarian protein and folate in
+    Indian diets.
+  domain: NUTRITION
+  subdomain: legumes
+  source_id: ifct-2017
+  source_type: nutrition_reference
+  publication_date: "2017"
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: protein_folate_source
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: seed-ifct-ragi-001
+  title: "Ragi (Finger Millet) - Nutrient Profile"
+  content: >
+    Approximate values per 100g: calcium ~340mg, one of the highest calcium contents among
+    commonly eaten Indian grains, along with iron and dietary fiber. Frequently recommended
+    during pregnancy for calcium intake.
+  domain: NUTRITION
+  subdomain: grains_millets
+  source_id: ifct-2017
+  source_type: nutrition_reference
+  publication_date: "2017"
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: calcium_source
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: seed-ifct-palak-001
+  title: "Palak (Spinach) - Nutrient Profile"
+  content: >
+    Approximate values per 100g: iron ~2.7mg, folate present, vitamin A present. Commonly
+    recommended leafy green for iron and folate during pregnancy; best paired with a
+    vitamin-C source to improve iron absorption.
+  domain: NUTRITION
+  subdomain: leafy_greens
+  source_id: ifct-2017
+  source_type: nutrition_reference
+  publication_date: "2017"
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: iron_folate_source
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: seed-ifct-toned-milk-001
+  title: "Toned Milk - Nutrient Profile"
+  content: >
+    Approximate values per 100ml: protein ~3g, calcium ~120mg. Standard calcium and protein
+    source recommended across all trimesters in Indian dietary guidance, including within
+    the Ayurvedic Garbhini Paricharya tradition.
+  domain: NUTRITION
+  subdomain: dairy
+  source_id: ifct-2017
+  source_type: nutrition_reference
+  publication_date: "2017"
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: calcium_protein_source
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: seed-ifct-banana-001
+  title: "Banana - Nutrient Profile"
+  content: >
+    Approximate values per 100g: potassium ~360mg, carbohydrate ~27g. Commonly recommended
+    as an easily digestible energy source and for managing pregnancy-related constipation
+    due to fiber content.
+  domain: NUTRITION
+  subdomain: fruits
+  source_id: ifct-2017
+  source_type: nutrition_reference
+  publication_date: "2017"
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: energy_fiber_source
+  evidence_level: ESTABLISHED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
