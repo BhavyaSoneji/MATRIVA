@@ -20,6 +20,39 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #12: Added `backend/app/safety/classifier.py` — `classify(query)`, the full Section 19/20 safety
+  classifier: 8 detection categories (emergency symptoms, dangerous requests, high-risk pregnancy
+  context, treatment-change requests, replace-professional-advice requests, medication questions,
+  contraindication questions, diagnosis requests) mapped to the 6 risk categories (SAFE_GENERAL,
+  LOW_CONCERN, MEDICAL_REVIEW, HIGH_RISK, URGENT_ESCALATION, INSUFFICIENT_INFORMATION), checked
+  most-severe-first so an emergency symptom always outranks a milder match. `requires_short_circuit`
+  is True only for HIGH_RISK/URGENT_ESCALATION per the acceptance criteria — MEDICAL_REVIEW/
+  LOW_CONCERN still proceed to RAG with the classification available for caveats. Supersedes #67's
+  thin version for production; kept #67 intact in case anything's already wired to it.
+- 15 new tests: one per detection category, the short-circuit routing contract for all 6 risk
+  categories, a word-boundary regression (reused #58's "fits"/"benefits" lesson), and a priority
+  test confirming higher severity wins when a query matches multiple categories.
+- **Found and fixed 2 more real bugs while writing this:** (1) `_contains_phrase` never lowercased
+  the input query, so "Can I take ibuprofen" wouldn't match lowercase keyword "can i take" at all
+  — classifier was silently under-triggering. (2) mypy caught a real pre-existing latent bug in
+  `app/core/config.py` (`Settings()` called with no args despite `database_url` having no default)
+  that had been invisible because `pydantic-settings` wasn't installed in this environment before
+  today's live-pgvector work, so mypy treated it as untyped `Any` and never actually checked it.
+  Fixed by enabling the `pydantic.mypy` plugin in `backend/mypy.ini` so mypy understands
+  `BaseSettings` subclasses load fields from env vars, not constructor args.
+- 100/100 tests passing across `backend/tests/`, ruff + mypy clean.
+- Related issue(s): #12
+- Status: done
+- Notes: same clinical-thresholds caveat as #67 — every phrase list is illustrative, drawn from
+  standard published guidance, not clinically validated. Flagged `PENDING_CLINICAL_REVIEW`,
+  needs Clinical Lead sign-off (#75) before production use. One design tension worth a second
+  look: Section 20's prose suggests medication/contraindication/diagnosis questions
+  (MEDICAL_REVIEW) might also warrant short-circuiting ("do not continue as a normal
+  recommendation query"), but issue #12's acceptance criteria explicitly scopes short-circuiting
+  to HIGH_RISK/URGENT_ESCALATION only — I followed the concrete acceptance criteria, flagging the
+  tension rather than silently picking an interpretation. Next: #13 (safety post-check validator).
+
+### 2026-09-24 — @neevmodh
 - #5 follow-up: **ran the live pgvector verification that was previously flagged as untested.**
   Docker is now running in this environment, so I spun up a standalone temporary Postgres+pgvector
   container (port 5433, NOT the shared `docker-compose.yml` service — port 5432 was already taken

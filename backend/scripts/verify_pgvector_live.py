@@ -23,12 +23,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy.orm import sessionmaker  # noqa: E402
+from sqlalchemy.orm import sessionmaker
 
-from app.core.db import Base, engine  # noqa: E402
-from app.models.knowledge import KnowledgeChunkRecord  # noqa: E402
-from app.rag.vector_store import PgVectorStore  # noqa: E402
-from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk  # noqa: E402
+from app.core.db import Base, engine
+from app.models.knowledge import KnowledgeChunkRecord
+from app.rag.vector_store import PgVectorStore
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
 
 def make_chunk(chunk_id: str, document_id: str) -> KnowledgeChunk:
