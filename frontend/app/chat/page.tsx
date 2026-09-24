@@ -31,6 +31,7 @@ const SUGGESTED_QUESTIONS = [
 ];
 
 const URGENT_STATUSES = new Set(["high_risk", "urgent_escalation"]);
+const CONVERSATION_STORAGE_KEY = "matriva.conversationId";
 
 function ChatContent() {
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
@@ -41,10 +42,18 @@ function ChatContent() {
   const [error, setError] = React.useState<string | null>(null);
   const bottomRef = React.useRef<HTMLDivElement>(null);
 
+  // GET /chat/history requires a conversation_id -- there is no "list my
+  // conversations" endpoint, so history can only be resumed for a
+  // conversation this browser has already started (persisted below).
   React.useEffect(() => {
     let cancelled = false;
+    const storedId = typeof window !== "undefined" ? localStorage.getItem(CONVERSATION_STORAGE_KEY) : null;
+    if (!storedId) {
+      setHistoryLoading(false);
+      return;
+    }
     api
-      .get<ChatHistoryResponse>("/chat/history")
+      .get<ChatHistoryResponse>(`/chat/history?conversation_id=${encodeURIComponent(storedId)}`)
       .then((res) => {
         if (cancelled) return;
         setConversationId(res.conversation_id);
@@ -56,7 +65,8 @@ function ChatContent() {
         setMessages(loaded);
       })
       .catch(() => {
-        // No history yet is fine; start fresh.
+        // Stored conversation is gone/inaccessible -- start fresh rather than looping on it.
+        localStorage.removeItem(CONVERSATION_STORAGE_KEY);
       })
       .finally(() => {
         if (!cancelled) setHistoryLoading(false);
@@ -83,6 +93,7 @@ function ChatContent() {
         conversation_id: conversationId,
       });
       setConversationId(res.conversation_id);
+      localStorage.setItem(CONVERSATION_STORAGE_KEY, res.conversation_id);
       const assistantMsg: ChatMessage = {
         id: res.message_id,
         role: "assistant",

@@ -62,6 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = React.useCallback(() => {
     setToken(null);
     setUser(null);
+    // Conversation history is per-user; don't let the next person on this
+    // browser resume (or 404-loop trying to resume) someone else's chat.
+    localStorage.removeItem("matriva.conversationId");
   }, []);
 
   return (
