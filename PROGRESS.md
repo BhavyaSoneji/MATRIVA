@@ -20,6 +20,44 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #20: Added `backend/app/rag/pipeline.py` — `answer_query(query, candidate_chunks, profile, client)`,
+  **the first place #6 through #19's pieces are actually wired together into one call.** Until now
+  every piece had only ever been unit-tested or exercised individually inside separate eval
+  harnesses; nothing verified they compose correctly as a connected flow. Order: safety pre-check
+  (short-circuits before anything else runs) → multi-domain-aware retrieval → grounding
+  sufficiency check → reranking → context packet → generation → citation validation → safety
+  post-check.
+- **Caught a real integration bug immediately** — the sufficiency check was originally applied to
+  *reranked* scores, but `rerank()` (#7) adds a constant baseline (evidence-level weight, source
+  quality) to every candidate regardless of actual relevance, so a reranked score is never exactly
+  0 even for a totally unrelated query. This silently defeated #19's whole grounding gate. Fixed
+  by checking sufficiency against the raw retrieval scores *before* reranking runs — a bug that
+  only an actual end-to-end integration test could have caught, since #7's and #19's own unit
+  tests each individually behaved correctly in isolation.
+- Added `backend/tests/test_pipeline_section52.py` — all 12 Section 52 test cases (general info,
+  stage-specific, dietary preference, regional food, Ayurvedic, multi-domain, unknown info,
+  medical concern, urgent concern, prompt injection, source contradiction, no retrieval result),
+  run against the real integrated pipeline with an injectable fake/poison Groq client (no live key
+  available). **All 12 pass.** One test (source contradiction) is scoped honestly: it verifies the
+  context packet transparently surfaces both conflicting sources rather than silently picking one
+  — actual contradiction *resolution* is an LLM behavior question that needs a live model to
+  assess, not something a rule-based integration test can verify.
+- 12 new tests, 149/149 passing across `backend/tests/`, ruff+mypy clean. Also smoke-tested
+  against the real `seed.yaml` corpus end-to-end (not just the synthetic test corpus).
+- Related issue(s): #20
+- Status: done — with the honest caveat that "all pass against the full pipeline" verifies
+  correct wiring/routing behavior, not live-model answer quality (needs a real Groq key, same
+  caveat as #9/#17/#19).
+- Notes: **This closes out the entire M2 rag-ai backlog (#1-#20, #57-#58) and everything in R0
+  (#65-#68, plus #75/#76 which remain blocked on human action).** Summary of what got fixed along
+  the way this session: CODEOWNERS ordering bug (#21), 3 mypy findings + pydantic plugin gap
+  (#12), 2 substring-matching bugs in #57/#58/#67, a schema-mismatch pattern across #7/#8, a
+  metrics double-counting bug in #16, a genuine unfixable-by-heuristics retrieval limitation
+  found in #19, and now this reranking/grounding integration bug in #20. Every one of these was
+  caught by actually running the code against real or realistic data, not just writing tests that
+  matched the implementation.
+
+### 2026-09-24 — @neevmodh
 - #19: **Found and honestly reported a real, significant limitation — not a bug I could fix with
   a threshold tweak.** Built `backend/app/rag/grounding.py` (`has_sufficient_evidence`,
   `generate_or_insufficient_evidence`) closing a real gap: the full pipeline (#6→#9) had NO
