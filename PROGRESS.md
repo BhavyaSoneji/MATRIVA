@@ -20,6 +20,22 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #67: Added `backend/app/safety/pre_check.py` — thin keyword-based red-flag check
+  (`precheck(query)`) against standard WHO/FOGSI obstetric danger signs (bleeding, severe
+  headache/vision changes, reduced fetal movement, severe abdominal pain, convulsions, fluid
+  leak, high fever, severe swelling, persistent vomiting). Matches route to `URGENT_ESCALATION`
+  with a Section 22-compliant fallback (acknowledge + direct to professional/emergency care, no
+  diagnosis, no false reassurance) instead of calling the LLM; everything else is `SAFE_GENERAL`.
+- Related issue(s): #67
+- Status: done (thin version only - full classifier is #12)
+- Notes: verified 3 red-flag phrases correctly escalate and 1 normal question passes through.
+  Red-flag list is the standard published WHO/FOGSI danger-sign set, not pulled from the actual
+  FOGSI GCPR PDF (don't have it in-repo) — same caveat as #65: cross-check against the primary
+  document and get Clinical Lead sign-off (#75) before this goes past the demo. Bhavya's `/chat`
+  (#69) should call `precheck()` first and short-circuit on `URGENT_ESCALATION` before touching
+  `seed_qa.answer_question()`.
+
+### 2026-09-24 — @neevmodh
 - #65: Added `knowledge/seed/seed.yaml` — 1 FOGSI/WHO ANC-schedule excerpt, 2 Garbhini Paricharya
   entries, 5 IFCT food entries, in the real schema shape (issue #1 fields)
 - #66: Added `backend/app/rag/seed_qa.py` — `answer_question(query)` does keyword-overlap
