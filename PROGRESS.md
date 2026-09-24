@@ -20,6 +20,25 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #7: Added `backend/app/rag/reranking.py` — `rerank(scored_chunks, context, source_types=...)`
+  combines the incoming semantic/keyword `base_score` (from #6) with pregnancy-stage relevance,
+  source quality, evidence level, regional relevance, and user-context term overlap, per Section
+  12 Step 7.
+- 7 new tests, explicitly covering ranking order changing across different user profiles (stage,
+  region) per this issue's acceptance criteria, plus a fairness check: `TRADITIONAL` evidence
+  scores within 0.05 of `SUPPORTED` when nothing else differs, so traditional/Ayurvedic content
+  isn't structurally penalized (Section 11). 29/29 passing across `backend/tests/`.
+- Related issue(s): #7
+- Status: done
+- Notes: **caught and fixed a schema bug while writing this** — `KnowledgeChunk` (#1) doesn't
+  carry `source_type` (only the parent `KnowledgeDocument` does), so an initial `hasattr` check
+  for it was silently always false, making the source-quality signal a dead no-op. Fixed by
+  taking an explicit `source_types: dict[source_id, SourceType]` lookup instead of trying to read
+  a field the chunk schema was never given. `source_quality`/`evidence_level` weights are
+  documented as reflecting documentation rigor/claim-confidence, not domain legitimacy, in line
+  with Section 11. Next: #8 (structured context packet construction).
+
+### 2026-09-24 — @neevmodh
 - #6: Added `backend/app/rag/retrieval.py` — `hybrid_retrieve(query, ...)` combines vector search
   (via #5's `VectorStore`), lenient metadata filtering (`apply_metadata_filters`: pregnancy_stage/
   domain/region per Section 13), and keyword-overlap scoring as a secondary signal, per Section 12
