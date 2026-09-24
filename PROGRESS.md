@@ -30,7 +30,7 @@ Paste your entry right below this line, above the older ones.
 - **Issue ownership:** Restored #23–#40, #59–#63, #69–#71, and #77 to **@BhavyaSoneji**. No backend or demo issue ownership was transferred to another contributor. PR #78 remains open for normal repository review, but no issue-task handoff was made.
 - **Related issue(s):** #23–#40, #59–#63, #69–#71, #77.
 - **Status:** done — code implemented, tested, rebased, and pushed; GitHub issue state remains open pending maintainer review/closure.
-- **Notes / honest limits:** The seed corpus is explicitly synthetic and is not a complete government-guideline corpus. FOGSI/IFCT/AYURVEDA content still requires qualified clinical review and a current source registry. Live Groq/Gemini calls were not made because no provider keys are configured. `frontend/raj` still needs its separate rebase for #77. Do not close issues automatically until the team confirms live-provider behavior, source governance, and the final clinical sign-off.
+- **Notes / honest limits:** The seed corpus is explicitly synthetic and is not a complete government-guideline corpus. FOGSI/IFCT/AYURVEDA content still requires qualified clinical review and a current source registry. Live Groq/Gemini calls were not made because no provider keys are configured. `frontend/raj` was fast-forwarded to `main` to complete #77.
 
 
 ### 2026-09-24 — @neevmodh
