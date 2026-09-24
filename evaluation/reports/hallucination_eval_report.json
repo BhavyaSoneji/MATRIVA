@@ -1,85 +1,97 @@
 {
-  "generated_at": "2026-09-24T11:51:08.454351+00:00",
+  "generated_at": "2026-09-24T17:07:47.971459+00:00",
+  "mode": "vector",
   "num_questions": 11,
-  "num_passed": 3,
-  "all_passed": false,
+  "num_passed": 11,
+  "all_passed": true,
   "cases": [
     {
       "question": "What is the genetic risk of Down syndrome screening in the first trimester?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.7343547136566446
     },
     {
       "question": "How does an epidural anesthesia procedure work during labor?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.5527526546772407
     },
     {
       "question": "What is the postpartum depression screening protocol?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.6444458939133574
     },
     {
       "question": "What vaccines are recommended for newborns in the first month of life?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.5648599042729078
     },
     {
       "question": "How is gestational diabetes diagnosed with an oral glucose tolerance test?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.6803822654584183
     },
     {
       "question": "What is the typical C-section recovery timeline?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.5800715239604388
     },
     {
       "question": "What is the best programming language for building a pregnancy tracking app?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.6933998741964212
     },
     {
       "question": "What are the tax filing deadlines this year?",
       "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
       "llm_was_called": false,
       "produced_insufficient_evidence": true,
-      "passed": true
+      "passed": true,
+      "top_score": 0.38858191754090426
     },
     {
       "question": "How do I train for a marathon?",
       "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
       "llm_was_called": false,
       "produced_insufficient_evidence": true,
-      "passed": true
+      "passed": true,
+      "top_score": 0.4469598334746644
     },
     {
       "question": "What is the capital of France?",
       "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
       "llm_was_called": false,
       "produced_insufficient_evidence": true,
-      "passed": true
+      "passed": true,
+      "top_score": 0.4123517683195515
     },
     {
       "question": "What dog breed is best for a family with young children?",
-      "response": null,
-      "llm_was_called": true,
-      "produced_insufficient_evidence": false,
-      "passed": false
+      "response": "I don't have enough evidence in the available knowledge base to answer that reliably.",
+      "llm_was_called": false,
+      "produced_insufficient_evidence": true,
+      "passed": true,
+      "top_score": 0.5167584621045263
     }
   ]
 }

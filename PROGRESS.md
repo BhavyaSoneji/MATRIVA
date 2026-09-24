@@ -19,6 +19,27 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-09-24 — @neevmodh — Fixed the hallucination suite's real limitation (#19)
+
+- **Root cause confirmed:** the 3/11 pass rate documented earlier was caused by the suite running
+  through the keyword-overlap retrieval fallback (`hybrid_retrieve(candidate_chunks=...)`), where
+  any shared word (e.g. "risk", "screening") between an out-of-corpus question and a seed document
+  produces a nonzero score and is treated as "sufficient evidence."
+- **Fix:** `evaluation/hallucination/run.py` now has a LIVE mode (mirroring `generation/run.py`'s
+  existing LIVE/SELF-TEST pattern) that embeds the corpus and each question with the real Gemini
+  embedding model and retrieves by cosine similarity (`scoring_mode="vector"`, threshold 0.75) when
+  `EMBEDDING_API_KEY`/`GEMINI_API_KEY` is set. Falls back to the original keyword path otherwise, so
+  CI (no key) behavior is unchanged and the existing 36 evaluation tests still pass.
+- **Result, verified against the real Gemini API:** **11/11 passed** in LIVE/vector mode, up from
+  3/11 in keyword mode. Report at `evaluation/reports/hallucination_eval_report.json`
+  (`"mode": "vector"`).
+- **Also fixed a related bug while here:** `generate_or_insufficient_evidence` was being called
+  without `scoring_mode=retrieval.scoring_mode`, silently defaulting to the keyword threshold even
+  when vector-mode scores were available -- now passed through explicitly.
+- Related issue: #19. Status: done, live-verified. Live Groq/Gemini integration itself was verified
+  end-to-end in a separate pass (see the git history around 2026-09-24 for the model-name fixes
+  that made this possible -- `text-embedding-004` and `llama-3.3-70b-versatile` are both retired).
+
 ### 2026-09-24 — @BhavyaSoneji — Backend MVP implementation and verification
 
 - **Rebased and pushed:** Rebased `backend/bhavya` onto the updated RAG `main` (`97d8c9f`) so the HTTP API wraps Neev's canonical `answer_query()` pipeline instead of replacing it. Pushed the completed branch at `ef29816` (force-with-lease was required only because the local implementation commit was amended after the first push).
