@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from app.models import (
     KnowledgeSource,
     ReviewStatus,
 )
+from app.rag.embeddings import embed_chunk_contents
 from app.schemas.api import DocumentMetadataRequest
 
 
@@ -135,13 +137,28 @@ def reindex_document(db: Session, document: KnowledgeDocument) -> int:
         for old_chunk in list(document.chunks):
             db.delete(old_chunk)
         db.flush()
-        for index, content in enumerate(pieces):
+
+        # Real RAG (issue #5), wired into the live API: compute an embedding
+        # per chunk at index time so retrieve_chunks_scored() can do real
+        # vector search instead of the keyword-overlap fallback. A provider
+        # failure here must not fail the whole reindex -- the chunk is still
+        # usable via keyword search, just without the semantic-search upgrade.
+        embeddings: list[list[float]] | list[None] = [None] * len(pieces)
+        api_key = os.environ.get("EMBEDDING_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        if api_key and pieces:
+            try:
+                embeddings = embed_chunk_contents(pieces, api_key=api_key)
+            except Exception:  # noqa: BLE001
+                embeddings = [None] * len(pieces)
+
+        for index, (content, embedding) in enumerate(zip(pieces, embeddings, strict=True)):
             db.add(
                 KnowledgeChunk(
                     document_id=document.id,
                     source_id=document.source_id,
                     chunk_index=index,
                     content=content,
+                    embedding=embedding,
                     extra_metadata={"char_count": len(content)},
                 )
             )

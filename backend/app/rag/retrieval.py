@@ -10,6 +10,7 @@ the unfiltered candidate pool if filtering would otherwise return nothing.
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import dataclass
 from dataclasses import dataclass as DatabaseDataclass
@@ -22,8 +23,9 @@ from app.models import KnowledgeChunk as KnowledgeChunkRow
 from app.models import KnowledgeDocument as KnowledgeDocumentRow
 from app.models import KnowledgeSource as KnowledgeSourceRow
 from app.models import ReviewStatus as ReviewStatusValue
+from app.rag.embeddings import embed_text
 from app.rag.keyword_search import keyword_overlap_score
-from app.rag.vector_store import VectorStore
+from app.rag.vector_store import VectorStore, cosine_similarity
 from app.schemas.knowledge import Domain, KnowledgeChunk
 
 DEFAULT_POOL_SIZE = 20
@@ -78,6 +80,7 @@ def hybrid_retrieve(
     vector_store: VectorStore | None = None,
     candidate_chunks: list[KnowledgeChunk] | None = None,
     candidate_scores: dict[str, float] | None = None,
+    candidate_scoring_mode: str | None = None,
     pregnancy_stage: str | None = None,
     domains: list[Domain] | None = None,
     region: str | None = None,
@@ -91,6 +94,11 @@ def hybrid_retrieve(
     embedding is available yet, same situation Sprint 0's seed_qa.py handles
     for #66). If both are given, vector-search candidates are used and
     keyword score is blended in as a secondary signal.
+
+    `candidate_scoring_mode` lets a caller that already computed real
+    vector-similarity scores for `candidate_chunks` upstream (e.g. the SQL
+    retrieval adapter's `retrieve_chunks_scored`) report that honestly,
+    instead of this always being mislabeled "keyword".
     """
     if vector_store is not None and query_embedding is not None:
         pool = vector_store.query(query_embedding, k=pool_size)
@@ -98,7 +106,7 @@ def hybrid_retrieve(
     elif candidate_chunks is not None:
         scores = candidate_scores or {}
         pool = [(chunk, float(scores.get(chunk.chunk_id, 0.0))) for chunk in candidate_chunks]
-        scoring_mode = "keyword"
+        scoring_mode = candidate_scoring_mode or "keyword"
     else:
         raise ValueError("Provide either (vector_store + query_embedding) or candidate_chunks")
 
@@ -168,7 +176,11 @@ def score_text(query: str, content: str) -> float:
     return (overlap / len(query_tokens)) + phrase_bonus
 
 
-def retrieve_chunks(
+def _embedding_api_key() -> str | None:
+    return os.environ.get("EMBEDDING_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
+
+def retrieve_chunks_scored(
     db: DatabaseSession,
     query: str,
     *,
@@ -178,7 +190,19 @@ def retrieve_chunks(
     source_type: str | None = None,
     evidence_level: str | None = None,
     limit: int = 8,
-) -> list[RetrievedChunk]:
+) -> tuple[list[RetrievedChunk], str]:
+    """Like `retrieve_chunks`, but also reports which scoring mode was used.
+
+    Real RAG (issue #6/#5 wired into the live API, not just the eval
+    scripts): if an embedding key is configured AND every approved
+    candidate chunk already has a stored embedding (populated at
+    ingest/reindex time -- see services/knowledge.py), retrieval is done
+    by real cosine similarity against a single query embedding
+    ("vector" mode). Otherwise -- no key, or any chunk still awaiting a
+    (re)index since this feature landed -- falls back to the original
+    keyword-overlap scoring ("keyword" mode) rather than silently mixing
+    the two incompatible score scales.
+    """
     statement = (
         select(KnowledgeChunkRow, KnowledgeDocumentRow, KnowledgeSourceRow)
         .join(KnowledgeDocumentRow, KnowledgeChunkRow.document_id == KnowledgeDocumentRow.id)
@@ -209,7 +233,8 @@ def retrieve_chunks(
         )
     statement = statement.order_by(KnowledgeChunkRow.chunk_index).limit(250)
     rows = db.execute(statement).all()
-    scored: list[RetrievedChunk] = []
+
+    candidates = []
     for chunk, document, source in rows:
         guideline = source.guideline
         if guideline is not None:
@@ -219,17 +244,83 @@ def retrieve_chunks(
             )
             if guideline.status != "active" or stale:
                 continue
-        searchable_text = " ".join(
-            str(value or "")
-            for value in (chunk.content, document.title, document.domain, document.subdomain, source.topic)
-        )
-        scored.append(
-            RetrievedChunk(chunk=chunk, document=document, source=source, score=score_text(query, searchable_text))
-        )
+        candidates.append((chunk, document, source))
+
+    api_key = _embedding_api_key()
+    scoring_mode = "keyword"
+    scored: list[RetrievedChunk] = []
+
+    if api_key and candidates and all(chunk.embedding for chunk, _doc, _src in candidates):
+        try:
+            query_embedding = embed_text(query, api_key=api_key)
+            scored = [
+                RetrievedChunk(
+                    chunk=chunk,
+                    document=document,
+                    source=source,
+                    score=cosine_similarity(query_embedding, chunk.embedding),
+                )
+                for chunk, document, source in candidates
+            ]
+            scoring_mode = "vector"
+        except Exception:  # noqa: BLE001
+            # Provider failure must not break retrieval -- fall through to keyword.
+            scored = []
+            scoring_mode = "keyword"
+
+    if scoring_mode == "keyword":
+        scored = [
+            RetrievedChunk(
+                chunk=chunk,
+                document=document,
+                source=source,
+                score=score_text(
+                    query,
+                    " ".join(
+                        str(value or "")
+                        for value in (chunk.content, document.title, document.domain, document.subdomain, source.topic)
+                    ),
+                ),
+            )
+            for chunk, document, source in candidates
+        ]
+
+    # Note: this only drops exactly-zero-relevance candidates -- it is NOT
+    # the Section 43 "insufficient evidence" safety gate. That gate lives in
+    # app.rag.grounding.has_sufficient_evidence, is mode-aware (0.75 for
+    # vector, 0.0 for keyword), and is what pipeline.answer_question's chat
+    # path actually enforces via candidate_scoring_mode. Applying the
+    # stricter vector threshold here too would also gate non-chat callers
+    # (recommendations, /knowledge/search) that have no such safety
+    # requirement and just want ranked candidates.
     if query.strip():
         scored = [item for item in scored if item.score > 0]
     scored.sort(key=lambda item: item.score, reverse=True)
-    return scored[: max(1, min(limit, 25))]
+    return scored[: max(1, min(limit, 25))], scoring_mode
+
+
+def retrieve_chunks(
+    db: DatabaseSession,
+    query: str,
+    *,
+    domain: str | None = None,
+    stage: str | None = None,
+    region: str | None = None,
+    source_type: str | None = None,
+    evidence_level: str | None = None,
+    limit: int = 8,
+) -> list[RetrievedChunk]:
+    chunks, _scoring_mode = retrieve_chunks_scored(
+        db,
+        query,
+        domain=domain,
+        stage=stage,
+        region=region,
+        source_type=source_type,
+        evidence_level=evidence_level,
+        limit=limit,
+    )
+    return chunks
 
 
 def build_context(chunks: list[RetrievedChunk]) -> str:

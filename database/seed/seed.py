@@ -59,9 +59,25 @@ from app.models import (  # noqa: E402
     User,
     UserRole,
 )
+from app.rag.embeddings import embed_text  # noqa: E402
 from app.services.stage import calculate_stage  # noqa: E402
 
 DEMO_PASSWORD = "DemoPass123!"
+
+
+def _seed_embedding(content: str) -> list[float] | None:
+    """Best-effort embedding for demo chunks so the seeded corpus actually
+    exercises real vector retrieval (see retrieve_chunks_scored) when an
+    embedding key is configured, instead of always falling back to keyword
+    search just because demo data was never (re)indexed through the admin
+    upload path."""
+    api_key = os.environ.get("EMBEDDING_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        return None
+    try:
+        return embed_text(content, api_key=api_key)
+    except Exception:  # noqa: BLE001
+        return None
 
 
 def _user(db, email: str, role: UserRole, name: str) -> User:
@@ -132,7 +148,8 @@ def seed_demo_data() -> None:
             anc_doc = KnowledgeDocument(source_id=anc.id, title="DEMO DATA — ANC schedule", domain="antenatal_care", language="en", region="India", review_status=ReviewStatus.APPROVED.value, index_status="indexed", content_hash="demo-anc", file_name="demo-anc.txt", mime_type="text/plain", raw_content=b"demo", active=True, created_by=admin.id, approved_by=admin.id)
             db.add(anc_doc)
             db.flush()
-            db.add(KnowledgeChunk(document_id=anc_doc.id, source_id=anc.id, chunk_index=0, content="For the demo scenario, the configured antenatal contact weeks are 12, 20, 26, 30, 34, 36, 38, 40, and 41. The next visit is the first configured week that is not earlier than the current week. Confirm timing and instructions with the maternity-care professional."))
+            anc_content = "For the demo scenario, the configured antenatal contact weeks are 12, 20, 26, 30, 34, 36, 38, 40, and 41. The next visit is the first configured week that is not earlier than the current week. Confirm timing and instructions with the maternity-care professional."
+            db.add(KnowledgeChunk(document_id=anc_doc.id, source_id=anc.id, chunk_index=0, content=anc_content, embedding=_seed_embedding(anc_content)))
         if anc.evidence_metadata is None:
             db.add(EvidenceMetadata(source_id=anc.id, evidence_level=EvidenceLevel.SUPPORTED.value, evidence_label="DEMO — clinical review required", review_status=ReviewStatus.APPROVED.value, reviewer=admin.email, notes="Synthetic demo only."))
         if anc.guideline is None:
@@ -158,7 +175,8 @@ def seed_demo_data() -> None:
             food_doc = KnowledgeDocument(source_id=food_source.id, title="DEMO DATA — balanced meal examples", domain="nutrition", language="en", region="India", review_status=ReviewStatus.APPROVED.value, index_status="indexed", content_hash="demo-food", file_name="demo-food.txt", mime_type="text/plain", raw_content=b"demo", active=True, created_by=admin.id, approved_by=admin.id)
             db.add(food_doc)
             db.flush()
-            db.add(KnowledgeChunk(document_id=food_doc.id, source_id=food_source.id, chunk_index=0, content="A balanced meal can include a variety of foods from the food groups appropriate to the user's needs and preferences. This demo does not prescribe quantities or replace individualized nutrition advice from a qualified clinician."))
+            food_content = "A balanced meal can include a variety of foods from the food groups appropriate to the user's needs and preferences. This demo does not prescribe quantities or replace individualized nutrition advice from a qualified clinician."
+            db.add(KnowledgeChunk(document_id=food_doc.id, source_id=food_source.id, chunk_index=0, content=food_content, embedding=_seed_embedding(food_content)))
         if db.execute(select(FoodItem).where(FoodItem.name == "Demo seasonal fruit")).scalar_one_or_none() is None:
             db.add(FoodItem(name="Demo seasonal fruit", local_names=["demo seasonal fruit"], region="India", cuisine="regional", ingredients=["demo placeholder"], dietary_types=["vegetarian", "vegan"], nutrition_metadata={"demo": True}, pregnancy_context="Use only as a placeholder until a current reviewed food source is loaded.", evidence_status=EvidenceLevel.SUPPORTED.value, safety_status=SafetyStatus.SAFE_GENERAL.value, source_ids=[food_source.id]))
         if db.execute(select(ExerciseGuidance).where(ExerciseGuidance.title == "Demo gentle walking")).scalar_one_or_none() is None:
@@ -184,7 +202,8 @@ def seed_demo_data() -> None:
             ayurveda_doc = KnowledgeDocument(source_id=ayurveda_source.id, title="DEMO DATA — traditional guidance", domain="ayurveda", language="en", region="India", review_status=ReviewStatus.APPROVED.value, index_status="indexed", content_hash="demo-ayurveda", file_name="demo-ayurveda.txt", mime_type="text/plain", raw_content=b"demo", active=True, created_by=admin.id, approved_by=admin.id)
             db.add(ayurveda_doc)
             db.flush()
-            db.add(KnowledgeChunk(document_id=ayurveda_doc.id, source_id=ayurveda_source.id, chunk_index=0, content="This synthetic traditional record is provided only to demonstrate provenance and evidence labels. It is not a government guideline and must not be used to diagnose or treat a condition."))
+            ayurveda_content = "This synthetic traditional record is provided only to demonstrate provenance and evidence labels. It is not a government guideline and must not be used to diagnose or treat a condition."
+            db.add(KnowledgeChunk(document_id=ayurveda_doc.id, source_id=ayurveda_source.id, chunk_index=0, content=ayurveda_content, embedding=_seed_embedding(ayurveda_content)))
         if db.execute(select(AyurvedicSource).where(AyurvedicSource.source_id == ayurveda_source.id)).scalar_one_or_none() is None:
             db.add(AyurvedicSource(source_id=ayurveda_source.id, book="DEMO traditional text", chapter="Demo chapter", verse_or_page="Demo locator", original_text="Synthetic placeholder", translation="Synthetic placeholder", interpretation="Traditional content is labelled separately and is not automatically safe or clinically established.", traditional_context="Demo only", evidence_label="traditional", provenance={"demo_data": True}))
 

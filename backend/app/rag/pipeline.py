@@ -35,7 +35,7 @@ from app.rag.multi_domain import (
     validate_segmentation,
 )
 from app.rag.reranking import UserContext, rerank
-from app.rag.retrieval import RetrievedChunk, hybrid_retrieve, retrieve_chunks
+from app.rag.retrieval import RetrievedChunk, hybrid_retrieve, retrieve_chunks_scored
 from app.safety.classifier import SafetyClassification, classify
 from app.safety.post_check import (
     SAFE_FALLBACK_RESPONSE,
@@ -63,6 +63,7 @@ def answer_query(
     *,
     candidate_chunks: list[KnowledgeChunk],
     candidate_scores: dict[str, float] | None = None,
+    candidate_scoring_mode: str | None = None,
     profile: UserContext | None = None,
     client: Groq | None = None,
     k: int = DEFAULT_K,
@@ -92,6 +93,7 @@ def answer_query(
         query,
         candidate_chunks=candidate_chunks,
         candidate_scores=candidate_scores,
+        candidate_scoring_mode=candidate_scoring_mode,
         domains=domains,
         k=k,
     )
@@ -213,7 +215,7 @@ def answer_question(
     deliberately not treated as a live clinical model result.
     """
 
-    retrieved = retrieve_chunks(db, query, domain=domain, stage=stage, region=region)
+    retrieved, scoring_mode = retrieve_chunks_scored(db, query, domain=domain, stage=stage, region=region)
     if not retrieved:
         return GenerationResult(text="", citation_ids=[]), retrieved
 
@@ -226,6 +228,7 @@ def answer_question(
                 query,
                 candidate_chunks=rag_chunks,
                 candidate_scores={chunk.chunk_id: item.score for chunk, item in zip(rag_chunks, retrieved)},
+                candidate_scoring_mode=scoring_mode,
                 profile=profile,
             )
             return GenerationResult(
