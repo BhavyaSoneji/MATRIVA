@@ -20,6 +20,26 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #57: Added `backend/app/rag/intent_classification.py` — `classify_intent(query, safety_result)`,
+  a keyword-based classifier over all 14 Section 30 categories (NUTRITION, EXERCISE, LIFESTYLE,
+  MENTAL_WELLBEING, ANTENATAL_CARE, PREGNANCY_DEVELOPMENT, AYURVEDA, TRADITIONAL_PRACTICE, FOOD,
+  MEDICAL_CONCERN, MEDICATION, EMERGENCY, GENERAL, OTHER). If `safety_result` indicates
+  `URGENT_ESCALATION`, that overrides the keyword classifier entirely and forces `EMERGENCY` —
+  safety always wins, per spec.
+- 5 new tests, including one example query per all 14 categories (acceptance criteria) and both
+  safety-override directions (urgent escalation overrides; a safe result does not). 65/65 passing
+  across `backend/tests/`.
+- Related issue(s): #57
+- Status: done
+- Notes: went rule-based rather than LLM-based for the initial version — Section 30 offers
+  LLM-based as one *option*, not a requirement, and the project's own Section 12 principle ("do
+  not make the LLM responsible for everything") plus #67's precedent (thin, rule-based safety
+  pre-check) both favor starting deterministic and fully unit-testable without an API key. Swap
+  in an LLM-assisted classifier later if keyword coverage proves insufficient in practice — the
+  safety-override contract stays identical either way. Next: #58 (multi-domain query
+  decomposition) builds directly on this.
+
+### 2026-09-24 — @neevmodh
 - #11: Added `backend/app/rag/query_rewriting.py` — `rewrite_query(raw_query, profile)` generates
   one retrieval-query variant per known personalization dimension (pregnancy stage, diet, region,
   each restriction), per Section 12 Step 5's example. Purely combines the caller-supplied profile
