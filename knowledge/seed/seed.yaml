@@ -61,6 +61,20 @@
   reviewed_by: null
   reviewed_at: null
   safety_tags: [requires_clinical_review]
+  ayurvedic_provenance:
+    source: Charaka Samhita
+    book: Charaka Samhita
+    chapter: Sharirasthana 8
+    verse_or_page: null
+    original_text: >
+      [NOT YET TRANSCRIBED. The Sanskrit/Devanagari original has not been precisely identified
+      and cross-verified against a primary edition. See knowledge/ayurveda/Prasuti-Tantra-OCR.txt
+      for raw OCR reference material. Do not treat this field as accurate until a qualified
+      reviewer (#75) has confirmed the exact verse.]
+    translation: null
+    interpretation: null
+    traditional_context: null
+    modern_evidence_status: TRADITIONAL
 
 - document_id: seed-ayurveda-garbhini-002
   title: "Garbhini Paricharya - Second Trimester Dietary Emphasis (Charaka Samhita, Sharirasthana Ch.8)"
@@ -83,6 +97,20 @@
   reviewed_by: null
   reviewed_at: null
   safety_tags: [requires_clinical_review]
+  ayurvedic_provenance:
+    source: Charaka Samhita
+    book: Charaka Samhita
+    chapter: Sharirasthana 8
+    verse_or_page: null
+    original_text: >
+      [NOT YET TRANSCRIBED. The Sanskrit/Devanagari original has not been precisely identified
+      and cross-verified against a primary edition. See knowledge/ayurveda/Prasuti-Tantra-OCR.txt
+      for raw OCR reference material. Do not treat this field as accurate until a qualified
+      reviewer (#75) has confirmed the exact verse.]
+    translation: null
+    interpretation: null
+    traditional_context: null
+    modern_evidence_status: TRADITIONAL
 
 - document_id: seed-ifct-moong-dal-001
   title: "Moong Dal (Green Gram, split) - Nutrient Profile"

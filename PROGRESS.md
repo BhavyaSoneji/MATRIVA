@@ -20,6 +20,30 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #15: **Found and fixed a real gap while starting this** — actually validated `knowledge/seed/seed.yaml`
+  against #1's `KnowledgeDocument` schema for the first time (nothing did this before; `seed_qa.py`
+  loads raw YAML dicts and bypasses the schema entirely) and both Ayurveda entries **failed**:
+  they didn't carry the `ayurvedic_provenance` object #1's own schema requires for `domain ==
+  AYURVEDA`. Fixed `seed.yaml` — added `ayurvedic_provenance` (source/book/chapter/
+  modern_evidence_status) to both entries, with `original_text` honestly marked
+  `[NOT YET TRANSCRIBED]` pointing at the OCR reference file rather than fabricating verse text.
+- Added `backend/app/evidence/ayurveda_provenance.py`: `load_and_validate_documents(raw_dicts)` —
+  an actual ingestion-path validation step (constructs+validates `KnowledgeDocument` per entry,
+  fails closed with a clear per-document error) — and `check_evidence_label_justified(document)`,
+  enforcing Section 11's "only use evidence labels that can actually be justified": for AYURVEDA
+  documents, `evidence_level` must agree with `ayurvedic_provenance.modern_evidence_status`, since
+  drift between the two is exactly how an unjustified label sneaks in unnoticed.
+- 6 new tests, including running the *real* `seed.yaml` through both functions (regression test
+  for the exact gap found) — confirms all 7 seed entries now validate and have justified evidence
+  labels. 132/132 passing across `backend/tests/`, ruff+mypy clean, ingestion suite (27/27) and
+  `seed_qa.retrieve()` reconfirmed unaffected by the `seed.yaml` change.
+- Related issue(s): #15
+- Status: done — acceptance criterion 2 (generation output separates MODERN MEDICAL vs
+  TRADITIONAL/AYURVEDIC vs EVIDENCE STATUS) was already satisfied by #58, no new work needed there.
+- Notes: this closes out the safety track (#12-#15). Only the evaluation track (#16-#20) remains
+  in the M2 rag-ai backlog.
+
+### 2026-09-24 — @neevmodh
 - #14: Added `backend/app/safety/prompt_injection.py` — Section 44 defense. Deliberately NOT
   content censorship: retrieved chunk text is never mutated/redacted for containing suspicious
   phrases (a legitimate source could innocuously discuss such phrasing). Instead: (1)
