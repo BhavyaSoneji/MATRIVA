@@ -19,12 +19,18 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
-### 2026-09-24 — @BhavyaSoneji
-- Implemented and locally verified the backend API slice for #23-#40, #59-#63, and #69-#71: auth/JWT, consent/profile/pregnancy, chat/history, knowledge/sources/guidelines, recommendations, food/lifestyle, feedback, privacy, admin, safety, evaluation, and observability.
-- Added security and deployment controls: PBKDF2 password hashing, role checks, validation, upload gates, rate limits, audit logs, fail-closed safety responses, consent withdrawal, CI secret scan, production Dockerfiles/compose, and frontend dependency audit updates.
-- Related issue(s): #23-#40, #59-#63, #69-#71, #77
-- Status: in-progress
-- Notes: The branch has been rebased onto the updated RAG `main`; the API adapter now wraps the canonical `answer_query()` pipeline instead of replacing it. Docker Desktop is installed; the local PostgreSQL/pgvector, Redis, backend, and frontend stack is running and healthy. GitHub issue closures/pushes have not been performed yet.
+### 2026-09-24 — @BhavyaSoneji — Backend MVP implementation and verification
+
+- **Rebased and pushed:** Rebased `backend/bhavya` onto the updated RAG `main` (`97d8c9f`) so the HTTP API wraps Neev's canonical `answer_query()` pipeline instead of replacing it. Pushed the completed branch at `ef29816` (force-with-lease was required only because the local implementation commit was amended after the first push).
+- **Foundation and persistence (#23–#26):** Added the FastAPI application structure, production-oriented configuration, SQLAlchemy application models, SQLite/PostgreSQL compatibility, Alembic `0001_initial` plus `0002_rag_vector_index`, pgvector support, idempotent synthetic seed data, Docker Compose, and Docker entrypoint migrations. The API's application `knowledge_chunks` table remains separate from the RAG team's `rag_knowledge_chunks` vector-index table so SQLite tests and PostgreSQL vector queries do not claim the same table.
+- **Auth, onboarding, and privacy (#27–#28, #37, #60–#63):** Added PBKDF2 password hashing, short-lived signed JWTs, role-based admin/staff authorization, consent-gated profile/pregnancy storage, pregnancy-stage calculation, session context separate from permanent profile data, structured export, consent withdrawal, account deletion, feedback, and audit logging.
+- **RAG/API integration (#29–#33, #59, #62):** Added the SQLAlchemy-to-canonical-RAG adapter, approved-source filtering, guideline staleness checks, grounded local fallback, citation/source responses, explainable recommendations, food/region and lifestyle filtering, and Ayurveda provenance storage/API. The full RAG path is used when a provider key is configured; the no-key path is deterministic and clearly marked local/demo behavior.
+- **Safety, admin, and operations (#34–#36, #38–#40, #61, #69–#71):** Added independent safety pre/post checks, fail-closed dependency handling, emergency escalation, document upload → index → review → approve workflow, reindex endpoint, safety-rule CRUD/events, evaluation APIs/reports, observability metrics, Redis startup check, rate limiting, upload validation, audit logs, CI secret scanning, CORS, and the unauthenticated R0 demo chat/ANC endpoints.
+- **Verification:** Backend **170 passed** (including the inherited RAG suite), ingestion **27 passed**, evaluation **36 passed**, Ruff clean, mypy clean, frontend lint/type-check/production build clean, and frontend production audit reports **0 vulnerabilities**. Docker Desktop is installed; PostgreSQL/pgvector, Redis, FastAPI, and Next.js all run locally, and `/health` reports database and Redis healthy. Demo chat returns only the relevant seeded source after the retrieval/stop-word fix.
+- **Related issue(s):** #23–#40, #59–#63, #69–#71, #77.
+- **Status:** done — code implemented, tested, rebased, and pushed; GitHub issue state remains open pending maintainer review/closure.
+- **Notes / honest limits:** The seed corpus is explicitly synthetic and is not a complete government-guideline corpus. FOGSI/IFCT/AYURVEDA content still requires qualified clinical review and a current source registry. Live Groq/Gemini calls were not made because no provider keys are configured. `frontend/raj` still needs its separate rebase for #77. Do not close issues automatically until the team confirms live-provider behavior, source governance, and the final clinical sign-off.
+
 
 ### 2026-09-24 — @neevmodh
 - #20: Added `backend/app/rag/pipeline.py` — `answer_query(query, candidate_chunks, profile, client)`,
