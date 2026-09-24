@@ -20,6 +20,21 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- Ran full OCR on `knowledge/ayurveda/Prasuti-Tantra-by-Dr-premvati-Tiwari.pdf` (408-page scanned
+  book, no text layer) and committed the extract to `knowledge/ayurveda/Prasuti-Tantra-OCR.txt`
+- Related issue(s): none directly (source material for future ingestion work, e.g. #2)
+- Status: done
+- Notes: installed Tesseract `hin`+`san` language data (via direct GitHub tessdata_fast download —
+  Homebrew's bottle CDN was failing with connection resets), figured out the scan's rotation
+  (each page renders sideways; needs -90deg), and OCR'd all 408 pages with `eng+hin`. English
+  translation paragraphs (the book includes its own English translations of the Sanskrit) come out
+  fairly clean; the Devanagari/Sanskrit verses have real recognition noise, as expected for a
+  scanned classical text with no correction pass — **do not treat this file as authoritative**.
+  It's raw material for someone to manually verify quotable verses/content against before they go
+  into `knowledge/seed/seed.yaml` or the real ingestion pipeline (#2). Same Clinical Lead review
+  requirement as the existing seed entries applies to anything pulled from this into product use.
+
+### 2026-09-24 — @neevmodh
 - #68: Drafted `docs/SUBMISSION.md` — Problem/Solution/Trustworthiness/Feasibility/Team structure
   per the approved roadmap, track/user/use-case fields filled per the official form, feasibility
   table mapping Sprint 0 (done pieces) → Sprint 1/2 (scoped backlog)
