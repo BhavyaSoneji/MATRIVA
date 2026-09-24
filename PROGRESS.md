@@ -20,6 +20,24 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #68: Drafted `docs/SUBMISSION.md` — Problem/Solution/Trustworthiness/Feasibility/Team structure
+  per the approved roadmap, track/user/use-case fields filled per the official form, feasibility
+  table mapping Sprint 0 (done pieces) → Sprint 1/2 (scoped backlog)
+- #76: Tried to confirm the submission platform at healthathon.reskilll.com — it's a JS-rendered
+  SPA, plain fetch returns only the page title with no route/form content, and the Chrome browser
+  extension wasn't connected in this environment so I couldn't render it. **Still unconfirmed —
+  needs a human to check the site directly (or reconnect the browser extension) and find the
+  actual Round 1 submission form.**
+- Related issue(s): #68, #76
+- Status: in-progress (both blocked on human input)
+- Notes: `docs/SUBMISSION.md` has 4 explicit `[TODO]` items that need a real person, not me:
+  Clinical Lead's actual name/credentials, verified citations for the academic RAG-safety papers
+  named in the brief (I won't fabricate bibliographic details), demo screenshots (waiting on
+  Bhavya's #69 and Raj's #72-#74), and confirming #75 has actually closed before implying the
+  Ayurveda content is signed off. #76 (submit) is blocked on #68 being finalized and on someone
+  confirming the actual submission form.
+
+### 2026-09-24 — @neevmodh
 - #67: Added `backend/app/safety/pre_check.py` — thin keyword-based red-flag check
   (`precheck(query)`) against standard WHO/FOGSI obstetric danger signs (bleeding, severe
   headache/vision changes, reduced fetal movement, severe abdominal pain, convulsions, fluid
