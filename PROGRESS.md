@@ -20,6 +20,25 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #3: Added `ingestion/pipelines/chunker.py` — `chunk_document(document)` groups a
+  `KnowledgeDocument`'s (#1) paragraph blocks into 300-700 token `KnowledgeChunk`s, never
+  splitting a paragraph across chunks and always keeping a heading attached to the content that
+  follows it. Oversized single paragraphs fall back to sentence-boundary splitting (never a blind
+  character cut). Every chunk inherits the parent document's `source_id`/`domain`/`topic`/
+  `pregnancy_stage`/`evidence_level`/`region`/`language` per Section 14.
+- Added `ingestion/tests/test_chunker.py` — 7 unit tests (size-range compliance, no
+  cross-chunk paragraph splitting, heading attachment, oversized-paragraph splitting, full
+  metadata completeness, sequential chunk_index). All passing (16/16 across `ingestion/tests/`).
+- Related issue(s): #3
+- Status: done
+- Notes: `chunker.py` bootstraps `backend/` onto `sys.path` to reuse #1's schema, since
+  `ingestion/` and `backend/` are separate top-level dirs with no shared packaging/install step
+  yet — flagging in case someone wants a cleaner shared-package approach later (e.g. #22 CI or a
+  future refactor). Token counts are word-count approximations, not real LLM tokenization; swap
+  `_count_tokens` for a real tokenizer if a later issue needs exact context-window fitting.
+  Next: #4 (metadata enrichment + quality checks, incl. duplicate detection).
+
+### 2026-09-24 — @neevmodh
 - #2: Added `ingestion/pipelines/parser.py` — `extract_text_from_pdf` (PyMuPDF), `extract_text_from_docx`
   (python-docx), `extract_text` (dispatch by extension), `clean_text` (whitespace/hyphenation
   normalization without altering meaning), `parse_document` (parse+clean in one call). Implements
