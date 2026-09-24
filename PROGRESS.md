@@ -20,6 +20,28 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #10: Added `backend/app/evidence/citation_validation.py` — `validate_citations(answer, ids)` /
+  `validate_citations_against_packet(answer, packet)` post-generation checkers per Section 12 Step
+  11 + Section 18. Fails closed: `[id]`-style citations not matching an actually-retrieved
+  chunk_id/document_id/source_id are stripped and flagged (not passed through); any URL in the
+  generated answer is stripped and flagged (invented, since our sources don't carry URLs); any
+  page-number reference ("page 42", "p. 12") is stripped and flagged as unverifiable.
+- 8 new tests: clean-answer passthrough, valid/invalid/mixed citations, URL fabrication, both page
+  reference patterns, and the packet-based convenience wrapper accepting all 3 valid id forms.
+  52/52 passing across `backend/tests/`.
+- Related issue(s): #10
+- Status: done
+- Notes: **page-number handling is a hard fail-everything approach, not a nuanced one** —
+  `KnowledgeChunk` (#1) has no page metadata field at all, so literally any page reference the LLM
+  outputs is currently unverifiable by construction and gets stripped. If page-level provenance
+  is ever added to the chunk schema (relevant for #15's Ayurveda provenance work, which already
+  tracks `verse_or_page` at the document level), this validator should be updated to check real
+  page numbers instead of blanket-stripping all of them. This closes out the full RAG pipeline
+  chain from #1 through #10. Remaining rag-ai items: #11 (personalized query rewriting, M2), #57/
+  #58 (intent classification, multi-domain decomposition, M2), then the safety (#12-#15) and
+  evaluation (#16-#20) tracks.
+
+### 2026-09-24 — @neevmodh
 - #9: Added `backend/app/llm/groq_client.py` — `generate_from_packet(context_packet, ...)`, the
   full Groq integration: takes a #8 `ContextPacket`, enforces the Section 58 source-grounded
   system prompt, retries with exponential backoff on transient connection/timeout errors, fails
