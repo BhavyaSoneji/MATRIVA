@@ -20,6 +20,24 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #8: Added `backend/app/rag/context_packet.py` — `build_context_packet(...)` assembles the 5
+  required sections (Section 16): USER CONTEXT, USER QUESTION, RETRIEVED SOURCES, SAFETY RESULT,
+  EVIDENCE METADATA, from #7's reranked output + #67's safety result. `ContextPacket.to_prompt_text()`
+  renders it LLM-ready. Truncation drops lowest-ranked chunks first once a token budget
+  (word-count approximation, default 2000) is exceeded, but always keeps at least one chunk even
+  if it alone exceeds budget (avoids an empty-context edge case).
+- 8 new tests: all 5 sections present, truncation behavior (drops lowest-ranked, respects order),
+  evidence summary (domain/evidence-level counts, needs-review flagging), safety-result passthrough,
+  empty-retrieval edge case. 37/37 passing across `backend/tests/`.
+- Related issue(s): #8
+- Status: done
+- Notes: **same schema lesson as #7, caught before it shipped this time** — `KnowledgeChunk`
+  doesn't carry `review_status` either (only `KnowledgeDocument` does), so `needs_review`
+  flagging takes an explicit `review_statuses: dict[document_id, status]` lookup rather than
+  reading a field the chunk schema never had. Next: #9 (Groq generation, full) — will need a live
+  Groq key to fully verify, same caveat as #66's Sprint-0 script.
+
+### 2026-09-24 — @neevmodh
 - #7: Added `backend/app/rag/reranking.py` — `rerank(scored_chunks, context, source_types=...)`
   combines the incoming semantic/keyword `base_score` (from #6) with pregnancy-stage relevance,
   source quality, evidence level, regional relevance, and user-context term overlap, per Section
