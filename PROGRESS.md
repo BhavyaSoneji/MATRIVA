@@ -20,6 +20,26 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #5 follow-up: **ran the live pgvector verification that was previously flagged as untested.**
+  Docker is now running in this environment, so I spun up a standalone temporary Postgres+pgvector
+  container (port 5433, NOT the shared `docker-compose.yml` service — port 5432 was already taken
+  by an unrelated container from other work on this machine, left untouched) and ran
+  `backend/scripts/verify_pgvector_live.py` against it: created the real `knowledge_chunks` table,
+  stored chunks with real pgvector `Vector` columns, ran a real `cosine_distance` SQL query
+  (correctly returned the nearest neighbor first), and verified re-indexing actually replaces old
+  chunks in a live database (not just the in-memory test double). **All passed.** Torn down the
+  temporary container afterward.
+- Added `backend/scripts/verify_pgvector_live.py` as a committed, repeatable script so anyone
+  with `docker compose up -d db` running can re-verify this themselves — it's not a pytest file
+  since it needs a real DB, so it won't run in CI.
+- Related issue(s): #5
+- Status: pgvector storage/query/re-indexing now fully verified end-to-end. Only remaining gap:
+  a real Gemini API call for `embed_text` — still untested, since I don't have an `EMBEDDING_API_KEY`
+  in this environment. Whoever has one should run that specific check; everything downstream of
+  embedding generation (storage, retrieval, re-indexing) is now confirmed working against real
+  infra, not just mocks.
+
+### 2026-09-24 — @neevmodh
 - #58: Added `backend/app/rag/multi_domain.py` — `detect_domains(query)` (multi-label domain
   detection across all 5 domains, unlike #57's single-label intent classifier), feeding
   `multi_domain_retrieval_filter(query)` into #6's `hybrid_retrieve` domain filter. On the
