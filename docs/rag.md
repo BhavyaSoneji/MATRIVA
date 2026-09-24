@@ -98,3 +98,14 @@ Retrieval must not rely solely on embeddings — combine with metadata filters, 
 region = Gujarat` when region-specific info is relevant. Don't over-filter in a way that removes
 important general medical information. Implemented in #6 (Sprint 1); Sprint 0's `seed_qa.py` uses
 plain keyword overlap only.
+
+## Backend/API integration
+
+The API now uses a small SQLAlchemy-to-RAG adapter. It converts approved ORM chunks into the
+canonical Pydantic chunks, calls the full `answer_query()` pipeline when a provider key is
+configured, and otherwise uses a deterministic source-grounded local fallback for development.
+The HTTP contract is `app.rag.pipeline.answer_question()`.
+
+Only active, approved documents from approved sources are eligible. Guideline registry entries
+that are retired or past their review due date are excluded. The demo seed is synthetic and must
+not be presented as a complete or current clinical corpus.

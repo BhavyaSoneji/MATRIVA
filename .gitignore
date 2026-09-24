@@ -25,6 +25,11 @@ npm-debug.log*
 .env
 .env.local
 
+# Local data and generated reports
+*.db
+backend/storage/
+evaluation/reports/*.json
+
 # OS
 .DS_Store
 Thumbs.db

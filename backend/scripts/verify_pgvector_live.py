@@ -25,8 +25,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from sqlalchemy.orm import sessionmaker
 
-from app.core.db import Base, engine
-from app.models.knowledge import KnowledgeChunkRecord
+from app.core.db import engine
+from app.models.knowledge import KnowledgeChunkRecord, RagBase
 from app.rag.vector_store import PgVectorStore
 from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
@@ -44,8 +44,8 @@ def make_chunk(chunk_id: str, document_id: str) -> KnowledgeChunk:
 
 
 def main() -> None:
-    print("Creating knowledge_chunks table (if not present)...")
-    Base.metadata.create_all(engine, tables=[KnowledgeChunkRecord.__table__])
+    print("Creating rag_knowledge_chunks table (if not present)...")
+    RagBase.metadata.create_all(engine, tables=[KnowledgeChunkRecord.__table__])
 
     session_factory = sessionmaker(bind=engine)
     store = PgVectorStore(session_factory)

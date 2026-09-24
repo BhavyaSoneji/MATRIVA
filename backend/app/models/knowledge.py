@@ -10,17 +10,35 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pgvector.sqlalchemy import Vector
-from sqlalchemy import DateTime, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+try:
+    from pgvector.sqlalchemy import Vector
+except ImportError:  # SQLite/test environments may not install the Postgres extension
+    from sqlalchemy.types import UserDefinedType
 
-from app.core.db import Base
+    class Vector(UserDefinedType):  # type: ignore[no-redef]
+        cache_ok = True
+
+        def __init__(self, dim: int) -> None:
+            self.dim = dim
+
+        def get_col_spec(self, **_kwargs: object) -> str:
+            return "JSON"
+
+from sqlalchemy import DateTime, Integer, String, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+
+class RagBase(DeclarativeBase):
+    pass
 
 EMBEDDING_DIM = 768  # Gemini text-embedding-004 output dimension
 
 
-class KnowledgeChunkRecord(Base):
-    __tablename__ = "knowledge_chunks"
+class KnowledgeChunkRecord(RagBase):
+    # The API's application knowledge table is `knowledge_chunks`; the RAG
+    # vector index is isolated as `rag_knowledge_chunks` so SQLite tests and
+    # PostgreSQL/pgvector can coexist without two ORM classes claiming one table.
+    __tablename__ = "rag_knowledge_chunks"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     chunk_id: Mapped[str] = mapped_column(String, unique=True, index=True)

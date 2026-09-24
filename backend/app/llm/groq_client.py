@@ -11,7 +11,21 @@ from __future__ import annotations
 import os
 import time
 
-from groq import APIConnectionError, APIStatusError, APITimeoutError, Groq
+try:
+    from groq import APIConnectionError, APIStatusError, APITimeoutError, Groq
+except ImportError:  # optional provider; local/demo mode uses a grounded fallback
+    class APIConnectionError(Exception):  # type: ignore[no-redef]
+        pass
+
+    class APIStatusError(Exception):  # type: ignore[no-redef]
+        pass
+
+    class APITimeoutError(Exception):  # type: ignore[no-redef]
+        pass
+
+    class Groq:  # type: ignore[no-redef]
+        def __init__(self, *_args, **_kwargs):
+            raise RuntimeError("Groq client is not installed; install the optional provider dependencies")
 
 from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
 from app.rag.context_packet import ContextPacket
