@@ -50,6 +50,7 @@ def answer_query(
     query: str,
     *,
     candidate_chunks: list[KnowledgeChunk],
+    candidate_scores: dict[str, float] | None = None,
     profile: UserContext | None = None,
     client: Groq | None = None,
     k: int = DEFAULT_K,
@@ -75,7 +76,13 @@ def answer_query(
         )
 
     domains = multi_domain_retrieval_filter(query)
-    retrieval = hybrid_retrieve(query, candidate_chunks=candidate_chunks, domains=domains, k=k)
+    retrieval = hybrid_retrieve(
+        query,
+        candidate_chunks=candidate_chunks,
+        candidate_scores=candidate_scores,
+        domains=domains,
+        k=k,
+    )
 
     # Sufficiency must be checked against RAW retrieval scores, not
     # reranked ones: rerank() adds a constant baseline (evidence-level
@@ -109,3 +116,102 @@ def answer_query(
         citation_result=citation_result,
         post_check_report=post_check_report,
     )
+
+
+# --- Database/API adapter -------------------------------------------------
+# The API uses SQLAlchemy models for persistence, while the RAG team's pipeline
+# uses the Pydantic knowledge schema.  Keep that boundary explicit so either
+# side can evolve without making the HTTP layer depend on ORM internals.
+from sqlalchemy.orm import Session as DatabaseSession  # noqa: E402
+
+from app.core.config import get_settings  # noqa: E402
+from app.llm.generator import GenerationResult, generate_grounded_answer  # noqa: E402
+from app.rag.retrieval import RetrievedChunk, retrieve_chunks  # noqa: E402
+from app.schemas.knowledge import Domain, EvidenceLevel, SourceType  # noqa: E402
+
+
+_DOMAIN_MAP = {
+    "modern_medical": Domain.MODERN_MEDICAL,
+    "ayurveda": Domain.AYURVEDA,
+    "nutrition": Domain.NUTRITION,
+    "lifestyle": Domain.LIFESTYLE,
+    "regional_cultural": Domain.REGIONAL_CULTURAL,
+    "antenatal_care": Domain.MODERN_MEDICAL,
+}
+_SOURCE_TYPE_MAP = {
+    "government": SourceType.INSTITUTIONAL_GUIDANCE,
+    "professional_society": SourceType.MEDICAL_GUIDELINE,
+    "international": SourceType.INSTITUTIONAL_GUIDANCE,
+    "academic": SourceType.CLINICAL_REFERENCE,
+    "traditional": SourceType.TRADITIONAL_REFERENCE,
+    "internal": SourceType.CLINICAL_REFERENCE,
+}
+_EVIDENCE_MAP = {
+    "traditional": EvidenceLevel.TRADITIONAL,
+    "preliminary": EvidenceLevel.PRELIMINARY,
+    "limited_evidence": EvidenceLevel.LIMITED_EVIDENCE,
+    "mixed_evidence": EvidenceLevel.MIXED_EVIDENCE,
+    "supported": EvidenceLevel.SUPPORTED,
+    "uncertain": EvidenceLevel.UNCERTAIN,
+    "not_established": EvidenceLevel.NOT_ESTABLISHED,
+}
+
+
+def _as_rag_chunk(item: RetrievedChunk) -> KnowledgeChunk:
+    document = item.document
+    source = item.source
+    return KnowledgeChunk(
+        chunk_id=item.chunk.id,
+        document_id=document.id,
+        source_id=source.id,
+        domain=_DOMAIN_MAP.get((document.domain or "").lower(), Domain.MODERN_MEDICAL),
+        topic=source.topic,
+        pregnancy_stage=document.pregnancy_stage,
+        evidence_level=_EVIDENCE_MAP.get((source.evidence_level or "").lower(), EvidenceLevel.UNCERTAIN),
+        region=document.region,
+        language=document.language or "en",
+        content=item.chunk.content,
+        chunk_index=item.chunk.chunk_index,
+        token_count=len(item.chunk.content.split()),
+    )
+
+
+def answer_question(
+    db: DatabaseSession,
+    query: str,
+    *,
+    domain: str | None = None,
+    stage: str | None = None,
+    region: str | None = None,
+) -> tuple[GenerationResult, list[RetrievedChunk]]:
+    """Run the full RAG pipeline when a provider key is configured.
+
+    The no-key path remains deterministic and source-grounded for local/demo use.  It is
+    deliberately not treated as a live clinical model result.
+    """
+
+    retrieved = retrieve_chunks(db, query, domain=domain, stage=stage, region=region)
+    if not retrieved:
+        return GenerationResult(text="", citation_ids=[]), retrieved
+
+    settings = get_settings()
+    if settings.llm_api_key:
+        try:
+            profile = UserContext(pregnancy_stage=stage, region=region)
+            rag_chunks = [_as_rag_chunk(item) for item in retrieved]
+            result = answer_query(
+                query,
+                candidate_chunks=rag_chunks,
+                candidate_scores={chunk.chunk_id: item.score for chunk, item in zip(rag_chunks, retrieved)},
+                profile=profile,
+            )
+            return GenerationResult(
+                text=result.answer,
+                citation_ids=list(dict.fromkeys(item.source.id for item in retrieved)),
+                used_external_provider=True,
+            ), retrieved
+        except Exception:
+            # Provider/pipeline failures must not bypass the safe local fallback.
+            pass
+
+    return generate_grounded_answer(query, retrieved), retrieved

@@ -19,6 +19,13 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-09-24 — @BhavyaSoneji
+- Implemented and locally verified the backend API slice for #23-#40, #59-#63, and #69-#71: auth/JWT, consent/profile/pregnancy, chat/history, knowledge/sources/guidelines, recommendations, food/lifestyle, feedback, privacy, admin, safety, evaluation, and observability.
+- Added security and deployment controls: PBKDF2 password hashing, role checks, validation, upload gates, rate limits, audit logs, fail-closed safety responses, consent withdrawal, CI secret scan, production Dockerfiles/compose, and frontend dependency audit updates.
+- Related issue(s): #23-#40, #59-#63, #69-#71, #77
+- Status: in-progress
+- Notes: The branch has been rebased onto the updated RAG `main`; the API adapter now wraps the canonical `answer_query()` pipeline instead of replacing it. Docker Desktop is installed; the local PostgreSQL/pgvector, Redis, backend, and frontend stack is running and healthy. GitHub issue closures/pushes have not been performed yet.
+
 ### 2026-09-24 — @neevmodh
 - #20: Added `backend/app/rag/pipeline.py` — `answer_query(query, candidate_chunks, profile, client)`,
   **the first place #6 through #19's pieces are actually wired together into one call.** Until now

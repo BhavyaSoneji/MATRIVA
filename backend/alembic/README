@@ -1,1 +1,10 @@
-Generic single-database configuration.
+MATRIVA database migrations
+
+Run from `backend/` with the environment loaded:
+
+    alembic upgrade head
+    alembic downgrade -1
+
+The initial migration creates the portable SQLAlchemy schema and enables pgvector on
+PostgreSQL when the `vector` extension is available. Use Alembic for deployed databases;
+`AUTO_CREATE_TABLES` is only a local/demo convenience.

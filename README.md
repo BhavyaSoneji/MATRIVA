@@ -23,22 +23,20 @@ retrieval, reranking, context packet construction, Groq generation, citation val
 personalized query rewriting, intent classification, multi-domain segmentation, the full safety
 classifier + post-check + prompt-injection defense, Ayurveda provenance validation, and retrieval/
 generation/safety/hallucination evaluation harnesses — all wired together end-to-end in
-[`backend/app/rag/pipeline.py`](./backend/app/rag/pipeline.py)'s `answer_query()`. 212 automated
+[`backend/app/rag/pipeline.py`](./backend/app/rag/pipeline.py)'s `answer_query()`. 233 automated
 tests pass across `backend/`, `ingestion/`, and `evaluation/`.
 
 **What's not yet live-verified:** no live Groq or Gemini API key has been used against this code —
 generation and embedding calls are tested against mocked/injected clients, not the real APIs.
-pgvector storage/retrieval/re-indexing *has* been verified against a real Postgres instance.
-Backend/frontend HTTP endpoints (`/chat`, auth, onboarding, etc.) are not yet built — `answer_query()`
-is the callable the API layer should wrap.
+pgvector storage/retrieval/re-indexing has been verified against a real Postgres instance.
+The backend HTTP layer is now implemented and wraps the canonical RAG pipeline; the local Docker
+stack (PostgreSQL/pgvector, Redis, FastAPI, and Next.js) has also been smoke-tested. Demo seed
+records are synthetic and must not be treated as current clinical guidance.
 
-**Known limitation, read before demoing:** keyword-overlap retrieval (the fallback in place until
-live embeddings are wired in) cannot reliably distinguish an incidental word match from genuine
-topical relevance — e.g. a question about a topic outside the corpus can still retrieve a
-loosely-related chunk on nothing more than shared common vocabulary, and the pipeline will attempt
-an answer instead of saying "insufficient evidence." See `PROGRESS.md`'s 2026-09-24 entry on
-issue #19 for the full investigation; this needs real semantic embeddings (#5) to fix properly,
-not a keyword threshold tweak (several were tried and don't work).
+**Known limitation, read before demoing:** the no-key local fallback uses keyword retrieval and
+cannot reliably distinguish an incidental word match from genuine topical relevance. The full
+semantic path is implemented on the RAG branch, but live provider calls still require valid API
+keys and a reviewed source corpus.
 
 ---
 
@@ -137,23 +135,18 @@ multiple vector databases, multiple orchestration frameworks. This is a modular 
 
 ```
 matriva/
-├── frontend/            Next.js app (UI) — Phase 0 scaffold, no feature pages yet
+├── frontend/            Next.js app (UI) — production build scaffold
 ├── backend/
 │   ├── app/
-│   │   ├── api/          route handlers — not yet built
-│   │   ├── models/       SQLAlchemy models (knowledge.py: pgvector-backed chunk table)
-│   │   ├── schemas/      knowledge.py — KnowledgeDocument/Chunk/AyurvedicProvenance schema
-│   │   ├── rag/          retrieval, reranking, context packets, embeddings, vector store,
-│   │   │                 query rewriting, multi-domain segmentation, grounding guard,
-│   │   │                 pipeline.py (answer_query — the full end-to-end orchestrator)
-│   │   ├── safety/       classifier.py (full), post_check.py, prompt_injection.py,
-│   │   │                 pre_check.py (thin Sprint-0 version, kept for existing callers)
-│   │   ├── llm/          Groq client + prompts
-│   │   ├── evidence/     citation validation, Ayurveda provenance validation
-│   │   ├── recommendation/, personalization/  not yet built
-│   │   └── core/         config, db
-│   ├── tests/            pytest — 149 tests
-│   └── scripts/          verify_pgvector_live.py — manual real-Postgres check
+│   │   ├── api/          FastAPI routers for auth, profile, chat, knowledge, admin, evaluation
+│   │   ├── models/       SQLAlchemy application models and evidence/guideline metadata
+│   │   ├── schemas/      API schemas + canonical RAG knowledge schemas
+│   │   ├── rag/          full RAG pipeline + SQLAlchemy/API adapter
+│   │   ├── safety/       full classifier/post-check/prompt-injection defense + API rules adapter
+│   │   ├── services/     auth, profile, chat, recommendations, admin, privacy, evaluation
+│   │   └── core/         config, database, security, rate limiting, observability
+│   ├── tests/            backend unit/integration and RAG regression tests
+│   └── scripts/          pgvector verification and secret scan
 ├── knowledge/
 │   ├── seed/seed.yaml    curated seed knowledge set (demo corpus)
 │   └── ayurveda/         source PDF + OCR text extract
@@ -176,42 +169,30 @@ matriva/
 - A Groq API key and a Gemini API key
 
 ### Environment variables
-Copy `.env.example` to `.env` and fill in:
+Copy `.env.example` to `.env` and set a unique `JWT_SECRET` (at least 32 characters).
+Never commit real secrets; `.env` is gitignored. `DEMO_MODE` must be `false` in production.
 
+```bash
+cp .env.example .env
 ```
-DATABASE_URL=
-REDIS_URL=
-VECTOR_DATABASE_URL=
-
-LLM_PROVIDER=groq
-LLM_API_KEY=
-LLM_MODEL=
-
-EMBEDDING_PROVIDER=gemini
-EMBEDDING_MODEL=
-
-JWT_SECRET=
-```
-
-Never commit real secrets. `.env` is gitignored.
 
 ### Run the stack
 
 ```bash
-# 1. Start Postgres (with pgvector) + Redis
-docker compose up -d db redis
+# Full local stack (Postgres/pgvector + Redis + API + frontend)
+docker compose up --build
 
-# 2. Backend
+# Or run the backend directly
 cd backend
-pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 alembic upgrade head
+python ../database/seed/seed.py  # optional synthetic demo data
 uvicorn app.main:app --reload
-
-# 3. Frontend
-cd frontend
-npm install
-npm run dev
 ```
+
+The API is available at `http://localhost:8000`; OpenAPI is at `http://localhost:8000/docs`.
+The production-oriented compose file is `docker-compose.prod.yml`; see
+[`docs/deployment.md`](./docs/deployment.md) before deploying.
 
 ### Run knowledge ingestion
 
@@ -223,18 +204,21 @@ python -m pipelines.run --source ../knowledge/ayurveda
 ### Run tests
 
 ```bash
-# backend (149 tests) + lint/type-check
-cd backend && ruff check . && mypy app/ && pytest
+# backend API + RAG tests, lint, type-check, and secret scan
+cd backend
+python -m pytest -q
+ruff check .
+python scripts/secret_scan.py --root ..
 
-# ingestion (27 tests)
-cd ingestion && pytest tests/
+# ingestion
+cd ../ingestion && pytest tests/
 
-# evaluation harnesses (36 tests)
-cd evaluation && pytest tests/
+# evaluation harnesses
+cd ../evaluation && pytest tests/
 
 # frontend lint/typecheck/build + e2e
-cd frontend && npm run lint && npm run typecheck && npm run build
-cd frontend && npx playwright install --with-deps chromium && npm run test:e2e
+cd ../frontend && npm run lint && npm run typecheck && npm run build
+npx playwright install --with-deps chromium && npm run test:e2e
 ```
 
 ### Run evaluation harnesses
