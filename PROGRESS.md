@@ -20,6 +20,24 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #6: Added `backend/app/rag/retrieval.py` — `hybrid_retrieve(query, ...)` combines vector search
+  (via #5's `VectorStore`), lenient metadata filtering (`apply_metadata_filters`: pregnancy_stage/
+  domain/region per Section 13), and keyword-overlap scoring as a secondary signal, per Section 12
+  Step 6. Metadata filtering is deliberately lenient (missing/"all"-tagged fields pass any filter)
+  and **falls back to the unfiltered candidate pool if filters would otherwise return zero
+  results**, per Section 13's "don't over-filter" guidance and this issue's acceptance criteria.
+  Works with either a real `vector_store` + `query_embedding`, or `candidate_chunks` alone
+  (keyword-only path, no embedding needed — same situation Sprint 0's `seed_qa.py` handles).
+- Extracted `backend/app/rag/keyword_search.py` (`tokenize`, `keyword_overlap_score`) out of
+  `seed_qa.py` so #6 doesn't duplicate Sprint 0's tokenizer; `seed_qa.py` now imports it. Reran
+  `seed_qa.retrieve()` manually to confirm no behavior change.
+- 11 new tests (`backend/tests/test_retrieval.py`); 22/22 passing across `backend/tests/`.
+- Related issue(s): #6
+- Status: done
+- Notes: next is #7 (reranking — semantic relevance, stage, source quality, evidence level,
+  region, user context), which sits directly downstream of this issue's output.
+
+### 2026-09-24 — @neevmodh
 - #5: Added `backend/app/rag/embeddings.py` (Gemini `embed_text`/`embed_chunk_contents`),
   `backend/app/models/knowledge.py` (`KnowledgeChunkRecord` ORM model with a pgvector `Vector(768)`
   column), and `backend/app/rag/vector_store.py` — a `VectorStore` protocol with two

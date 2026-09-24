@@ -11,13 +11,14 @@ Exposed as a plain callable (`answer_question`) so the backend's /chat endpoint
 from __future__ import annotations
 
 import os
-import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 import yaml
 from groq import Groq
+
+from app.rag.keyword_search import tokenize as _tokenize
 
 SEED_PATH = Path(__file__).resolve().parents[3] / "knowledge" / "seed" / "seed.yaml"
 
@@ -36,16 +37,6 @@ Clearly distinguish, using explicit section labels in your answer:
 If the evidence is insufficient to answer, say so explicitly instead of guessing.
 
 Do not diagnose. Do not prescribe treatment. Do not replace professional medical care."""
-
-_STOPWORDS = {
-    "the", "a", "an", "is", "are", "what", "should", "for", "of", "in", "on",
-    "to", "and", "or", "my", "me", "i", "do", "does", "can", "any", "with",
-}
-
-
-def _tokenize(text: str) -> set[str]:
-    return {w for w in re.findall(r"[a-z]+", text.lower()) if w not in _STOPWORDS}
-
 
 @lru_cache
 def load_seed() -> list[dict[str, Any]]:
