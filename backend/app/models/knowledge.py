@@ -31,7 +31,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 class RagBase(DeclarativeBase):
     pass
 
-EMBEDDING_DIM = 768  # Gemini text-embedding-004 output dimension
+EMBEDDING_DIM = 768  # gemini-embedding-001, requested at this output_dimensionality
 
 
 class KnowledgeChunkRecord(RagBase):

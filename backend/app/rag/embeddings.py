@@ -9,7 +9,10 @@ import os
 
 import google.generativeai as genai
 
-EMBEDDING_MODEL = "models/text-embedding-004"
+# text-embedding-004 has been retired; gemini-embedding-001 is the current
+# model but defaults to 3072 dimensions, so output_dimensionality is pinned
+# to EMBEDDING_DIM to match the fixed-width pgvector column below.
+EMBEDDING_MODEL = "models/gemini-embedding-001"
 EMBEDDING_DIM = 768
 
 
@@ -21,7 +24,7 @@ def embed_text(text: str, *, api_key: str | None = None, model: str = EMBEDDING_
             "Gemini API key not configured (set EMBEDDING_API_KEY or GEMINI_API_KEY)"
         )
     genai.configure(api_key=key)
-    result = genai.embed_content(model=model, content=text)
+    result = genai.embed_content(model=model, content=text, output_dimensionality=EMBEDDING_DIM)
     return result["embedding"]
 
 

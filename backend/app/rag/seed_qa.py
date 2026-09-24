@@ -73,7 +73,7 @@ def answer_question(
     query: str,
     *,
     api_key: str | None = None,
-    model: str = "llama-3.3-70b-versatile",
+    model: str = "openai/gpt-oss-120b",
 ) -> dict[str, Any]:
     """Return {answer, sources[], evidence_label} for a single demo question."""
     entries = retrieve(query)

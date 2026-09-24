@@ -52,10 +52,10 @@ class Settings(BaseSettings):
     # Optional external providers
     llm_provider: str = "groq"
     llm_api_key: str = ""
-    llm_model: str = "llama-3.3-70b-versatile"
+    llm_model: str = "openai/gpt-oss-120b"
     embedding_provider: str = "gemini"
     embedding_api_key: str = ""
-    embedding_model: str = "text-embedding-004"
+    embedding_model: str = "models/gemini-embedding-001"
 
     @field_validator("debug", mode="before")
     @classmethod
