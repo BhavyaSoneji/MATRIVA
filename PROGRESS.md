@@ -20,6 +20,19 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #2: Added `ingestion/pipelines/parser.py` — `extract_text_from_pdf` (PyMuPDF), `extract_text_from_docx`
+  (python-docx), `extract_text` (dispatch by extension), `clean_text` (whitespace/hyphenation
+  normalization without altering meaning), `parse_document` (parse+clean in one call). Implements
+  the first stages of Section 37's pipeline (SOURCE FILE → PARSER → EXTRACTION → CLEANING).
+- Added `ingestion/tests/test_parser.py` — 9 unit tests (PDF/docx extraction, unsupported-type
+  rejection, 4 cleaning behaviors), generated sample fixtures on the fly (no binary test fixtures
+  committed). All passing.
+- Related issue(s): #2
+- Status: done
+- Notes: structural analysis + chunking is #3 (next), metadata enrichment + quality checks is #4.
+  Run tests with `cd ingestion && python -m pytest tests/`.
+
+### 2026-09-24 — @neevmodh
 - #1: Defined the knowledge document/chunk schema in `backend/app/schemas/knowledge.py`
   (`KnowledgeDocument`, `KnowledgeChunk`, `AyurvedicProvenance`, `Domain`, `SourceType`,
   `EvidenceLevel`, `ReviewStatus`) per Master Prompt Sections 9/10/11/14; documented in
