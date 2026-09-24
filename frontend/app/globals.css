@@ -2,48 +2,94 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  MATRIVA design tokens — sky-blue medical/wellness theme.
+  Sharp, structured UI: near-zero border radius everywhere (see --radius and
+  tailwind.config.ts borderRadius scale).
+*/
 :root {
-  --background: 150 30% 98%;
-  --foreground: 200 30% 15%;
-  --muted: 150 20% 95%;
-  --muted-foreground: 200 15% 40%;
-  --primary: 175 45% 38%;
+  --background: 202 45% 98%;
+  --foreground: 208 45% 14%;
+  --muted: 204 40% 95%;
+  --muted-foreground: 206 20% 40%;
+  --primary: 199 89% 42%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 205 55% 90%;
-  --secondary-foreground: 200 30% 20%;
-  --accent: 25 70% 92%;
-  --accent-foreground: 20 40% 25%;
-  --border: 150 20% 88%;
+  --secondary: 201 60% 92%;
+  --secondary-foreground: 205 45% 20%;
+  --accent: 189 55% 90%;
+  --accent-foreground: 199 70% 22%;
+  --border: 205 30% 86%;
   --card: 0 0% 100%;
-  --card-foreground: 200 30% 15%;
-  --destructive: 0 65% 48%;
+  --card-foreground: 208 45% 14%;
+  --destructive: 356 70% 46%;
   --destructive-foreground: 0 0% 100%;
-  --success: 150 45% 35%;
-  --warning: 38 80% 45%;
-  --radius: 0.75rem;
+  --success: 158 45% 34%;
+  --warning: 32 85% 44%;
+
+  /* Sharp corners: near-square by default; small radius reserved for tiny
+     controls (checkboxes etc.) where a fully square edge reads as a bug. */
+  --radius: 0.125rem;
+
+  /* extra tokens for the pregnancy visualization / gradients */
+  --sky-50: 202 100% 97%;
+  --sky-100: 201 94% 92%;
+  --sky-200: 200 90% 84%;
+  --sky-300: 199 88% 72%;
+  --sky-400: 199 89% 58%;
+  --sky-500: 199 89% 48%;
+  --sky-600: 200 92% 38%;
+  --sky-700: 201 88% 30%;
+  --sky-900: 206 60% 16%;
 }
 
 .dark {
-  --background: 200 30% 8%;
-  --foreground: 150 20% 92%;
-  --muted: 200 20% 14%;
-  --muted-foreground: 150 10% 65%;
-  --primary: 175 45% 55%;
-  --primary-foreground: 200 30% 8%;
-  --secondary: 205 30% 18%;
-  --secondary-foreground: 150 20% 92%;
-  --accent: 25 30% 18%;
-  --accent-foreground: 25 60% 85%;
-  --border: 200 20% 20%;
-  --card: 200 28% 11%;
-  --card-foreground: 150 20% 92%;
-  --destructive: 0 60% 55%;
+  --background: 208 40% 7%;
+  --foreground: 202 35% 92%;
+  --muted: 208 30% 13%;
+  --muted-foreground: 203 15% 65%;
+  --primary: 199 85% 58%;
+  --primary-foreground: 208 45% 8%;
+  --secondary: 205 30% 17%;
+  --secondary-foreground: 202 35% 92%;
+  --accent: 199 30% 18%;
+  --accent-foreground: 199 70% 82%;
+  --border: 205 22% 22%;
+  --card: 208 32% 10%;
+  --card-foreground: 202 35% 92%;
+  --destructive: 356 65% 55%;
   --destructive-foreground: 0 0% 100%;
-  --success: 150 40% 55%;
-  --warning: 38 70% 55%;
+  --success: 158 40% 55%;
+  --warning: 32 75% 55%;
+
+  --sky-50: 208 32% 12%;
+  --sky-100: 206 30% 16%;
+  --sky-200: 203 30% 22%;
+  --sky-300: 201 40% 32%;
+  --sky-400: 199 55% 45%;
+  --sky-500: 199 70% 55%;
+  --sky-600: 199 80% 62%;
+  --sky-700: 199 85% 70%;
+  --sky-900: 200 90% 90%;
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+}
+
+/* Subtle, medical-grade backdrop wash used behind hero/dashboard sections */
+.bg-wellness-gradient {
+  background-image: linear-gradient(
+    180deg,
+    hsl(var(--sky-50)) 0%,
+    hsl(var(--background)) 55%
+  );
+}
+
+.bg-sky-panel-gradient {
+  background-image: linear-gradient(
+    135deg,
+    hsl(var(--sky-500)) 0%,
+    hsl(var(--sky-600)) 100%
+  );
 }

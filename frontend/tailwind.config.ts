@@ -39,12 +39,29 @@ const config: Config = {
         },
         success: "hsl(var(--success))",
         warning: "hsl(var(--warning))",
+        sky: {
+          50: "hsl(var(--sky-50))",
+          100: "hsl(var(--sky-100))",
+          200: "hsl(var(--sky-200))",
+          300: "hsl(var(--sky-300))",
+          400: "hsl(var(--sky-400))",
+          500: "hsl(var(--sky-500))",
+          600: "hsl(var(--sky-600))",
+          700: "hsl(var(--sky-700))",
+          900: "hsl(var(--sky-900))",
+        },
       },
       borderRadius: {
+        /* Sharp, structured UI: no rounded cards/buttons/pills. A hair of
+           radius (1-2px) is kept only for `lg`/`xl` so focus rings and hairline
+           borders don't look aliased; everything else is a true square edge. */
+        none: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+        md: "0px",
         lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-        xl: "calc(var(--radius) + 4px)",
+        xl: "calc(var(--radius) + 1px)",
+        full: "0px",
       },
     },
   },

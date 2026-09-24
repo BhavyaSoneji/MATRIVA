@@ -123,7 +123,7 @@ function ChatContent() {
     <main className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col px-4 py-6">
       <h1 className="mb-4 text-xl font-semibold text-foreground">Chat with MATRIVA</h1>
 
-      <div className="flex-1 overflow-y-auto rounded-xl border border-border bg-card p-4">
+      <div className="flex-1 overflow-y-auto border border-border bg-card p-4">
         {historyLoading && <LoadingState label="Loading conversation..." />}
         {!historyLoading && messages.length === 0 && (
           <p className="py-8 text-center text-sm text-muted-foreground">
@@ -145,10 +145,10 @@ function ChatContent() {
                   </Alert>
                 )}
                 <div
-                  className={`rounded-xl px-4 py-2.5 text-sm ${
+                  className={`border px-4 py-2.5 text-sm ${
                     m.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                      ? "border-transparent bg-primary text-primary-foreground"
+                      : "border-border bg-muted text-foreground"
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{m.text}</p>
@@ -195,7 +195,7 @@ function ChatContent() {
           ))}
           {sending && (
             <div className="flex justify-start">
-              <div className="flex items-center gap-2 rounded-xl bg-muted px-4 py-2.5 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2 border border-border bg-muted px-4 py-2.5 text-sm text-muted-foreground">
                 <Spinner className="h-4 w-4" /> Thinking...
               </div>
             </div>
@@ -216,7 +216,7 @@ function ChatContent() {
             key={q}
             onClick={() => sendMessage(q)}
             disabled={sending}
-            className="rounded-full border border-border bg-background px-3 py-1.5 text-xs text-foreground/80 hover:bg-muted disabled:opacity-50"
+            className="border border-border bg-background px-3 py-1.5 text-xs text-foreground/80 hover:bg-muted disabled:opacity-50"
           >
             {q}
           </button>

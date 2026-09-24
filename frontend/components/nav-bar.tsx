@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
-import { Leaf } from "lucide-react";
+import { HeartPulse } from "lucide-react";
 
 const links = [
   { href: "/dashboard", label: "Dashboard" },
@@ -36,8 +36,10 @@ export function NavBar() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-primary">
-          <Leaf className="h-5 w-5" />
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight text-primary">
+          <span className="flex h-8 w-8 items-center justify-center border border-primary/30 bg-sky-50 text-primary">
+            <HeartPulse className="h-4 w-4" />
+          </span>
           MATRIVA
         </Link>
         {user && (
@@ -46,8 +48,10 @@ export function NavBar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-muted ${
-                  pathname === link.href ? "bg-muted font-medium text-primary" : "text-foreground/80"
+                className={`border-b-2 px-2.5 py-1.5 text-sm transition-colors hover:bg-muted ${
+                  pathname === link.href
+                    ? "border-primary font-medium text-primary"
+                    : "border-transparent text-foreground/80"
                 }`}
               >
                 {link.label}
@@ -58,8 +62,10 @@ export function NavBar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`rounded-md px-2.5 py-1.5 text-sm transition-colors hover:bg-muted ${
-                    pathname === link.href ? "bg-muted font-medium text-primary" : "text-foreground/80"
+                  className={`border-b-2 px-2.5 py-1.5 text-sm transition-colors hover:bg-muted ${
+                    pathname === link.href
+                      ? "border-primary font-medium text-primary"
+                      : "border-transparent text-foreground/80"
                   }`}
                 >
                   {link.label}
@@ -95,7 +101,7 @@ export function NavBar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`rounded-md px-2 py-1 text-xs ${
+              className={`px-2 py-1 text-xs ${
                 pathname === link.href ? "bg-muted font-medium text-primary" : "text-foreground/70"
               }`}
             >

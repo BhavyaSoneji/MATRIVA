@@ -240,7 +240,7 @@ function SettingsContent() {
               Delete my account
             </Button>
           ) : (
-            <div className="flex flex-col gap-2 rounded-lg border border-destructive/40 bg-destructive/5 p-4">
+            <div className="flex flex-col gap-2 border-l-4 border-y border-r border-destructive/40 bg-destructive/5 p-4">
               <p className="text-sm text-destructive">
                 This permanently deletes your account and all data. This cannot be undone. Type{" "}
                 <strong>DELETE</strong> to confirm.
