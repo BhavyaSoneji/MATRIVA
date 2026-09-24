@@ -11,11 +11,28 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
-from app.api import admin, auth, chat, demo, evaluations, feedback, knowledge, privacy, profile, recommendations
+from app.api import (
+    admin,
+    auth,
+    chat,
+    demo,
+    evaluations,
+    feedback,
+    knowledge,
+    privacy,
+    profile,
+    recommendations,
+)
 from app.api.deps import StaffUser
 from app.core.config import get_settings
 from app.core.db import SessionLocal, init_db
-from app.core.observability import configure_logging, log_event, metrics, new_request_id, request_id_context
+from app.core.observability import (
+    configure_logging,
+    log_event,
+    metrics,
+    new_request_id,
+    request_id_context,
+)
 from app.core.rate_limit import rate_limiter
 from app.core.redis import connect_redis
 from app.core.security import validate_runtime_security
@@ -59,7 +76,9 @@ async def request_security_and_metrics(request: Request, call_next):
     started = time.perf_counter()
     path = request.url.path
     try:
-        if path.startswith("/auth") or path.startswith("/chat") or path.startswith("/knowledge") or path.startswith("/sources") or path.startswith("/pregnancy") or path.startswith("/guidelines") or path.startswith("/ayurveda"):
+        if path.startswith(
+            ("/auth", "/chat", "/knowledge", "/sources", "/pregnancy", "/guidelines", "/ayurveda")
+        ):
             if path.startswith("/auth"):
                 limit = settings.rate_limit_auth_per_minute
             elif path.startswith("/chat"):
@@ -120,13 +139,13 @@ def health() -> dict[str, str]:
     try:
         with SessionLocal() as db:
             db.execute(text("SELECT 1"))
-    except Exception:
+    except Exception:  # noqa: BLE001
         database_status = "unavailable"
     redis_client = getattr(app.state, "redis", None)
     if redis_client is not None:
         try:
             redis_client.ping()
-        except Exception:
+        except Exception:  # noqa: BLE001
             redis_status = "unavailable"
     else:
         redis_status = "not_configured"

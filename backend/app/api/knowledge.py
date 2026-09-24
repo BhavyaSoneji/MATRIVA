@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import select
@@ -13,13 +13,18 @@ from app.models import (
 )
 from app.rag.retrieval import retrieve_chunks
 from app.repositories.knowledge import get_source, source_payload
-from app.schemas.api import GuidelineResponse, KnowledgeResult, KnowledgeSearchResponse, SourceResponse
+from app.schemas.api import (
+    GuidelineResponse,
+    KnowledgeResult,
+    KnowledgeSearchResponse,
+    SourceResponse,
+)
 
 router = APIRouter(tags=["knowledge"])
 
 
 def _guideline_status(status_value: str, review_due_date) -> str:
-    if review_due_date is not None and review_due_date < date.today():
+    if review_due_date is not None and review_due_date < datetime.now(timezone.utc).date():
         return "stale"
     return status_value
 

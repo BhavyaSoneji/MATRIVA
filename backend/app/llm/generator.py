@@ -33,8 +33,10 @@ def _local_grounded_answer(query: str, chunks: list[RetrievedChunk]) -> str:
     lines.extend(
         [
             "",
-            "This is educational information, not a diagnosis or a substitute for your maternity-care professional. "
-            "If the reviewed material does not cover your situation, the system should say so rather than infer a missing fact.",
+            (
+                "This is educational information, not a diagnosis or a substitute for your maternity-care professional. "
+                "If the reviewed material does not cover your situation, the system should say so rather than infer a missing fact."
+            ),
         ]
     )
     return "\n".join(lines)

@@ -16,7 +16,7 @@ from app.models import (
 )
 from app.schemas.api import ConsentRequest, DeleteResponse
 from app.services.audit import record_audit
-from app.services.profile import profile_payload, pregnancy_payload, set_consent
+from app.services.profile import pregnancy_payload, profile_payload, set_consent
 
 router = APIRouter(prefix="/privacy", tags=["privacy"])
 

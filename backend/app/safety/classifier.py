@@ -18,8 +18,11 @@ Lead (#75) before being presented as clinically validated, same as #67.
 from __future__ import annotations
 
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from enum import StrEnum
+
+from app.models import RiskLevel, SafetyRule, SafetyStatus
 
 
 class RiskCategory(StrEnum):
@@ -166,16 +169,11 @@ def classify(query: str) -> SafetyClassification:
 # --- API/database safety adapter ------------------------------------------
 # The API supports administrator-managed safety rules in addition to the
 # reviewed rule set used by the RAG evaluation pipeline.
-import unicodedata  # noqa: E402
-
-from app.models import RiskLevel, SafetyRule, SafetyStatus  # noqa: E402
 
 
 class SafetySubsystemError(RuntimeError):
     """Raised when the independent safety layer cannot make a decision."""
 
-
-from dataclasses import dataclass, field  # noqa: E402
 
 
 @dataclass(frozen=True)

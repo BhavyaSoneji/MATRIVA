@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 import time
+from collections.abc import Iterable
 from typing import Any
 
 from fastapi import HTTPException, status
@@ -22,12 +22,16 @@ from app.models import (
 from app.rag.pipeline import answer_question
 from app.rag.retrieval import RetrievedChunk
 from app.repositories.knowledge import source_payload
-from app.safety.classifier import SafetySubsystemError, classify_query, insufficient_evidence, validate_generated_answer
+from app.safety.classifier import (
+    SafetySubsystemError,
+    classify_query,
+    insufficient_evidence,
+    validate_generated_answer,
+)
 from app.schemas.api import ChatResponse, Citation, MessageRequest, SourceResponse
 from app.services.audit import active_safety_rules, record_safety_event
 from app.services.recommendation import generate_recommendations
 from app.services.stage import calculate_stage
-
 
 INTENT_KEYWORDS = {
     "EMERGENCY": {"emergency", "bleeding", "severe headache", "fetal movement", "breathing", "pain"},

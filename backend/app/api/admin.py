@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile, status
@@ -39,7 +39,11 @@ from app.schemas.api import (
     SourceResponse,
 )
 from app.services.audit import record_audit
-from app.services.knowledge import DocumentProcessingError, create_document, reindex_document
+from app.services.knowledge import (
+    DocumentProcessingError,
+    create_document,
+    reindex_document,
+)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -54,7 +58,7 @@ ALLOWED_EXTENSIONS = {".pdf", ".txt", ".md", ".json", ".csv"}
 
 
 def _guideline_status(item: Guideline) -> str:
-    if item.review_due_date is not None and item.review_due_date < date.today():
+    if item.review_due_date is not None and item.review_due_date < datetime.now(timezone.utc).date():
         return "stale"
     return item.status
 
@@ -92,7 +96,7 @@ async def upload_document(
     admin: AdminUser,
     db: DBSession,
     metadata: str = Form(...),
-    file: UploadFile = File(...),
+    file: UploadFile = File(...),  # noqa: B008
 ) -> DocumentResponse:
     try:
         parsed = DocumentMetadataRequest.model_validate(json.loads(metadata))

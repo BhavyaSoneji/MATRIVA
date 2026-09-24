@@ -18,19 +18,23 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from sqlalchemy.orm import Session as DatabaseSession
+
+from app.core.config import get_settings
 from app.evidence.citation_validation import (
     CitationValidationResult,
     validate_citations_against_packet,
 )
+from app.llm.generator import GenerationResult, generate_grounded_answer
 from app.llm.groq_client import Groq, generate_from_packet
 from app.rag.context_packet import ContextPacket, build_context_packet
 from app.rag.grounding import INSUFFICIENT_EVIDENCE_RESPONSE, has_sufficient_evidence
 from app.rag.multi_domain import multi_domain_retrieval_filter
 from app.rag.reranking import UserContext, rerank
-from app.rag.retrieval import hybrid_retrieve
+from app.rag.retrieval import RetrievedChunk, hybrid_retrieve, retrieve_chunks
 from app.safety.classifier import SafetyClassification, classify
 from app.safety.post_check import PostCheckReport, validate_and_finalize
-from app.schemas.knowledge import KnowledgeChunk
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk, SourceType
 
 DEFAULT_K = 5
 
@@ -122,14 +126,6 @@ def answer_query(
 # The API uses SQLAlchemy models for persistence, while the RAG team's pipeline
 # uses the Pydantic knowledge schema.  Keep that boundary explicit so either
 # side can evolve without making the HTTP layer depend on ORM internals.
-from sqlalchemy.orm import Session as DatabaseSession  # noqa: E402
-
-from app.core.config import get_settings  # noqa: E402
-from app.llm.generator import GenerationResult, generate_grounded_answer  # noqa: E402
-from app.rag.retrieval import RetrievedChunk, retrieve_chunks  # noqa: E402
-from app.schemas.knowledge import Domain, EvidenceLevel, SourceType  # noqa: E402
-
-
 _DOMAIN_MAP = {
     "modern_medical": Domain.MODERN_MEDICAL,
     "ayurveda": Domain.AYURVEDA,
@@ -210,7 +206,7 @@ def answer_question(
                 citation_ids=list(dict.fromkeys(item.source.id for item in retrieved)),
                 used_external_provider=True,
             ), retrieved
-        except Exception:
+        except Exception:  # noqa: BLE001, S110
             # Provider/pipeline failures must not bypass the safe local fallback.
             pass
 

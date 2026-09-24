@@ -10,8 +10,18 @@ the unfiltered candidate pool if filtering would otherwise return nothing.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
+from dataclasses import dataclass as DatabaseDataclass
+from datetime import datetime, timezone
 
+from sqlalchemy import or_, select
+from sqlalchemy.orm import Session as DatabaseSession
+
+from app.models import KnowledgeChunk as KnowledgeChunkRow
+from app.models import KnowledgeDocument as KnowledgeDocumentRow
+from app.models import KnowledgeSource as KnowledgeSourceRow
+from app.models import ReviewStatus as ReviewStatusValue
 from app.rag.keyword_search import keyword_overlap_score
 from app.rag.vector_store import VectorStore
 from app.schemas.knowledge import Domain, KnowledgeChunk
@@ -111,17 +121,6 @@ def hybrid_retrieve(
 # The RAG evaluation pipeline above consumes the canonical Pydantic chunks.
 # The HTTP API persists the same concepts in SQLAlchemy rows, so this adapter
 # performs approval/staleness checks before exposing rows to the service layer.
-import re  # noqa: E402
-from dataclasses import dataclass as DatabaseDataclass  # noqa: E402
-from datetime import date  # noqa: E402
-
-from sqlalchemy import or_, select  # noqa: E402
-from sqlalchemy.orm import Session as DatabaseSession  # noqa: E402
-
-from app.models import KnowledgeChunk as KnowledgeChunkRow  # noqa: E402
-from app.models import KnowledgeDocument as KnowledgeDocumentRow  # noqa: E402
-from app.models import KnowledgeSource as KnowledgeSourceRow  # noqa: E402
-from app.models import ReviewStatus as ReviewStatusValue  # noqa: E402
 
 
 @DatabaseDataclass(frozen=True)
@@ -204,7 +203,10 @@ def retrieve_chunks(
     for chunk, document, source in rows:
         guideline = source.guideline
         if guideline is not None:
-            stale = guideline.review_due_date is not None and guideline.review_due_date < date.today()
+            stale = (
+                guideline.review_due_date is not None
+                and guideline.review_due_date < datetime.now(timezone.utc).date()
+            )
             if guideline.status != "active" or stale:
                 continue
         searchable_text = " ".join(

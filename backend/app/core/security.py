@@ -105,7 +105,7 @@ def credentials_exception() -> HTTPException:
 
 def get_current_user(
     token: str | None = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db),  # noqa: B008
 ) -> User:
     if not token:
         raise credentials_exception()
@@ -118,7 +118,7 @@ def get_current_user(
 
 def get_optional_user(
     token: str | None = Depends(oauth2_scheme),
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db),  # noqa: B008
 ) -> User | None:
     if not token:
         return None
@@ -127,14 +127,14 @@ def get_optional_user(
     return user if user and user.is_active else None
 
 
-def require_admin(user: User = Depends(get_current_user)) -> User:
+def require_admin(user: User = Depends(get_current_user)) -> User:  # noqa: B008
     role = user.role.value if isinstance(user.role, UserRole) else str(user.role)
     if role not in {UserRole.ADMIN.value, UserRole.EVALUATOR.value}:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Staff privileges required")
     return user
 
 
-def require_admin_only(user: User = Depends(get_current_user)) -> User:
+def require_admin_only(user: User = Depends(get_current_user)) -> User:  # noqa: B008
     role = user.role.value if isinstance(user.role, UserRole) else str(user.role)
     if role != UserRole.ADMIN.value:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Administrator privileges required")

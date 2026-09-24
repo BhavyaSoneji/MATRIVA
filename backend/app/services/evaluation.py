@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from app.models import EvaluationRun, KnowledgeChunk, User
 from app.safety.classifier import classify_query
 
-
 REPORT_DIR = Path(__file__).resolve().parents[3] / "evaluation" / "reports"
 
 
@@ -64,7 +63,7 @@ def run_evaluation(db: Session, requested_by: User | None, suite: str) -> Evalua
         run.report_path = str(report_path.relative_to(REPORT_DIR.parents[1]))
         run.status = "completed"
         run.completed_at = datetime.now(timezone.utc)
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         run.status = "failed"
         run.error = str(exc)[:1000]
         run.completed_at = datetime.now(timezone.utc)

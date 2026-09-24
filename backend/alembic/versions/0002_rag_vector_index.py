@@ -4,7 +4,6 @@ Revision ID: 0002_rag_vector_index
 Revises: 0001_initial
 """
 from alembic import op
-
 from app.models.knowledge import KnowledgeChunkRecord, RagBase
 
 revision = "0002_rag_vector_index"

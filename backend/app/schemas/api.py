@@ -6,7 +6,14 @@ from datetime import date, datetime
 from typing import Any
 from urllib.parse import urlparse
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 
 class APIModel(BaseModel):
@@ -195,7 +202,7 @@ class ChatResponse(APIModel):
     sources: list[SourceResponse] = Field(default_factory=list)
     citations: list[Citation] = Field(default_factory=list)
     evidence: dict[str, Any] = Field(default_factory=dict)
-    recommendations: list["RecommendationResponse"] = Field(default_factory=list)
+    recommendations: list[RecommendationResponse] = Field(default_factory=list)
 
 
 class ChatHistoryResponse(APIModel):
@@ -229,7 +236,7 @@ class FeedbackRequest(APIModel):
     comment: str | None = Field(default=None, max_length=2000)
 
     @model_validator(mode="after")
-    def exactly_one_target(self) -> "FeedbackRequest":
+    def exactly_one_target(self) -> FeedbackRequest:
         if bool(self.message_id) == bool(self.recommendation_id):
             raise ValueError("provide exactly one of message_id or recommendation_id")
         return self

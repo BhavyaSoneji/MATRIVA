@@ -39,7 +39,7 @@ def chat(payload: MessageRequest, request: Request, user: OptionalUser, db: DBSe
                 "recommendations": [],
             },
         )
-    except Exception as exc:
+    except Exception as exc:  # noqa: BLE001
         db.rollback()
         log_event("chat.dependency_failed", request_id=getattr(request.state, "request_id", "-"), error_type=type(exc).__name__)
         return JSONResponse(

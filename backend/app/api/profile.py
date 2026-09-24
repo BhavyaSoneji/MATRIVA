@@ -2,10 +2,29 @@ from fastapi import APIRouter, HTTPException, status
 from sqlalchemy import select
 
 from app.api.deps import CurrentUser, DBSession
-from app.models import ConsentRecord, CulturalProfile, DietaryProfile, HealthProfile, LifestyleProfile, PregnancyProfile
-from app.schemas.api import DeleteResponse, PregnancyResponse, PregnancyUpdateRequest, ProfileResponse, ProfileUpdateRequest
+from app.models import (
+    ConsentRecord,
+    CulturalProfile,
+    DietaryProfile,
+    HealthProfile,
+    LifestyleProfile,
+    PregnancyProfile,
+)
+from app.schemas.api import (
+    DeleteResponse,
+    PregnancyResponse,
+    PregnancyUpdateRequest,
+    ProfileResponse,
+    ProfileUpdateRequest,
+)
 from app.services.audit import record_audit
-from app.services.profile import ConsentRequired, pregnancy_payload, profile_payload, update_pregnancy, update_profile
+from app.services.profile import (
+    ConsentRequired,
+    pregnancy_payload,
+    profile_payload,
+    update_pregnancy,
+    update_profile,
+)
 
 router = APIRouter(tags=["profile"])
 
