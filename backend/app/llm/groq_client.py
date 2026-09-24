@@ -16,6 +16,7 @@ from groq import APIConnectionError, APIStatusError, APITimeoutError, Groq
 from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
 from app.rag.context_packet import ContextPacket
 from app.rag.multi_domain import MULTI_DOMAIN_PROMPT_ADDENDUM, requires_segmentation
+from app.safety.prompt_injection import INJECTION_DEFENSE_ADDENDUM
 
 DEFAULT_MODEL = "llama-3.3-70b-versatile"
 DEFAULT_TIMEOUT_SECONDS = 30.0
@@ -56,7 +57,9 @@ def generate_from_packet(
     if client is None:
         client = Groq(api_key=_resolve_api_key(api_key), timeout=timeout)
 
-    system_prompt = SOURCE_GROUNDED_SYSTEM_PROMPT
+    # Section 44: always-on defense -- retrieved evidence is untrusted data,
+    # never instructions, regardless of what it contains.
+    system_prompt = SOURCE_GROUNDED_SYSTEM_PROMPT + "\n" + INJECTION_DEFENSE_ADDENDUM
     if requires_segmentation(context_packet.evidence_summary.domains):
         # Section 31: retrieved evidence spans AYURVEDA + another domain --
         # enforce clearly separated MODERN/TRADITIONAL/EVIDENCE STATUS sections.
