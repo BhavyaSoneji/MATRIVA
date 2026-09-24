@@ -20,6 +20,29 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #13: Added `backend/app/safety/post_check.py` — 5 independent Section 21 checks, each its own
+  function: `detect_unsupported_medical_claims` (claim-shaped language + zero verified citations),
+  `detect_dangerous_recommendations` (false reassurance / unsafe self-treatment phrases, Section
+  22), `detect_missing_escalation` (pre-check flagged HIGH_RISK/URGENT_ESCALATION but response
+  lacks escalation language), `detect_source_inconsistency` (reuses #10's citation validation),
+  `detect_evidence_mismatch` (absolute-certainty language over TRADITIONAL-only evidence, Section
+  11). `run_post_check` combines all 5 into a `PostCheckReport`; `validate_and_finalize`
+  implements the fail-closed contract — returns `SAFE_FALLBACK_RESPONSE` instead of the raw LLM
+  response if any check fails, never both.
+- 19 new tests: each check independently, `run_post_check` combining them, and 3 tests directly
+  verifying the fail-closed behavior itself (clean response passes through unchanged; any failure
+  returns the fallback and never the raw dangerous/unescalated text). 119/119 passing across
+  `backend/tests/`, ruff+mypy clean.
+- Related issue(s): #13
+- Status: done
+- Notes: same caveat as #12/#67 — these are rule-based approximations (Section 19: never rely
+  only on the LLM), not a guarantee of catching every unsafe generation; the checks are a coarse
+  safety net on top of #6-#10 doing retrieval/citation correctly, not a substitute for it. Only
+  implements the "return safe fallback" half of Section 21's "regenerate or return a safe
+  fallback" — actual regeneration (re-calling Groq with a corrective prompt) would be a caller-side
+  enhancement on top of this, not implemented here. Next: #14 (prompt injection defense).
+
+### 2026-09-24 — @neevmodh
 - #12: Added `backend/app/safety/classifier.py` — `classify(query)`, the full Section 19/20 safety
   classifier: 8 detection categories (emergency symptoms, dangerous requests, high-risk pregnancy
   context, treatment-change requests, replace-professional-advice requests, medication questions,
