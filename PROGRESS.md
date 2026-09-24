@@ -20,6 +20,24 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #4: Added `ingestion/pipelines/quality.py` — `check_document_quality(document, corpus)` runs
+  all 8 Section 38 checks (source exists, source identity, readability, metadata completeness,
+  domain, evidence status, pregnancy relevance, safety relevance) plus Section 39 duplicate
+  detection (exact hash + semantic similarity), returns a `QualityReport`. FAIL-severity checks
+  block ingestion (`accepted=False`); WARN-severity checks (pregnancy/safety relevance) pass
+  through but flag for human review.
+- 27/27 tests passing across `ingestion/tests/` (11 new for quality.py).
+- Related issue(s): #4
+- Status: done
+- Notes: semantic similarity uses `difflib.SequenceMatcher` over normalized text as a lightweight,
+  dependency-free stand-in — swap for real embedding cosine similarity once #5 lands, same
+  pattern as Sprint 0's `seed_qa.py` keyword overlap ahead of #6. Safety-relevance check reuses
+  #67's `RED_FLAGS` list to flag undocumented danger-sign content. This closes out the ingestion
+  pipeline's first four stages (#1-#4); #5 (embeddings + pgvector) is next but needs real infra
+  (Postgres+pgvector running, a Gemini API key) I don't have in this environment — I'll write the
+  code and note what can't be live-tested here.
+
+### 2026-09-24 — @neevmodh
 - #3: Added `ingestion/pipelines/chunker.py` — `chunk_document(document)` groups a
   `KnowledgeDocument`'s (#1) paragraph blocks into 300-700 token `KnowledgeChunk`s, never
   splitting a paragraph across chunks and always keeping a heading attached to the content that
