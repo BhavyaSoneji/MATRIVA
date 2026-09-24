@@ -20,6 +20,32 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #5: Added `backend/app/rag/embeddings.py` (Gemini `embed_text`/`embed_chunk_contents`),
+  `backend/app/models/knowledge.py` (`KnowledgeChunkRecord` ORM model with a pgvector `Vector(768)`
+  column), and `backend/app/rag/vector_store.py` — a `VectorStore` protocol with two
+  implementations: `InMemoryVectorStore` (pure-Python cosine similarity, fully unit-tested) and
+  `PgVectorStore` (real Postgres+pgvector, same interface). Both implement re-indexing the same
+  way: `upsert_document` replaces a document's entire chunk set, so old embeddings never remain
+  active after a document changes (Section 15's requirement).
+- 11 new tests (`backend/tests/test_vector_store.py`, `backend/tests/test_embeddings.py`), all
+  passing — this is also the **first pytest-based test coverage for `backend/`** (Sprint 0's
+  #66/#67 were only ad hoc script-verified, not pytest).
+- Related issue(s): #5
+- Status: partially verified — see notes
+- Notes: **I don't have a live Postgres+pgvector instance or a Gemini API key in this
+  environment**, so `PgVectorStore` and real embedding calls are untested here. What I *did*
+  verify: the re-indexing/nearest-neighbor logic itself (via `InMemoryVectorStore`, same
+  algorithm `PgVectorStore` expresses as SQL) and `embed_text`'s error handling + call shape
+  (mocked, not a live API call). Acceptance criterion "basic retrieval query returns expected
+  nearest neighbors on test data" is satisfied against `InMemoryVectorStore`; **whoever has
+  `docker compose up db` running and a real `EMBEDDING_API_KEY` should run one live end-to-end
+  check (embed → store → query) before this is considered fully closed.**
+  Also flagging: `google-generativeai` (already pinned in `backend/requirements.txt` from Phase 0,
+  not my choice) is now fully deprecated upstream — pip install prints "All support for the
+  google.generativeai package has ended... switch to google.genai". Not blocking for the
+  hackathon, but worth a migration issue before real production use.
+
+### 2026-09-24 — @neevmodh
 - #4: Added `ingestion/pipelines/quality.py` — `check_document_quality(document, corpus)` runs
   all 8 Section 38 checks (source exists, source identity, readability, metadata completeness,
   domain, evidence status, pregnancy relevance, safety relevance) plus Section 39 duplicate
