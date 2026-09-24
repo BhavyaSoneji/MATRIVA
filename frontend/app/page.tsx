@@ -1,10 +1,85 @@
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { ShieldCheck, Sprout, MessagesSquare, HeartPulse } from "lucide-react";
+
+const features = [
+  {
+    icon: ShieldCheck,
+    title: "Safety-first guidance",
+    description:
+      "Every answer is checked against safety rules. Anything urgent is flagged clearly, so you know when to see a doctor.",
+  },
+  {
+    icon: HeartPulse,
+    title: "Grounded in real evidence",
+    description:
+      "Recommendations cite modern medical sources with transparent evidence levels — supported, preliminary, or uncertain.",
+  },
+  {
+    icon: Sprout,
+    title: "Traditional & Ayurvedic knowledge",
+    description:
+      "Explore traditional practices alongside modern medicine, always clearly labeled as traditional rather than clinically proven.",
+  },
+  {
+    icon: MessagesSquare,
+    title: "Ask anything, anytime",
+    description:
+      "Chat with MATRIVA about nutrition, lifestyle, and stage-specific guidance, with sources for every answer.",
+  },
+];
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 p-8">
-      <h1 className="text-3xl font-semibold">MATRIVA</h1>
-      <p className="text-muted-foreground">
-        Holistic AI pregnancy guidance platform - frontend scaffold (Phase 0).
-      </p>
+    <main className="mx-auto flex max-w-6xl flex-col gap-20 px-4 py-16">
+      <section className="flex flex-col items-center gap-6 text-center">
+        <span className="rounded-full bg-secondary px-4 py-1 text-sm font-medium text-secondary-foreground">
+          Pregnancy guidance you can trust
+        </span>
+        <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Calm, evidence-based guidance for every stage of your pregnancy
+        </h1>
+        <p className="max-w-2xl text-lg text-muted-foreground">
+          MATRIVA blends modern medical evidence with traditional and Ayurvedic knowledge to help you make informed,
+          safe choices — with clear sourcing and a safety net that never lets a serious concern slip by.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/signup">
+            <Button size="lg">Get started free</Button>
+          </Link>
+          <Link href="/login">
+            <Button size="lg" variant="outline">
+              Log in
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      <section className="grid gap-6 sm:grid-cols-2">
+        {features.map((feature) => (
+          <Card key={feature.title}>
+            <CardHeader>
+              <feature.icon className="mb-2 h-8 w-8 text-primary" />
+              <CardTitle>{feature.title}</CardTitle>
+              <CardDescription>{feature.description}</CardDescription>
+            </CardHeader>
+          </Card>
+        ))}
+      </section>
+
+      <section className="rounded-2xl bg-secondary/60 p-10 text-center">
+        <CardContent className="flex flex-col items-center gap-4 p-0">
+          <h2 className="text-2xl font-semibold">Ready for personalized guidance?</h2>
+          <p className="max-w-xl text-muted-foreground">
+            Create your free account, tell us about your pregnancy, and get a dashboard tailored to your stage,
+            region, and preferences.
+          </p>
+          <Link href="/signup">
+            <Button size="lg">Create your account</Button>
+          </Link>
+        </CardContent>
+      </section>
     </main>
   );
 }
