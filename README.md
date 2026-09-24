@@ -1,51 +1,57 @@
 # MATRIVA — Holistic AI Pregnancy Guidance Platform
 
-A personalized, knowledge-grounded pregnancy guidance platform that integrates structured user
-context with curated modern medical, Ayurvedic, nutritional, cultural, and lifestyle knowledge
-through Retrieval-Augmented Generation, personalization, recommendation logic, source attribution,
-and an independent safety layer.
+**A personalized, evidence-grounded pregnancy companion** that combines a woman's own profile with
+curated modern medical, Ayurvedic, nutritional, cultural, and lifestyle knowledge — through
+retrieval-augmented generation, an independent safety layer, and transparent source attribution.
 
-**This is not a generic pregnancy chatbot.** It does not replace doctors, obstetricians, or
-emergency care. It provides educational, source-grounded guidance and escalates high-risk queries
-to professional medical care instead of answering them as ordinary wellness questions.
+> **This is not a generic pregnancy chatbot.** It does not replace doctors, obstetricians, or
+> emergency care. It answers from a reviewed knowledge base, always shows where an answer comes
+> from and how strong the evidence is, and escalates high-risk queries to professional care
+> instead of answering them as ordinary wellness questions.
 
-Full implementation spec: [`Master Prompt.txt`](./Master%20Prompt.txt)
-Full feature list: [`docs/FEATURES.md`](./docs/FEATURES.md)
-Government guidance & policy alignment: [`docs/COMPLIANCE.md`](./docs/COMPLIANCE.md)
-Live progress log: [`PROGRESS.md`](./PROGRESS.md)
+📄 Full implementation spec — [`Master Prompt.txt`](./Master%20Prompt.txt)
+📋 Full feature list — [`docs/FEATURES.md`](./docs/FEATURES.md)
+⚖️ Policy & compliance alignment — [`docs/COMPLIANCE.md`](./docs/COMPLIANCE.md)
+🗓️ Live progress log — [`PROGRESS.md`](./PROGRESS.md)
 
 ---
 
 ## Status
 
-The full M1 (Foundation + RAG Core) and M2 rag-ai backlog is implemented and tested: knowledge
-schema, ingestion (parsing/chunking/quality checks), embeddings + pgvector storage, hybrid
-retrieval, reranking, context packet construction, Groq generation, citation validation,
-personalized query rewriting, intent classification, multi-domain segmentation, the full safety
-classifier + post-check + prompt-injection defense, Ayurveda provenance validation, and retrieval/
-generation/safety/hallucination evaluation harnesses — all wired together end-to-end in
-[`backend/app/rag/pipeline.py`](./backend/app/rag/pipeline.py)'s `answer_query()`. 233 automated
-tests pass across `backend/`, `ingestion/`, and `evaluation/`.
+**Backend, RAG pipeline, and frontend are all implemented and wired end-to-end.**
 
-**What's not yet live-verified:** no live Groq or Gemini API key has been used against this code —
-generation and embedding calls are tested against mocked/injected clients, not the real APIs.
-pgvector storage/retrieval/re-indexing has been verified against a real Postgres instance.
-The backend HTTP layer is now implemented and wraps the canonical RAG pipeline; the local Docker
-stack (PostgreSQL/pgvector, Redis, FastAPI, and Next.js) has also been smoke-tested. Demo seed
-records are synthetic and must not be treated as current clinical guidance.
+- The full RAG core (ingestion, embeddings, hybrid retrieval, reranking, context construction,
+  grounded generation, citation validation, safety pre/post-check, multi-domain segmentation) is
+  live in [`backend/app/rag/pipeline.py`](./backend/app/rag/pipeline.py)'s `answer_query()`, backed
+  by a complete FastAPI HTTP layer (auth, onboarding, chat, knowledge, recommendations, admin,
+  evaluation, privacy).
+- **Live provider integration is verified**, not just mocked: real Groq (`openai/gpt-oss-120b`)
+  chat completions and real Gemini (`gemini-embedding-001`) embeddings have both been exercised
+  end-to-end against the actual APIs, including the full `answer_query()` pipeline producing a
+  cited, grounded answer and correctly short-circuiting to "insufficient evidence" when the
+  knowledge base has nothing relevant.
+- The full product frontend (Next.js) is built: landing, auth, onboarding, dashboard, AI chat with
+  citations and evidence-level badges, nutrition/lifestyle/ayurveda/stage-wise guidance pages,
+  recommendations, a sources explorer, settings/privacy, and admin dashboards for document and
+  evaluation management — all wired to the real backend API.
+- **238 automated tests pass** across `backend/` (175), `ingestion/` (27), and `evaluation/` (36);
+  the frontend builds cleanly with zero lint/type errors across all 17 routes.
+- The full local stack (PostgreSQL/pgvector, Redis, FastAPI, Next.js) runs via Docker Compose, and
+  each service's production Dockerfile has been built and smoke-tested independently.
 
-**Known limitation, read before demoing:** the no-key local fallback uses keyword retrieval and
-cannot reliably distinguish an incidental word match from genuine topical relevance. The full
-semantic path is implemented on the RAG branch, but live provider calls still require valid API
-keys and a reviewed source corpus.
+**Known, honestly-reported limitation:** the hallucination/grounding evaluation suite
+(`evaluation/hallucination/`) currently passes 3 of 11 out-of-corpus test questions — see
+[Limitations](#limitations) below and `PROGRESS.md` (2026-09-24, issue #19) for the investigation.
+This is a real, measured gap in retrieval precision, not a documentation placeholder.
 
 ---
 
 ## Problem
 
-Pregnant women navigating nutrition, lifestyle, and traditional practice questions get answers
-from generic sources that blend modern medical evidence with unverified traditional claims,
-without ever showing which is which, how strong the evidence is, or when to see a doctor instead.
+Pregnant women navigating nutrition, lifestyle, and traditional-practice questions get answers from
+generic sources that blend modern medical evidence with unverified traditional claims — without
+ever showing which is which, how strong the evidence is, or when to see a doctor instead of asking
+an app.
 
 ## Solution
 
@@ -75,7 +81,7 @@ CITATIONS / SOURCES
 USER-FRIENDLY RESPONSE
 ```
 
-Core principles: evidence first, retrieval before generation, safety before personalization,
+Core principles: **evidence first**, retrieval before generation, safety before personalization,
 personalization never overrides safety, and traditional/Ayurvedic knowledge is always explicitly
 labelled and never silently equated with modern medical evidence.
 
@@ -84,51 +90,55 @@ labelled and never silently equated with modern medical evidence.
 ## Architecture
 
 ```
-                     ┌─────────────────────┐
-                     │      Frontend       │
-                     │     Next.js UI      │
-                     └──────────┬──────────┘
-                                │ HTTPS / REST
-                                ▼
-                     ┌─────────────────────┐
-                     │      FastAPI        │
-                     │       Backend       │
-                     └──────────┬──────────┘
-                                │
-             ┌──────────────────┼──────────────────┐
-             ▼                  ▼                  ▼
-      ┌─────────────┐   ┌──────────────┐   ┌──────────────┐
-      │ PostgreSQL  │   │  RAG Engine  │   │ Safety Engine│
-      │ + pgvector  │   │  Retrieval   │   │ Rules/Risk   │
-      └─────────────┘   │  Reranking   │   │ Escalation   │
-                         └──────┬───────┘   └──────────────┘
-                                │
-                                ▼
-                         ┌──────────────┐
-                         │   LLM (Groq) │
-                         └──────┬───────┘
-                                ▼
-                        Answer + Sources
+                     ┌──────────────────────┐
+                     │       Frontend        │
+                     │     Next.js 16 UI     │
+                     └───────────┬───────────┘
+                                 │ HTTPS / REST (JWT)
+                                 ▼
+                     ┌──────────────────────┐
+                     │        FastAPI        │
+                     │        Backend        │
+                     └───────────┬───────────┘
+                                 │
+              ┌──────────────────┼──────────────────┐
+              ▼                  ▼                   ▼
+      ┌──────────────┐   ┌──────────────┐   ┌────────────────┐
+      │  PostgreSQL  │   │  RAG Engine  │   │  Safety Engine  │
+      │  + pgvector  │   │  Retrieval   │   │  Rules / Risk   │
+      └──────────────┘   │  Reranking   │   │  Escalation     │
+                          └──────┬───────┘   └────────────────┘
+                                 │
+                                 ▼
+                          ┌──────────────┐
+                          │ LLM (Groq) +  │
+                          │ Embeddings    │
+                          │ (Gemini)      │
+                          └──────┬───────┘
+                                 ▼
+                         Answer + Citations
 ```
 
 ## Tech Stack
 
 | Layer | Choice |
 |---|---|
-| Frontend | Next.js + TypeScript, Tailwind CSS, shadcn/ui |
-| Backend | Python, FastAPI, Pydantic, SQLAlchemy |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, shadcn/ui-style components |
+| Backend | Python 3.11, FastAPI, Pydantic, SQLAlchemy, Alembic |
 | Database | PostgreSQL |
 | Vector search | pgvector |
-| Cache / tasks | Redis |
-| LLM (generation) | Groq |
-| Embeddings | Gemini |
+| Cache / rate limiting | Redis |
+| LLM (generation) | Groq (`openai/gpt-oss-120b`) |
+| Embeddings | Gemini (`gemini-embedding-001`) |
 | Document processing | PyMuPDF, python-docx |
 | Auth | JWT |
 | Containers | Docker, Docker Compose |
-| Testing | pytest, Playwright |
+| Testing | pytest, Playwright, ruff, mypy, eslint |
 
-Deliberately not used at this stage: microservices, Kubernetes, fine-tuning/custom model training,
-multiple vector databases, multiple orchestration frameworks. This is a modular monolith.
+Deliberately **not** used at this stage: microservices, Kubernetes, fine-tuning/custom model
+training, multiple vector databases, multiple orchestration frameworks. This is a modular monolith
+by design — the pieces are cleanly separated (RAG, safety, API, ingestion, evaluation) without the
+operational overhead a distributed system would add at this scale.
 
 ---
 
@@ -136,26 +146,30 @@ multiple vector databases, multiple orchestration frameworks. This is a modular 
 
 ```
 matriva/
-├── frontend/            Next.js app (UI) — production build scaffold
+├── frontend/             Next.js app — landing, auth, onboarding, dashboard, chat,
+│                         nutrition/lifestyle/ayurveda/guidance, recommendations,
+│                         sources explorer, settings, admin (documents, evaluation)
 ├── backend/
 │   ├── app/
-│   │   ├── api/          FastAPI routers for auth, profile, chat, knowledge, admin, evaluation
-│   │   ├── models/       SQLAlchemy application models and evidence/guideline metadata
-│   │   ├── schemas/      API schemas + canonical RAG knowledge schemas
-│   │   ├── rag/          full RAG pipeline + SQLAlchemy/API adapter
-│   │   ├── safety/       full classifier/post-check/prompt-injection defense + API rules adapter
-│   │   ├── services/     auth, profile, chat, recommendations, admin, privacy, evaluation
-│   │   └── core/         config, database, security, rate limiting, observability
-│   ├── tests/            backend unit/integration and RAG regression tests
-│   └── scripts/          pgvector verification and secret scan
+│   │   ├── api/          FastAPI routers: auth, profile, chat, knowledge, admin,
+│   │   │                 evaluation, recommendations, privacy, feedback, demo
+│   │   ├── models/       SQLAlchemy application models + evidence/guideline metadata
+│   │   ├── schemas/      API request/response schemas + canonical RAG knowledge schemas
+│   │   ├── rag/          Full RAG pipeline (retrieval, reranking, context, grounding,
+│   │   │                 embeddings) + the SQLAlchemy/API adapter
+│   │   ├── safety/       Independent classifier, post-check, prompt-injection defense
+│   │   ├── services/     Auth, profile, chat, recommendation, admin, privacy, evaluation
+│   │   └── core/         Config, database, security, rate limiting, observability
+│   ├── tests/            175 backend unit/integration/RAG regression tests
+│   └── scripts/          pgvector live verification, secret scan
 ├── knowledge/
-│   ├── seed/seed.yaml    curated seed knowledge set (demo corpus)
-│   └── ayurveda/         source PDF + OCR text extract
-├── ingestion/            pipelines/ (parser, chunker, quality checks) + tests — 27 tests
-├── evaluation/           retrieval/generation/safety/hallucination eval harnesses + datasets
-│                         + reports/ + tests/ — 36 tests
-├── database/             migrations, seeds
-├── docs/                 architecture, api, rag, safety, deployment, SUBMISSION.md
+│   ├── seed/seed.yaml    Curated seed knowledge set (demo corpus)
+│   └── ayurveda/         Source PDF + OCR text extract
+├── ingestion/            Parser, chunker, quality-check pipelines — 27 tests
+├── evaluation/           Retrieval/generation/safety/hallucination eval harnesses,
+│                         datasets, reports/ — 36 tests
+├── database/             Migrations, seed script
+├── docs/                 Architecture, API, RAG, safety, deployment, compliance docs
 └── docker-compose.yml
 ```
 
@@ -167,33 +181,46 @@ matriva/
 - Docker + Docker Compose
 - Node.js 20+
 - Python 3.11+
-- A Groq API key and a Gemini API key
+- A Groq API key and a Gemini API key (optional — the app runs in a safe local grounded-fallback
+  mode without them, useful for development without live provider costs)
 
 ### Environment variables
-Copy `.env.example` to `.env` and set a unique `JWT_SECRET` (at least 32 characters).
-Never commit real secrets; `.env` is gitignored. `DEMO_MODE` must be `false` in production.
+
+Copy `.env.example` to `.env` and set a unique `JWT_SECRET` (at least 32 characters, generate with
+`python -c "import secrets; print(secrets.token_urlsafe(48))"`). `.env` is gitignored — never
+commit real secrets. `DEMO_MODE` must be `false` in production.
 
 ```bash
 cp .env.example .env
 ```
 
-### Run the stack
+### Run the full stack
 
 ```bash
-# Full local stack (Postgres/pgvector + Redis + API + frontend)
+# Postgres/pgvector + Redis + FastAPI + Next.js, all together
 docker compose up --build
-
-# Or run the backend directly
-cd backend
-python -m pip install -r requirements-dev.txt
-alembic upgrade head
-python ../database/seed/seed.py  # optional synthetic demo data
-uvicorn app.main:app --reload
 ```
 
-The API is available at `http://localhost:8000`; OpenAPI is at `http://localhost:8000/docs`.
+Or run each service directly for faster local iteration:
+
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt -r requirements-dev.txt
+alembic upgrade head
+python ../database/seed/seed.py     # optional synthetic demo data
+uvicorn app.main:app --reload       # http://localhost:8000  (docs at /docs)
+
+# Frontend
+cd frontend
+npm install
+cp .env.example .env.local          # set NEXT_PUBLIC_API_URL
+npm run dev                          # http://localhost:3000
+```
+
 The production-oriented compose file is `docker-compose.prod.yml`; see
-[`docs/deployment.md`](./docs/deployment.md) before deploying.
+[`docs/deployment.md`](./docs/deployment.md) and [`frontend/README.md`](./frontend/README.md)
+before deploying.
 
 ### Run knowledge ingestion
 
@@ -202,35 +229,37 @@ cd ingestion
 python -m pipelines.run --source ../knowledge/ayurveda
 ```
 
-### Run tests
+### Run the tests
 
 ```bash
-# backend API + RAG tests, lint, type-check, and secret scan
+# Backend: tests, lint, type-check, secret scan
 cd backend
-python -m pytest -q
+pytest -q
 ruff check .
+mypy app/
 python scripts/secret_scan.py --root ..
 
-# ingestion
+# Ingestion
 cd ../ingestion && pytest tests/
 
-# evaluation harnesses
+# Evaluation harnesses
 cd ../evaluation && pytest tests/
 
-# frontend lint/typecheck/build + e2e
-cd ../frontend && npm run lint && npm run typecheck && npm run build
+# Frontend: lint, type-check, production build, e2e
+cd ../frontend
+npm run lint && npm run typecheck && npm run build
 npx playwright install --with-deps chromium && npm run test:e2e
 ```
 
 ### Run evaluation harnesses
 
-Each writes a JSON report to `evaluation/reports/`. `generation.run` and any live-pipeline check
-need `LLM_API_KEY`/`GROQ_API_KEY`; without one they run in a self-test mode against curated
+Each writes a JSON report to `evaluation/reports/`. Generation and live-pipeline checks use
+`LLM_API_KEY`/`GROQ_API_KEY` when set; without one they run in a self-test mode against curated
 example responses instead of live model output.
 
 ```bash
 cd evaluation
-python -m retrieval.run       # Recall@K, Precision@K, MRR, nDCG@K against knowledge/seed/seed.yaml
+python -m retrieval.run       # Recall@K, Precision@K, MRR, nDCG@K
 python -m generation.run      # groundedness, citation correctness, relevance, completeness
 python -m safety.run          # safety classifier routing correctness (21 test cases)
 python -m hallucination.run   # out-of-corpus questions -> must return "insufficient evidence"
@@ -238,8 +267,8 @@ python -m hallucination.run   # out-of-corpus questions -> must return "insuffic
 
 ### Verify pgvector against a real Postgres instance
 
-The automated test suite only exercises an in-memory vector store double. To check the real
-pgvector-backed implementation:
+The automated test suite exercises an in-memory vector store double. To check the real
+pgvector-backed implementation against a live database:
 
 ```bash
 docker compose up -d db
@@ -258,39 +287,36 @@ python scripts/verify_pgvector_live.py
 | Backend | [@BhavyaSoneji](https://github.com/BhavyaSoneji) | `backend/`, `database/`, API endpoints, DB models |
 | Frontend | [@Rajodedra](https://github.com/Rajodedra) | `frontend/`, all UI pages |
 
-- Full backlog is tracked as GitHub Issues across 3 milestones (`M1: Foundation + RAG Core`,
+- Full backlog is tracked as GitHub Issues across milestones (`M1: Foundation + RAG Core`,
   `M2: Personalization + Safety + Domain Engines`, `M3: Frontend + Admin + Evaluation + Deploy`).
 - Every feature in [`docs/FEATURES.md`](./docs/FEATURES.md) maps to a tracked issue.
 - Ownership/review routing is enforced via [`.github/CODEOWNERS`](./.github/CODEOWNERS).
-- **After every commit, add a short entry to [`PROGRESS.md`](./PROGRESS.md)** so the team always
-  knows real project status without digging through git log.
+- **After every meaningful change, add a short entry to [`PROGRESS.md`](./PROGRESS.md)** so the
+  team always knows real project status without digging through git log.
 
 ---
 
 ## Limitations
 
-- Prototype stage: knowledge base is seeded from a small curated set of sources (8 documents in
-  `knowledge/seed/seed.yaml`), not comprehensive coverage of any domain.
-- Clinical safety rules and thresholds must come from qualified medical reviewers — this codebase
-  does not invent or certify clinical rules. Ayurvedic content is explicitly marked
-  `PENDING_CLINICAL_REVIEW` until a Clinical Lead signs off.
-- **Retrieval is keyword-overlap-based, not semantic**, until real embeddings (Gemini, via
-  `backend/app/rag/embeddings.py`) are exercised against a live API key. This has a real,
-  measured consequence: the hallucination/grounding test suite
-  (`evaluation/hallucination/`) currently only reliably catches out-of-corpus questions that
-  share literally zero vocabulary with the seed corpus — a question on a related-but-uncovered
-  topic can still retrieve a loosely-matching chunk and get an attempted answer instead of an
-  "insufficient evidence" response. See `PROGRESS.md` (2026-09-24, issue #19) for the investigation.
-- Generation (Groq) and embedding (Gemini) API calls are tested against injected fake clients, not
-  verified against the live APIs, in this codebase's current state.
+- **Prototype-stage knowledge base**: seeded from a small curated set of sources
+  (`knowledge/seed/seed.yaml`), not comprehensive coverage of any domain.
+- **Clinical rules require sign-off**: this codebase does not invent or certify medical thresholds.
+  Ayurvedic content is explicitly marked `PENDING_CLINICAL_REVIEW` until a Clinical Lead signs off.
+- **Retrieval precision gap, honestly measured**: the hallucination/grounding suite
+  (`evaluation/hallucination/`) currently passes only 3 of 11 out-of-corpus questions — a question
+  on a related-but-uncovered topic can retrieve a loosely-matching chunk and get an attempted
+  answer instead of an "insufficient evidence" response. This is tracked as open issue #19; see
+  `PROGRESS.md` (2026-09-24) for the investigation.
+- **Branch protection is not yet enabled** on `main` (tracked as open issue #21) — CODEOWNERS
+  routing exists, but merges are not currently gated by required review/CI in GitHub settings.
 - Not a substitute for professional medical advice, diagnosis, or emergency care at any stage.
 
 ## Safety Considerations
 
-- Safety classification is an independent module, never delegated solely to the LLM.
-- If the safety subsystem fails, the system fails closed — it will not return an unrestricted
+- Safety classification is an **independent module**, never delegated solely to the LLM.
+- If the safety subsystem fails, the system **fails closed** — it will not return an unrestricted
   medical recommendation.
 - Traditional/Ayurvedic content is always labelled and never presented as having the same evidence
   status as modern medical guidance unless explicitly supported by a reviewed source.
-- Retrieved document content is always treated as data, never as instructions (prompt-injection
-  defense).
+- Retrieved document content is always treated as **data, never as instructions**
+  (prompt-injection defense).
