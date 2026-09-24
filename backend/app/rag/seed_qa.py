@@ -18,25 +18,11 @@ from typing import Any
 import yaml
 from groq import Groq
 
+from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT as SYSTEM_PROMPT
 from app.rag.keyword_search import tokenize as _tokenize
 
 SEED_PATH = Path(__file__).resolve().parents[3] / "knowledge" / "seed" / "seed.yaml"
 
-SYSTEM_PROMPT = """You are a source-grounded pregnancy education assistant.
-
-Use only the provided retrieved evidence below. Do not invent medical facts. Do not fabricate
-citations. Do not imply that traditional knowledge has modern clinical validation unless the
-evidence explicitly supports that claim.
-
-Clearly distinguish, using explicit section labels in your answer:
-- Modern medical guidance
-- Traditional/Ayurvedic information
-- Cultural practice
-- Uncertain or limited evidence
-
-If the evidence is insufficient to answer, say so explicitly instead of guessing.
-
-Do not diagnose. Do not prescribe treatment. Do not replace professional medical care."""
 
 @lru_cache
 def load_seed() -> list[dict[str, Any]]:

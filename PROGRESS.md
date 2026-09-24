@@ -20,6 +20,29 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #9: Added `backend/app/llm/groq_client.py` — `generate_from_packet(context_packet, ...)`, the
+  full Groq integration: takes a #8 `ContextPacket`, enforces the Section 58 source-grounded
+  system prompt, retries with exponential backoff on transient connection/timeout errors, fails
+  immediately (no retry) on non-retryable API errors (auth/rate-limit/bad-request). Accepts an
+  injectable `client` param for testability.
+- Extracted `backend/app/llm/prompts.py` (`SOURCE_GROUNDED_SYSTEM_PROMPT`) out of `seed_qa.py`
+  (#66) — same dedup pattern as #6's keyword_search.py extraction, re-verified `seed_qa.py`
+  unaffected.
+- 7 new tests (mocked Groq client, no live API needed): success path, system-prompt content/shape
+  verified against Section 58's required phrases, retry-then-succeed on connection/timeout
+  errors, retry exhaustion, and non-retryable errors failing fast without wasting a retry. 44/44
+  passing across `backend/tests/`.
+- Related issue(s): #9
+- Status: partially verified — see notes
+- Notes: **"tested against hallucination test cases" (acceptance criteria) is only partially
+  satisfiable here** — I verified the system prompt is correctly constructed and sent, and the
+  retry/error-handling logic, all via mocks; I did NOT verify actual model output against real
+  hallucination test cases, since that needs a live Groq API key and #19's real evaluation
+  dataset (not built yet). Whoever has a Groq key should run a handful of #19-style
+  out-of-corpus questions through this once #19 exists. No personalization added, per spec
+  ("Phase 4 = grounded QA only") — personalization is #11. Next: #10 (citation validation).
+
+### 2026-09-24 — @neevmodh
 - #8: Added `backend/app/rag/context_packet.py` — `build_context_packet(...)` assembles the 5
   required sections (Section 16): USER CONTEXT, USER QUESTION, RETRIEVED SOURCES, SAFETY RESULT,
   EVIDENCE METADATA, from #7's reranked output + #67's safety result. `ContextPacket.to_prompt_text()`
