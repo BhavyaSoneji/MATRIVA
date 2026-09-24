@@ -1,0 +1,438 @@
+{
+  "generated_at": "2026-09-24T11:36:46.049588+00:00",
+  "aggregate": {
+    "num_queries": 24,
+    "k": 5,
+    "mean_recall_at_k": 1.0,
+    "mean_precision_at_k": 0.20000000000000004,
+    "mean_reciprocal_rank": 0.9027777777777778,
+    "mean_ndcg_at_k": 0.9275774794642881
+  },
+  "per_domain": {
+    "MODERN_MEDICAL": {
+      "num_queries": 3,
+      "mean_recall_at_k": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "AYURVEDA": {
+      "num_queries": 6,
+      "mean_recall_at_k": 1.0,
+      "mean_reciprocal_rank": 0.9166666666666666
+    },
+    "NUTRITION": {
+      "num_queries": 15,
+      "mean_recall_at_k": 1.0,
+      "mean_reciprocal_rank": 0.8777777777777778
+    }
+  },
+  "per_query": [
+    {
+      "query": "When should I have my antenatal checkups during pregnancy?",
+      "expected_source": "fogsi-gcpr",
+      "expected_document_id": "seed-anc-fogsi-001",
+      "expected_domain": "MODERN_MEDICAL",
+      "retrieved_document_ids": [
+        "seed-anc-fogsi-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What is the WHO recommended number of prenatal visits?",
+      "expected_source": "fogsi-gcpr",
+      "expected_document_id": "seed-anc-fogsi-001",
+      "expected_domain": "MODERN_MEDICAL",
+      "retrieved_document_ids": [
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-toned-milk-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "At which weeks of pregnancy should I visit my doctor for checkups?",
+      "expected_source": "fogsi-gcpr",
+      "expected_document_id": "seed-anc-fogsi-001",
+      "expected_domain": "MODERN_MEDICAL",
+      "retrieved_document_ids": [
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-banana-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What does Ayurveda recommend for a pregnant woman's daily routine?",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-001",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-001",
+        "seed-ayurveda-garbhini-002",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What is Garbhini Paricharya in Charaka Samhita?",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-001",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-001",
+        "seed-ayurveda-garbhini-002",
+        "seed-ifct-toned-milk-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Traditional Ayurvedic guidance on avoiding physical strain during pregnancy",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-001",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-toned-milk-001",
+        "seed-anc-fogsi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What Ayurvedic diet is recommended in the second trimester?",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-002",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-002",
+        "seed-ifct-toned-milk-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Ayurveda food recommendations for months four to six of pregnancy",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-002",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-anc-fogsi-001",
+        "seed-ayurveda-garbhini-002",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_k": 0.6309297535714575
+    },
+    {
+      "query": "Second trimester ghee and milk diet according to traditional teaching",
+      "expected_source": "charaka-samhita-sharirasthana-8",
+      "expected_document_id": "seed-ayurveda-garbhini-002",
+      "expected_domain": "AYURVEDA",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-002",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-toned-milk-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Is moong dal a good protein source during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-moong-dal-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-palak-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-toned-milk-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What foods provide folate for pregnant women?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-moong-dal-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-palak-001",
+        "seed-anc-fogsi-001",
+        "seed-ayurveda-garbhini-002"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.5,
+      "ndcg_at_k": 0.6309297535714575
+    },
+    {
+      "query": "Green gram nutrient content for pregnancy diet",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-moong-dal-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-banana-001",
+        "seed-ifct-ragi-001",
+        "seed-anc-fogsi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Does ragi have calcium for pregnant women?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-ragi-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-ragi-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-toned-milk-001",
+        "seed-anc-fogsi-001",
+        "seed-ayurveda-garbhini-002"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What grain is high in calcium for pregnancy nutrition?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-ragi-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-ragi-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-toned-milk-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Finger millet nutrient profile during pregnancy",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-ragi-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-banana-001",
+        "seed-ifct-toned-milk-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Is spinach good for iron during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-palak-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-palak-001",
+        "seed-ifct-ragi-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-banana-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What leafy greens help with iron deficiency in pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-palak-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-palak-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-banana-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Palak nutrient content and vitamin A for pregnant women",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-palak-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-palak-001",
+        "seed-ifct-banana-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Is milk a good calcium source during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-toned-milk-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-toned-milk-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.3333333333333333,
+      "ndcg_at_k": 0.5
+    },
+    {
+      "query": "How much protein does toned milk provide during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-toned-milk-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-toned-milk-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-anc-fogsi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Standard dairy calcium and protein source recommended in Garbhini Paricharya",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-toned-milk-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-toned-milk-001",
+        "seed-ifct-moong-dal-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-ayurveda-garbhini-002",
+        "seed-ifct-ragi-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "Is banana good for constipation during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-banana-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-banana-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    },
+    {
+      "query": "What fruit gives quick energy during pregnancy?",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-banana-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-ragi-001",
+        "seed-ifct-palak-001",
+        "seed-ifct-banana-001",
+        "seed-anc-fogsi-001",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 0.3333333333333333,
+      "ndcg_at_k": 0.5
+    },
+    {
+      "query": "Banana potassium and carbohydrate content for pregnant women",
+      "expected_source": "ifct-2017",
+      "expected_document_id": "seed-ifct-banana-001",
+      "expected_domain": "NUTRITION",
+      "retrieved_document_ids": [
+        "seed-ifct-banana-001",
+        "seed-ayurveda-garbhini-001",
+        "seed-anc-fogsi-001",
+        "seed-ayurveda-garbhini-002",
+        "seed-ifct-moong-dal-001"
+      ],
+      "recall_at_k": 1.0,
+      "precision_at_k": 0.2,
+      "reciprocal_rank": 1.0,
+      "ndcg_at_k": 1.0
+    }
+  ]
+}

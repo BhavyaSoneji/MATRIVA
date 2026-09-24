@@ -20,6 +20,37 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #16: Added `evaluation/retrieval/metrics.py` (Recall@K, Precision@K, MRR/reciprocal rank,
+  nDCG@K — pure functions, 16 tests), `evaluation/retrieval/eval_dataset.yaml` (24 labeled
+  queries across all 3 domains currently in the corpus — MODERN_MEDICAL, AYURVEDA, NUTRITION —
+  3 query variants per each of the 8 real `seed.yaml` documents), and `evaluation/retrieval/run.py`
+  — a real harness: loads+validates seed documents via #15's `load_and_validate_documents`,
+  converts them to chunks, runs every eval query through #6's actual `hybrid_retrieve`, and
+  writes `evaluation/reports/retrieval_eval_report.json` (aggregate + per-domain + per-query).
+  Also added an `evaluation` CI job (was completely uncovered before, same gap ingestion had
+  pre-#22).
+- **Ran the harness and found a real bug in my own metric implementation**: nDCG came out as
+  1.88 (mathematically impossible — nDCG is bounded to [0,1]). Root cause: several distinct
+  documents legitimately share one `source_id` (all 5 IFCT food entries cite `ifct-2017`), so
+  scoring against `source_id` let one relevant document's repeated appearance across ranks get
+  counted as multiple separate hits. Fixed two ways: (1) scoring now uses `document_id` (unique)
+  instead of `source_id`, (2) added `_dedupe_preserve_order` to all 4 metric functions as a
+  general safeguard, since #3's real chunker will eventually produce multiple chunks per
+  document and the same double-counting bug would otherwise resurface. Added a regression test.
+- **Real result after the fix**: 24/24 queries, mean Recall@5 = 1.00, mean Precision@5 = 0.20
+  (expected — 1 relevant doc out of 5 retrieved, only 8 total documents exist), mean MRR = 0.90,
+  mean nDCG@5 = 0.93. The 4 imperfectly-ranked queries are a genuine, useful finding, not a bug:
+  keyword-only retrieval (the fallback path, since no live embeddings are available) sometimes
+  ranks a generically-worded Ayurveda doc above a more specific nutrition doc for a query like
+  "What foods provide folate?" — a concrete example strengthening the case for #6's real
+  semantic vector search once #5's embeddings are live.
+- Related issue(s): #16
+- Status: done
+- Notes: 16/16 new tests pass across `evaluation/tests/`. Dataset is intentionally scoped to the
+  *current* real corpus rather than synthetic placeholders — it should grow as the real ingestion
+  pipeline (#2-#4) brings in more documents. Next: #17 (generation evaluation).
+
+### 2026-09-24 — @neevmodh
 - #15: **Found and fixed a real gap while starting this** — actually validated `knowledge/seed/seed.yaml`
   against #1's `KnowledgeDocument` schema for the first time (nothing did this before; `seed_qa.py`
   loads raw YAML dicts and bypasses the schema entirely) and both Ayurveda entries **failed**:

@@ -1,0 +1,154 @@
+# Retrieval evaluation dataset (issue #16, Master Prompt Section 40).
+#
+# Labeled against the current knowledge/seed/seed.yaml corpus (#65) -- the only real corpus
+# available. Each entry: query, expected_source (source_id), expected_document_id,
+# expected_topic, expected_domain. 3 query variants per seed document x 8 documents = 24 queries,
+# covering all 3 represented domains (MODERN_MEDICAL, AYURVEDA, NUTRITION).
+#
+# NOTE: as the real ingestion pipeline (#2-#4) brings in more documents, this dataset should grow
+# alongside it -- it's currently scoped to what's actually retrievable right now, not a synthetic
+# placeholder.
+
+- query: "When should I have my antenatal checkups during pregnancy?"
+  expected_source: fogsi-gcpr
+  expected_document_id: seed-anc-fogsi-001
+  expected_topic: anc_visit_schedule
+  expected_domain: MODERN_MEDICAL
+
+- query: "What is the WHO recommended number of prenatal visits?"
+  expected_source: fogsi-gcpr
+  expected_document_id: seed-anc-fogsi-001
+  expected_topic: anc_visit_schedule
+  expected_domain: MODERN_MEDICAL
+
+- query: "At which weeks of pregnancy should I visit my doctor for checkups?"
+  expected_source: fogsi-gcpr
+  expected_document_id: seed-anc-fogsi-001
+  expected_topic: anc_visit_schedule
+  expected_domain: MODERN_MEDICAL
+
+- query: "What does Ayurveda recommend for a pregnant woman's daily routine?"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-001
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "What is Garbhini Paricharya in Charaka Samhita?"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-001
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "Traditional Ayurvedic guidance on avoiding physical strain during pregnancy"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-001
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "What Ayurvedic diet is recommended in the second trimester?"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-002
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "Ayurveda food recommendations for months four to six of pregnancy"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-002
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "Second trimester ghee and milk diet according to traditional teaching"
+  expected_source: charaka-samhita-sharirasthana-8
+  expected_document_id: seed-ayurveda-garbhini-002
+  expected_topic: traditional_antenatal_regimen
+  expected_domain: AYURVEDA
+
+- query: "Is moong dal a good protein source during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-moong-dal-001
+  expected_topic: protein_folate_source
+  expected_domain: NUTRITION
+
+- query: "What foods provide folate for pregnant women?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-moong-dal-001
+  expected_topic: protein_folate_source
+  expected_domain: NUTRITION
+
+- query: "Green gram nutrient content for pregnancy diet"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-moong-dal-001
+  expected_topic: protein_folate_source
+  expected_domain: NUTRITION
+
+- query: "Does ragi have calcium for pregnant women?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-ragi-001
+  expected_topic: calcium_source
+  expected_domain: NUTRITION
+
+- query: "What grain is high in calcium for pregnancy nutrition?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-ragi-001
+  expected_topic: calcium_source
+  expected_domain: NUTRITION
+
+- query: "Finger millet nutrient profile during pregnancy"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-ragi-001
+  expected_topic: calcium_source
+  expected_domain: NUTRITION
+
+- query: "Is spinach good for iron during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-palak-001
+  expected_topic: iron_folate_source
+  expected_domain: NUTRITION
+
+- query: "What leafy greens help with iron deficiency in pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-palak-001
+  expected_topic: iron_folate_source
+  expected_domain: NUTRITION
+
+- query: "Palak nutrient content and vitamin A for pregnant women"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-palak-001
+  expected_topic: iron_folate_source
+  expected_domain: NUTRITION
+
+- query: "Is milk a good calcium source during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-toned-milk-001
+  expected_topic: calcium_protein_source
+  expected_domain: NUTRITION
+
+- query: "How much protein does toned milk provide during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-toned-milk-001
+  expected_topic: calcium_protein_source
+  expected_domain: NUTRITION
+
+- query: "Standard dairy calcium and protein source recommended in Garbhini Paricharya"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-toned-milk-001
+  expected_topic: calcium_protein_source
+  expected_domain: NUTRITION
+
+- query: "Is banana good for constipation during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-banana-001
+  expected_topic: energy_fiber_source
+  expected_domain: NUTRITION
+
+- query: "What fruit gives quick energy during pregnancy?"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-banana-001
+  expected_topic: energy_fiber_source
+  expected_domain: NUTRITION
+
+- query: "Banana potassium and carbohydrate content for pregnant women"
+  expected_source: ifct-2017
+  expected_document_id: seed-ifct-banana-001
+  expected_topic: energy_fiber_source
+  expected_domain: NUTRITION
