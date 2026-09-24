@@ -1,4 +1,19 @@
-# RAG / AI / evaluation / testing / overall review
+# GitHub CODEOWNERS matches the LAST pattern in this file that matches a given path -- NOT the
+# most specific one. Broad rules must come first; specific overrides must come last, or the
+# broad rule silently wins. (issue #21: this ordering bug existed in the original file -- the
+# rag/safety/llm/evidence -> @neevmodh rules were listed before the broader /backend/ ->
+# @BhavyaSoneji rule, so /backend/ would have overridden all of them.)
+
+# Backend (broad -- specific overrides below win over this)
+/backend/                    @BhavyaSoneji
+/database/                   @BhavyaSoneji
+/docker-compose.yml          @BhavyaSoneji
+
+# Frontend
+/frontend/                   @Rajodedra
+
+# RAG / AI / safety / evidence / evaluation / testing / overall review (overrides /backend/ above
+# for these specific subpaths, because they're listed last)
 /backend/app/rag/            @neevmodh
 /backend/app/safety/         @neevmodh
 /backend/app/llm/            @neevmodh
@@ -6,11 +21,3 @@
 /ingestion/                  @neevmodh
 /evaluation/                 @neevmodh
 /.github/                    @neevmodh
-
-# Backend
-/backend/                    @BhavyaSoneji
-/database/                   @BhavyaSoneji
-/docker-compose.yml          @BhavyaSoneji
-
-# Frontend
-/frontend/                   @Rajodedra

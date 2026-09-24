@@ -113,7 +113,7 @@ class KnowledgeDocument(BaseModel):
     # Present only when domain == AYURVEDA (Section 11 provenance requirement).
     ayurvedic_provenance: AyurvedicProvenance | None = None
 
-    def model_post_init(self, __context: object) -> None:
+    def model_post_init(self, context: object, /) -> None:
         if self.domain == Domain.AYURVEDA and self.ayurvedic_provenance is None:
             raise ValueError(
                 "AYURVEDA documents must carry ayurvedic_provenance (Master Prompt Section 11)"

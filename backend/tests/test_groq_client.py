@@ -7,11 +7,12 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.llm import groq_client  # noqa: E402
-from app.llm.groq_client import GenerationError, generate_from_packet  # noqa: E402
-from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT  # noqa: E402
-from app.rag.context_packet import build_context_packet  # noqa: E402
-from groq import APIConnectionError, APIStatusError, APITimeoutError  # noqa: E402
+from groq import APIConnectionError, APIStatusError, APITimeoutError
+
+from app.llm import groq_client
+from app.llm.groq_client import GenerationError, generate_from_packet
+from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
+from app.rag.context_packet import build_context_packet
 
 _REQUEST = httpx.Request("POST", "https://api.groq.com/openai/v1/chat/completions")
 

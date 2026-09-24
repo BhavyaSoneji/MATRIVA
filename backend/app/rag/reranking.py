@@ -98,7 +98,7 @@ def rerank(
     reranked = []
     for chunk, base_score in scored_chunks:
         source_type = source_types.get(chunk.source_id)
-        source_quality = SOURCE_QUALITY_WEIGHT.get(source_type, 0.7)
+        source_quality = SOURCE_QUALITY_WEIGHT.get(source_type, 0.7) if source_type else 0.7
         evidence_weight = EVIDENCE_LEVEL_WEIGHT.get(chunk.evidence_level, 0.5)
 
         final_score = (

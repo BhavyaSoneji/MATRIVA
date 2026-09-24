@@ -3,9 +3,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.rag.retrieval import apply_metadata_filters, hybrid_retrieve  # noqa: E402
-from app.rag.vector_store import InMemoryVectorStore  # noqa: E402
-from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk  # noqa: E402
+from app.rag.retrieval import apply_metadata_filters, hybrid_retrieve
+from app.rag.vector_store import InMemoryVectorStore
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
 
 def make_chunk(

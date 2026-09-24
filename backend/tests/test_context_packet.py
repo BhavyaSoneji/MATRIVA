@@ -3,9 +3,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.rag.context_packet import build_context_packet  # noqa: E402
-from app.rag.reranking import UserContext  # noqa: E402
-from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk  # noqa: E402
+from app.rag.context_packet import build_context_packet
+from app.rag.reranking import UserContext
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
 
 def make_chunk(chunk_id: str, content: str, document_id: str = "doc-1") -> KnowledgeChunk:

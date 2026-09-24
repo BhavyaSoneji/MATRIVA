@@ -5,7 +5,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.rag import embeddings  # noqa: E402
+from app.rag import embeddings
 
 
 def test_embed_text_raises_without_api_key(monkeypatch: pytest.MonkeyPatch) -> None:

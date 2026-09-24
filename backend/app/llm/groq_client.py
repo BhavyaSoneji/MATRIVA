@@ -64,9 +64,14 @@ def generate_from_packet(
     for attempt in range(max_retries):
         try:
             completion = client.chat.completions.create(
-                model=model, messages=messages, temperature=temperature
+                model=model,
+                messages=messages,  # type: ignore[arg-type]  # plain dicts match the SDK's TypedDict shape at runtime
+                temperature=temperature,
             )
-            return completion.choices[0].message.content
+            content = completion.choices[0].message.content
+            if content is None:
+                raise GenerationError("Groq response had no content (empty choice)")
+            return content
         except _RETRYABLE_ERRORS as exc:
             last_error = exc
             if attempt < max_retries - 1:

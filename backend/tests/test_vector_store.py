@@ -3,8 +3,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.rag.vector_store import InMemoryVectorStore, cosine_similarity  # noqa: E402
-from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk  # noqa: E402
+from app.rag.vector_store import InMemoryVectorStore, cosine_similarity
+from app.schemas.knowledge import Domain, EvidenceLevel, KnowledgeChunk
 
 
 def make_chunk(chunk_id: str, document_id: str, domain: Domain = Domain.NUTRITION) -> KnowledgeChunk:

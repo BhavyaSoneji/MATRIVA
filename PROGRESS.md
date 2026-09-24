@@ -20,6 +20,38 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #21: **Fixed a real bug in `.github/CODEOWNERS`** — GitHub CODEOWNERS uses "last matching
+  pattern wins," but the original file listed the specific `/backend/app/rag/`, `/safety/`,
+  `/llm/`, `/evidence/` → @neevmodh rules *before* the broader `/backend/` → @BhavyaSoneji rule.
+  Since `/backend/` also matches those subpaths and came later, it would have silently overridden
+  all of them — every PR touching rag/safety/llm/evidence code would have requested Bhavya for
+  review instead of me. Reordered: broad rules first, specific overrides last (documented inline
+  so it doesn't regress).
+- #21: **Deliberately did NOT enable branch protection on `main`.** It's a repo-wide GitHub
+  setting that would immediately affect whether Bhavya/Raj can push directly — turning it on the
+  day before the Sep 25 deadline risks blocking someone mid-crunch if they need a fast direct
+  push. Recommend enabling this after R0 ships, matching the team's own Sprint 1 ("if
+  shortlisted") timeline.
+- #22: Added CI coverage that was missing: backend `mypy` type-check job (added `backend/mypy.ini`,
+  `ignore_missing_imports=True` since several deps like groq/pgvector lack full stubs), an
+  `ingestion` test job (27 tests existed but had zero CI coverage), frontend `tsc --noEmit`
+  type-check, and a Playwright `e2e` job with a minimal smoke test (`frontend/tests/e2e/smoke.spec.ts`
+  — frontend has no real flows yet, Raj should expand this as features land).
+- **Generated `frontend/package-lock.json`** — it didn't exist, so the existing `npm ci` CI step
+  would have failed on every run. Also fixed 3 real `mypy` findings (LLM response `content` could
+  be `None` and wasn't handled; a `SourceType | None` passed where a non-Optional key was
+  expected; a Pydantic `model_post_init` signature needing PEP 570 positional-only syntax) and 27
+  `ruff` findings (unnecessary `noqa: E402` comments now that lint is actually enforced, import
+  ordering, including one pre-existing issue in `backend/alembic/env.py` from the Phase 0 scaffold).
+- Verified locally end-to-end: backend ruff+mypy+pytest (52/52), ingestion pytest (27/27), frontend
+  lint+typecheck+build+e2e all green.
+- Related issue(s): #21 (partial), #22
+- Status: #22 done; #21 CODEOWNERS bug fixed but branch protection intentionally deferred
+- Notes: this is the first time ruff/mypy have actually been run against this codebase — worth
+  running `ruff check backend/` and `mypy backend/app` locally before every PR from now on so CI
+  doesn't become the first place these surface.
+
+### 2026-09-24 — @neevmodh
 - #10: Added `backend/app/evidence/citation_validation.py` — `validate_citations(answer, ids)` /
   `validate_citations_against_packet(answer, packet)` post-generation checkers per Section 12 Step
   11 + Section 18. Fails closed: `[id]`-style citations not matching an actually-retrieved
