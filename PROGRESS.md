@@ -20,6 +20,31 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #17: Added `evaluation/generation/metrics.py` — automates what's actually automatable per
+  Section 41 by reusing #10/#13 rather than reimplementing: `citation_correctness` (wraps #10),
+  `groundedness_check` (wraps #13's unsupported-claim + source-inconsistency detectors),
+  `answer_relevance` (keyword-overlap proxy, same lightweight-stand-in pattern as #6/#4),
+  `completeness_check` (word-count + citation-presence proxy). **Deliberately left clarity and
+  final quality judgment out of the automated script** — Section 41 itself says "use human review
+  for final quality assessment," and clarity specifically isn't something a rule-based check can
+  meaningfully score.
+- Added `evaluation/generation/run.py`: LIVE mode (real retrieve→generate against the actual
+  pipeline, #6-#9) when a Groq key is configured, SELF_TEST mode (4 hand-authored example
+  responses — grounded+cited, ungrounded, fabricated-citation, too-short) when it isn't, so the
+  scoring logic is exercised and demonstrated either way. Ran it here (no key in this
+  environment): all 4 planted problems correctly detected (ungrounded claim flagged, fabricated
+  citation flagged, short response flagged incomplete).
+- Added `evaluation/generation/human_review_checklist.md` — the manual review checklist per
+  acceptance criterion 2, covering all 6 Section 41 dimensions plus Section 11/31 evidence
+  separation and safety escalation, with a PASS/PASS WITH NOTES/FAIL rating scale and batch
+  summary template.
+- 12 new tests, 28/28 passing across `evaluation/tests/`.
+- Related issue(s): #17
+- Status: done
+- Notes: same "automated checks are a coarse proxy, not a substitute for human judgment" caveat
+  as #12/#13. Next: #18 (safety evaluation test suite).
+
+### 2026-09-24 — @neevmodh
 - #16: Added `evaluation/retrieval/metrics.py` (Recall@K, Precision@K, MRR/reciprocal rank,
   nDCG@K — pure functions, 16 tests), `evaluation/retrieval/eval_dataset.yaml` (24 labeled
   queries across all 3 domains currently in the corpus — MODERN_MEDICAL, AYURVEDA, NUTRITION —

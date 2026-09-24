@@ -1,0 +1,92 @@
+{
+  "mode": "SELF_TEST",
+  "cases": [
+    {
+      "query": "Is spinach good for iron during pregnancy?",
+      "response": "Spinach is a commonly recommended source of iron during pregnancy [seed-ifct-palak-001].",
+      "citation_correctness": {
+        "verified_count": 1,
+        "unverifiable_count": 0,
+        "is_clean": true
+      },
+      "groundedness": {
+        "grounded": true,
+        "unsupported_claim_phrases": [],
+        "source_inconsistent": false
+      },
+      "answer_relevance": 0.8,
+      "completeness": {
+        "word_count": 11,
+        "has_citation": true,
+        "likely_complete": false
+      },
+      "label": "grounded_with_citation"
+    },
+    {
+      "query": "Is spinach good for iron during pregnancy?",
+      "response": "You have anemia and spinach will definitely cure it immediately.",
+      "citation_correctness": {
+        "verified_count": 0,
+        "unverifiable_count": 0,
+        "is_clean": true
+      },
+      "groundedness": {
+        "grounded": false,
+        "unsupported_claim_phrases": [
+          "you have"
+        ],
+        "source_inconsistent": false
+      },
+      "answer_relevance": 0.2,
+      "completeness": {
+        "word_count": 10,
+        "has_citation": false,
+        "likely_complete": false
+      },
+      "label": "ungrounded_unsupported_claim"
+    },
+    {
+      "query": "Is spinach good for iron during pregnancy?",
+      "response": "Spinach helps with iron levels [nonexistent-source-42].",
+      "citation_correctness": {
+        "verified_count": 0,
+        "unverifiable_count": 1,
+        "is_clean": false
+      },
+      "groundedness": {
+        "grounded": false,
+        "unsupported_claim_phrases": [],
+        "source_inconsistent": true
+      },
+      "answer_relevance": 0.4,
+      "completeness": {
+        "word_count": 6,
+        "has_citation": false,
+        "likely_complete": false
+      },
+      "label": "fabricated_citation"
+    },
+    {
+      "query": "Is spinach good for iron during pregnancy?",
+      "response": "Yes.",
+      "citation_correctness": {
+        "verified_count": 0,
+        "unverifiable_count": 0,
+        "is_clean": true
+      },
+      "groundedness": {
+        "grounded": true,
+        "unsupported_claim_phrases": [],
+        "source_inconsistent": false
+      },
+      "answer_relevance": 0.0,
+      "completeness": {
+        "word_count": 1,
+        "has_citation": false,
+        "likely_complete": false
+      },
+      "label": "too_short"
+    }
+  ],
+  "generated_at": "2026-09-24T11:40:48.853877+00:00"
+}
