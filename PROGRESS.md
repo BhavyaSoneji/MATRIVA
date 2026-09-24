@@ -20,6 +20,23 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #11: Added `backend/app/rag/query_rewriting.py` — `rewrite_query(raw_query, profile)` generates
+  one retrieval-query variant per known personalization dimension (pregnancy stage, diet, region,
+  each restriction), per Section 12 Step 5's example. Purely combines the caller-supplied profile
+  terms with the raw query — never invents new terms, satisfying Section 23's "personalization
+  selects, never invents medical guidance."
+- 8 new tests, including the acceptance criteria's explicit "same query + different profiles
+  retrieves different relevant docs" case: a small corpus with a vegetarian-focused chunk and a
+  Kerala-regional chunk, showing the top keyword-overlap match flips between the two profiles.
+  60/60 passing across `backend/tests/`.
+- Related issue(s): #11
+- Status: done
+- Notes: `noqa: E402` reminder for myself — this project's ruff config doesn't enable E402, so
+  those comments in new test files are flagged as unused (`RUF100`) and auto-removed; stopped
+  adding them to new files. Next: #57 (chat intent classification) or #12 (safety pre-check
+  classifier, full) — both M2, no hard dependency between them.
+
+### 2026-09-24 — @neevmodh
 - #21: **Fixed a real bug in `.github/CODEOWNERS`** — GitHub CODEOWNERS uses "last matching
   pattern wins," but the original file listed the specific `/backend/app/rag/`, `/safety/`,
   `/llm/`, `/evidence/` → @neevmodh rules *before* the broader `/backend/` → @BhavyaSoneji rule.
