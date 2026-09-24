@@ -80,7 +80,9 @@ function DashboardContent() {
             )}
             {!loading && pregnancy && (
               <div className="flex flex-col gap-1">
-                <p className="text-2xl font-semibold capitalize text-foreground">{pregnancy.stage}</p>
+                <p className="text-2xl font-semibold capitalize text-foreground">
+                  {pregnancy.stage.replace(/_/g, " ")}
+                </p>
                 <p className="text-sm text-muted-foreground">
                   Week {pregnancy.current_week} · Trimester {pregnancy.trimester}
                 </p>
