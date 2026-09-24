@@ -20,6 +20,22 @@ Paste your entry right below this line, above the older ones.
 <!-- NEW ENTRIES GO HERE -->
 
 ### 2026-09-24 — @neevmodh
+- #1: Defined the knowledge document/chunk schema in `backend/app/schemas/knowledge.py`
+  (`KnowledgeDocument`, `KnowledgeChunk`, `AyurvedicProvenance`, `Domain`, `SourceType`,
+  `EvidenceLevel`, `ReviewStatus`) per Master Prompt Sections 9/10/11/14; documented in
+  `docs/rag.md`. Model enforces Section 11's rule in code, not just convention: an `AYURVEDA`
+  document without `ayurvedic_provenance` raises a validation error.
+- Related issue(s): #1
+- Status: done
+- Notes: **found and fixed a schema mismatch while formalizing this** — Section 11 is the only
+  place the Master Prompt defines an evidence-label vocabulary (`TRADITIONAL`, `PRELIMINARY`,
+  `LIMITED_EVIDENCE`, `MIXED_EVIDENCE`, `SUPPORTED`, `UNCERTAIN`, `NOT_ESTABLISHED`), and it's used
+  generically across domains. `knowledge/seed/seed.yaml` (#65) had used a non-spec value
+  (`ESTABLISHED`) for the FOGSI/IFCT entries — corrected to `SUPPORTED` in both `seed.yaml` and
+  `backend/app/rag/seed_qa.py`'s `_evidence_label()`, retested, retrieval still works correctly.
+  Sprint 1 ingestion (#2-#4) and the real ORM models should build against this schema directly.
+
+### 2026-09-24 — @neevmodh
 - Ran full OCR on `knowledge/ayurveda/Prasuti-Tantra-by-Dr-premvati-Tiwari.pdf` (408-page scanned
   book, no text layer) and committed the extract to `knowledge/ayurveda/Prasuti-Tantra-OCR.txt`
 - Related issue(s): none directly (source material for future ingestion work, e.g. #2)

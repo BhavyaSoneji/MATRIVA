@@ -1,13 +1,15 @@
 # Hand-curated seed knowledge set for Health-a-thon Round 1 (issue #65).
 #
-# Field shape matches the real knowledge document schema (issue #1 / Master Prompt Section 9)
-# so this drops into the real ingestion pipeline later without rework:
+# Field shape matches the real knowledge document schema (issue #1, backend/app/schemas/knowledge.py,
+# Master Prompt Section 9) so this drops into the real ingestion pipeline later without rework:
 # document_id, title, content, domain, subdomain, source_id, source_type, publication_date,
 # version, language, region, pregnancy_stage, topic, evidence_level, review_status,
 # reviewed_by, reviewed_at, safety_tags.
 #
+# evidence_level uses the Section 11 vocabulary (see docs/rag.md): TRADITIONAL, PRELIMINARY,
+# LIMITED_EVIDENCE, MIXED_EVIDENCE, SUPPORTED, UNCERTAIN, NOT_ESTABLISHED.
+#
 # review_status values used here:
-#   ESTABLISHED_INTERNAL   - matches the schedule/spec the team already committed to in docs/
 #   PENDING_SOURCE_VERIFICATION - factual claim not yet checked against the primary document
 #   PENDING_CLINICAL_REVIEW - traditional/Ayurvedic content awaiting Clinical Lead sign-off (#75)
 #
@@ -31,7 +33,7 @@
   region: IN
   pregnancy_stage: all
   topic: anc_visit_schedule
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null
@@ -98,7 +100,7 @@
   region: IN
   pregnancy_stage: all
   topic: protein_folate_source
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null
@@ -120,7 +122,7 @@
   region: IN
   pregnancy_stage: all
   topic: calcium_source
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null
@@ -142,7 +144,7 @@
   region: IN
   pregnancy_stage: all
   topic: iron_folate_source
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null
@@ -164,7 +166,7 @@
   region: IN
   pregnancy_stage: all
   topic: calcium_protein_source
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null
@@ -186,7 +188,7 @@
   region: IN
   pregnancy_stage: all
   topic: energy_fiber_source
-  evidence_level: ESTABLISHED
+  evidence_level: SUPPORTED
   review_status: PENDING_SOURCE_VERIFICATION
   reviewed_by: null
   reviewed_at: null

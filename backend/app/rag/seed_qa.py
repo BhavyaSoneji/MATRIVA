@@ -85,8 +85,8 @@ def _evidence_label(entries: list[dict[str, Any]]) -> str:
     pending_review = any(e["review_status"] == "PENDING_CLINICAL_REVIEW" for e in entries)
     if pending_review:
         return "MIXED_PENDING_CLINICAL_REVIEW" if len(levels) > 1 else "TRADITIONAL_PENDING_CLINICAL_REVIEW"
-    if levels == {"ESTABLISHED"}:
-        return "ESTABLISHED"
+    if levels == {"SUPPORTED"}:
+        return "SUPPORTED"
     if levels == {"TRADITIONAL"}:
         return "TRADITIONAL"
     return "MIXED_MODERN_TRADITIONAL"
