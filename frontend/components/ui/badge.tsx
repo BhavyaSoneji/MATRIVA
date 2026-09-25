@@ -2,18 +2,23 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
+/*
+  Badges are typographic marks, not filled pills. Meaning is carried by the
+  glyph the caller supplies (◆ ◇ ○ ▲) as much as by hue, so they stay readable
+  in grayscale and for colour-blind readers.
+*/
 const badgeVariants = cva(
-  "inline-flex items-center rounded-none border px-2.5 py-0.5 text-xs font-medium tracking-wide transition-colors",
+  "inline-flex items-center gap-1.5 rounded-none text-[9.5px] font-bold uppercase tracking-[0.14em] leading-none",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        outline: "border-border text-foreground",
-        success: "border-transparent bg-success/15 text-success",
-        warning: "border-transparent bg-warning/15 text-warning",
-        destructive: "border-transparent bg-destructive/15 text-destructive",
-        traditional: "border-transparent bg-accent text-accent-foreground",
+        default: "bg-primary px-2.5 py-1.5 text-primary-foreground",
+        secondary: "text-muted-foreground",
+        outline: "border border-border px-2.5 py-1.5 text-muted-foreground",
+        success: "text-success",
+        warning: "text-warning",
+        destructive: "text-destructive",
+        traditional: "text-muted-foreground",
       },
     },
     defaultVariants: {

@@ -5,17 +5,17 @@ import { RequireAuth } from "@/components/require-auth";
 import { api, ApiError } from "@/lib/api";
 import type { KnowledgeSearchResponse, KnowledgeResult, SourceResponse } from "@/lib/types";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingState } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EvidenceBadge } from "@/components/evidence-badge";
+import { ArrowUpRight } from "lucide-react";
 
 function SourcesContent() {
   const [query, setQuery] = React.useState("");
   const [results, setResults] = React.useState<KnowledgeResult[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [activeId, setActiveId] = React.useState<string | null>(null);
   const [detail, setDetail] = React.useState<SourceResponse | null>(null);
   const [detailError, setDetailError] = React.useState<string | null>(null);
 
@@ -35,6 +35,7 @@ function SourcesContent() {
   }, [search]);
 
   const openDetail = async (sourceId: string) => {
+    setActiveId(sourceId);
     setDetailError(null);
     setDetail(null);
     try {
@@ -52,67 +53,100 @@ function SourcesContent() {
   }, [results]);
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Sources & evidence explorer</h1>
-        <p className="text-muted-foreground">Browse the underlying sources behind MATRIVA&apos;s guidance.</p>
+    <main className="mx-auto w-full max-w-[1400px] px-6 py-10">
+      <div className="rise-in border-b border-border pb-9">
+        <p className="eyebrow text-accent">Evidence</p>
+        <h1 className="display mt-3 text-[2.5rem] leading-none">Sources & evidence explorer</h1>
+        <p className="mt-3 text-sm text-muted-foreground">
+          Browse the underlying sources behind MATRIVA&apos;s guidance.
+        </p>
       </div>
+
       <form
-        className="flex gap-2"
+        className="mt-8 max-w-sm"
         onSubmit={(e) => {
           e.preventDefault();
           search(query);
         }}
       >
-        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search topics or keywords..." />
-        <Button type="submit">Search</Button>
+        <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search topics or keywords…" />
       </form>
+
       {loading && <LoadingState label="Loading sources..." />}
       {!loading && error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mt-8">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       {!loading && !error && uniqueSources.length === 0 && (
-        <p className="text-sm text-muted-foreground">No sources found.</p>
+        <p className="mt-8 text-sm text-muted-foreground">No sources found.</p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {uniqueSources.map((s) => (
-          <Card key={s.id} className="cursor-pointer hover:border-primary" onClick={() => openDetail(s.id)}>
-            <CardHeader>
-              <CardTitle className="text-base">{s.title || s.name}</CardTitle>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">{s.source_type}</p>
-            </CardHeader>
-            <CardContent className="flex flex-wrap gap-1.5">
-              <EvidenceBadge level={s.evidence_level} />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
 
-      {detailError && (
-        <Alert variant="destructive">
-          <AlertDescription>{detailError}</AlertDescription>
-        </Alert>
-      )}
-      {detail && (
-        <Card className="border-primary">
-          <CardHeader>
-            <CardTitle>{detail.title}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-2 text-sm">
-            <p>Authority: {detail.authority || "—"}</p>
-            <p>Jurisdiction: {detail.jurisdiction || "—"}</p>
-            <p>Topic: {detail.topic || "—"}</p>
-            {detail.url && (
-              <a href={detail.url} target="_blank" rel="noreferrer" className="text-primary underline">
-                View source
-              </a>
-            )}
-            <EvidenceBadge level={detail.evidence_level} />
-          </CardContent>
-        </Card>
-      )}
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.1fr]">
+        <div className="flex flex-col">
+          {uniqueSources.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => openDetail(s.id)}
+              className={`flex items-center justify-between gap-4 border-b border-border px-4 py-4 text-left transition-colors first:border-t ${
+                activeId === s.id ? "bg-sage-100" : "hover:bg-foreground/[0.02]"
+              }`}
+            >
+              <div>
+                <p className="display text-lg leading-[1.2]">{s.title || s.name}</p>
+                <p className="eyebrow-sm mt-1.5 text-muted-foreground">{s.source_type}</p>
+              </div>
+              <EvidenceBadge level={s.evidence_level} />
+            </button>
+          ))}
+        </div>
+
+        <div>
+          {detailError && (
+            <Alert variant="destructive">
+              <AlertDescription>{detailError}</AlertDescription>
+            </Alert>
+          )}
+          {!detailError && !detail && (
+            <div className="flex h-full min-h-[16rem] items-center justify-center border border-dashed border-border p-8 text-center">
+              <p className="text-sm text-muted-foreground">Select a source to see its detail.</p>
+            </div>
+          )}
+          {detail && (
+            <div className="bg-ink p-9 text-cream-100">
+              <p className="eyebrow-sm text-sage-300">{detail.authority || "Source"}</p>
+              <h2 className="display mt-3 text-[1.7rem] leading-[1.25]">{detail.title}</h2>
+
+              <dl className="mt-7 flex flex-wrap gap-8">
+                <div>
+                  <dt className="eyebrow-sm text-cream-100/55">Jurisdiction</dt>
+                  <dd className="mt-1.5 text-sm font-semibold">{detail.jurisdiction || "—"}</dd>
+                </div>
+                <div>
+                  <dt className="eyebrow-sm text-cream-100/55">Topic</dt>
+                  <dd className="mt-1.5 text-sm font-semibold">{detail.topic || "—"}</dd>
+                </div>
+              </dl>
+
+              <div className="mt-8 flex items-center justify-between border-t border-cream-100/15 pt-6">
+                <EvidenceBadge level={detail.evidence_level} />
+                {detail.url && (
+                  <a
+                    href={detail.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="eyebrow-sm flex items-center gap-1.5 text-cream-100 transition-opacity hover:opacity-75"
+                  >
+                    View original source
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </main>
   );
 }

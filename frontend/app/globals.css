@@ -3,93 +3,318 @@
 @tailwind utilities;
 
 /*
-  MATRIVA design tokens — sky-blue medical/wellness theme.
-  Sharp, structured UI: near-zero border radius everywhere (see --radius and
-  tailwind.config.ts borderRadius scale).
+  MATRIVA — editorial-clinical design system.
+
+  Cream ground, sage accent, blush for caution, a green-black ink for type.
+  Two rules worth knowing before editing:
+    1. Pale tones carry surfaces, the deep tone carries type. Contrast decides
+       which is used, never taste.
+    2. Evidence marks differ by SHAPE as well as hue (◆ ◇ ○ ▲) so they survive
+       grayscale and colour-blind reading.
 */
 :root {
-  --background: 202 45% 98%;
-  --foreground: 208 45% 14%;
-  --muted: 204 40% 95%;
-  --muted-foreground: 206 20% 40%;
-  --primary: 199 89% 42%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 201 60% 92%;
-  --secondary-foreground: 205 45% 20%;
-  --accent: 189 55% 90%;
-  --accent-foreground: 199 70% 22%;
-  --border: 205 30% 86%;
-  --card: 0 0% 100%;
-  --card-foreground: 208 45% 14%;
-  --destructive: 356 70% 46%;
-  --destructive-foreground: 0 0% 100%;
-  --success: 158 45% 34%;
-  --warning: 32 85% 44%;
+  --background: 44 35% 94%;
+  --foreground: 120 13% 13%;
 
-  /* Sharp corners: near-square by default; small radius reserved for tiny
-     controls (checkboxes etc.) where a fully square edge reads as a bug. */
+  --card: 48 45% 98%;
+  --card-foreground: 120 13% 13%;
+
+  --muted: 44 29% 90%;
+  --muted-foreground: 105 8% 38%;
+
+  /* primary is ink: the single dark note on a light page */
+  --primary: 120 13% 13%;
+  --primary-foreground: 44 35% 94%;
+
+  --secondary: 87 31% 89%;
+  --secondary-foreground: 105 19% 33%;
+
+  --accent: 105 19% 33%;
+  --accent-foreground: 44 35% 94%;
+
+  --border: 49 11% 83%;
+
+  --destructive: 355 29% 47%;
+  --destructive-foreground: 44 35% 94%;
+  --success: 105 19% 33%;
+  --warning: 188 20% 36%;
+
+  /* Sharp, structured UI: square edges everywhere. */
   --radius: 0.125rem;
 
-  /* extra tokens for the pregnancy visualization / gradients */
-  --sky-50: 202 100% 97%;
-  --sky-100: 201 94% 92%;
-  --sky-200: 200 90% 84%;
-  --sky-300: 199 88% 72%;
-  --sky-400: 199 89% 58%;
-  --sky-500: 199 89% 48%;
-  --sky-600: 200 92% 38%;
-  --sky-700: 201 88% 30%;
-  --sky-900: 206 60% 16%;
+  /* the palette, by name */
+  --cream-50: 48 45% 98%;
+  --cream-100: 44 35% 94%;
+  --cream-200: 44 29% 90%;
+
+  --sage-100: 87 31% 89%;
+  --sage-200: 90 30% 79%;
+  --sage-300: 95 21% 65%;
+  --sage-400: 95 21% 57%;
+  --sage-500: 104 19% 40%;
+  --sage-600: 105 19% 33%;
+  --sage-700: 108 16% 26%;
+
+  --blush-100: 0 47% 93%;
+  --blush-200: 357 41% 82%;
+  --blush-500: 355 29% 47%;
+
+  --slate-500: 188 20% 36%;
+
+  --ink: 120 13% 13%;
+  --ink-2: 129 14% 20%;
+
+  /* legacy aliases — older pages still reference the sky-* scale */
+  --sky-50: 48 45% 98%;
+  --sky-100: 87 31% 89%;
+  --sky-200: 90 30% 79%;
+  --sky-300: 95 21% 65%;
+  --sky-400: 95 21% 57%;
+  --sky-500: 104 19% 40%;
+  --sky-600: 105 19% 33%;
+  --sky-700: 108 16% 26%;
+  --sky-900: 120 13% 13%;
 }
 
 .dark {
-  --background: 208 40% 7%;
-  --foreground: 202 35% 92%;
-  --muted: 208 30% 13%;
-  --muted-foreground: 203 15% 65%;
-  --primary: 199 85% 58%;
-  --primary-foreground: 208 45% 8%;
-  --secondary: 205 30% 17%;
-  --secondary-foreground: 202 35% 92%;
-  --accent: 199 30% 18%;
-  --accent-foreground: 199 70% 82%;
-  --border: 205 22% 22%;
-  --card: 208 32% 10%;
-  --card-foreground: 202 35% 92%;
-  --destructive: 356 65% 55%;
-  --destructive-foreground: 0 0% 100%;
-  --success: 158 40% 55%;
-  --warning: 32 75% 55%;
+  --background: 120 13% 9%;
+  --foreground: 44 25% 92%;
 
-  --sky-50: 208 32% 12%;
-  --sky-100: 206 30% 16%;
-  --sky-200: 203 30% 22%;
-  --sky-300: 201 40% 32%;
-  --sky-400: 199 55% 45%;
-  --sky-500: 199 70% 55%;
-  --sky-600: 199 80% 62%;
-  --sky-700: 199 85% 70%;
-  --sky-900: 200 90% 90%;
+  --card: 129 12% 13%;
+  --card-foreground: 44 25% 92%;
+
+  --muted: 129 10% 17%;
+  --muted-foreground: 95 8% 66%;
+
+  --primary: 90 30% 79%;
+  --primary-foreground: 120 13% 11%;
+
+  --secondary: 129 12% 18%;
+  --secondary-foreground: 44 25% 92%;
+
+  --accent: 90 30% 79%;
+  --accent-foreground: 120 13% 11%;
+
+  --border: 120 8% 24%;
+
+  --destructive: 357 41% 72%;
+  --destructive-foreground: 120 13% 11%;
+  --success: 90 30% 74%;
+  --warning: 188 28% 64%;
+
+  --cream-50: 129 12% 15%;
+  --cream-100: 120 13% 9%;
+  --cream-200: 129 10% 17%;
+
+  --sage-100: 129 12% 20%;
+  --sage-200: 120 12% 28%;
+  --sage-300: 100 14% 42%;
+  --sage-400: 95 20% 55%;
+  --sage-500: 90 26% 68%;
+  --sage-600: 90 30% 79%;
+  --sage-700: 87 31% 86%;
+
+  --blush-100: 355 16% 22%;
+  --blush-200: 356 24% 40%;
+  --blush-500: 357 41% 76%;
+
+  --slate-500: 188 28% 64%;
+
+  --ink: 44 25% 92%;
+  --ink-2: 44 20% 84%;
+
+  --sky-50: 129 12% 15%;
+  --sky-100: 129 12% 20%;
+  --sky-200: 120 12% 28%;
+  --sky-300: 100 14% 42%;
+  --sky-400: 95 20% 55%;
+  --sky-500: 90 26% 68%;
+  --sky-600: 90 30% 79%;
+  --sky-700: 87 31% 86%;
+  --sky-900: 44 25% 92%;
 }
 
 body {
   background: hsl(var(--background));
   color: hsl(var(--foreground));
+  font-feature-settings: "ss01", "cv01";
 }
 
-/* Subtle, medical-grade backdrop wash used behind hero/dashboard sections */
+/* Numbers align in columns wherever they are compared. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer components {
+  /* ── editorial primitives ─────────────────────────────────────── */
+
+  /* Micro-caps label. The counterweight to the display type. */
+  .eyebrow {
+    @apply text-[10px] font-bold uppercase tracking-[0.2em];
+  }
+
+  .eyebrow-sm {
+    @apply text-[9.5px] font-bold uppercase tracking-[0.18em];
+  }
+
+  /* Display type: the serif carries every headline and every number. */
+  .display {
+    font-family: var(--font-display), Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+    line-height: 1;
+  }
+
+  /* Mask reveal — wrap a line, animate the inner span up out of the box. */
+  .mask {
+    @apply block overflow-hidden;
+  }
+
+  .mask > * {
+    @apply block;
+    padding-bottom: 0.13em;
+    animation: mv-rise 1.05s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* One curve for everything that moves. */
+  .rise-in {
+    animation: mv-fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .hair {
+    @apply border-border;
+  }
+
+  /* Evidence marks: shape first, colour second. */
+  .mark {
+    @apply eyebrow-sm inline-flex items-center gap-1.5;
+  }
+}
+
+@layer utilities {
+  .lift {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease;
+  }
+
+  .lift:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Soft, warm-neutral elevation. Shadows are never black. */
+  .shadow-plate {
+    box-shadow: 0 46px 80px -40px hsl(var(--ink) / 0.5);
+  }
+
+  .shadow-card {
+    box-shadow: 0 10px 24px -16px hsl(var(--ink) / 0.3);
+  }
+
+  .shadow-float {
+    box-shadow: 0 38px 66px -26px hsl(var(--ink) / 0.42);
+  }
+}
+
+@keyframes mv-rise {
+  from {
+    transform: translateY(108%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes mv-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes mv-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes mv-drift {
+  0%,
+  100% {
+    transform: translateZ(var(--z, 0)) translateY(0);
+  }
+  50% {
+    transform: translateZ(var(--z, 0)) translateY(-11px);
+  }
+}
+
+@keyframes mv-scene {
+  from {
+    opacity: 0;
+    transform: rotateY(-26deg) rotateX(10deg) translateY(34px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(-19deg) rotateX(7deg) translateY(0);
+  }
+}
+
+@keyframes mv-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.34;
+    transform: scale(0.82);
+  }
+}
+
+@keyframes mv-breathe {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+}
+
+/* Ring and sparkline draw-in. The element sets its own dash length. */
+@keyframes mv-draw {
+  from {
+    stroke-dashoffset: var(--dash, 1000);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Soft light washes, straight off the reference plates. */
 .bg-wellness-gradient {
-  background-image: linear-gradient(
-    180deg,
-    hsl(var(--sky-50)) 0%,
-    hsl(var(--background)) 55%
-  );
+  background-image: radial-gradient(
+      70rem 40rem at 88% -10%,
+      hsl(var(--sage-200) / 0.55),
+      transparent 60%
+    ),
+    radial-gradient(50rem 36rem at 4% 108%, hsl(var(--blush-100) / 0.9), transparent 62%);
 }
 
 .bg-sky-panel-gradient {
-  background-image: linear-gradient(
-    135deg,
-    hsl(var(--sky-500)) 0%,
-    hsl(var(--sky-600)) 100%
-  );
+  background-image: linear-gradient(135deg, hsl(var(--sage-100)), hsl(var(--sage-200)));
 }

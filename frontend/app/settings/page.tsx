@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { LoadingState } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CircleCheck, Download, Trash2 } from "lucide-react";
 
 function SettingsContent() {
   const { logout } = useAuth();
@@ -111,160 +111,210 @@ function SettingsContent() {
   if (loading) return <LoadingState label="Loading settings..." />;
 
   return (
-    <main className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
-      <h1 className="text-2xl font-semibold text-foreground">Settings</h1>
+    <main className="mx-auto w-full max-w-[1400px] px-6 py-10">
+      <div className="rise-in flex items-center gap-4 border-b border-border pb-9">
+        <ManageIcon />
+        <h1 className="display text-[2.5rem] leading-none">Settings</h1>
+      </div>
 
       {message && (
-        <Alert variant="success">
+        <Alert variant="success" className="mt-7">
           <AlertDescription>{message}</AlertDescription>
         </Alert>
       )}
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mt-7">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile & pregnancy</CardTitle>
-          <CardDescription>
+      <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        {/* profile */}
+        <section className="border border-border p-8">
+          <p className="eyebrow-sm text-accent">Profile & pregnancy</p>
+          <p className="mt-1.5 text-sm text-muted-foreground">
             {profile ? "Update your details below." : "You haven't set up your profile yet."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="fullName">Full name</Label>
-            <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="region">Region</Label>
-            <Input id="region" value={region} onChange={(e) => setRegion(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="diet">Dietary preference</Label>
-            <Select id="diet" value={dietType} onChange={(e) => setDietType(e.target.value)}>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="non_vegetarian">Non-vegetarian</option>
-              <option value="eggetarian">Eggetarian</option>
-            </Select>
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="week">Current pregnancy week</Label>
-            <Input
-              id="week"
-              type="number"
-              min={1}
-              max={42}
-              value={currentWeek}
-              onChange={(e) => setCurrentWeek(Number(e.target.value))}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="dueDate">Due date</Label>
-            <Input id="dueDate" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="first">First pregnancy?</Label>
-            <Select id="first" value={firstPregnancy ? "yes" : "no"} onChange={(e) => setFirstPregnancy(e.target.value === "yes")}>
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
-            </Select>
-          </div>
-          {pregnancy && (
-            <p className="text-xs text-muted-foreground">
-              Current stage: {pregnancy.stage} (trimester {pregnancy.trimester})
-            </p>
-          )}
-          <Button onClick={saveProfile} disabled={saving}>
-            {saving ? "Saving..." : "Save changes"}
-          </Button>
-        </CardContent>
-      </Card>
+          </p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Consent</CardTitle>
-          <CardDescription>
-            Consent status: {profile?.consent ? "granted" : "not granted"}
-            {profile?.consent_version ? ` (v${profile.consent_version})` : ""}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={async () => {
-              setError(null);
-              try {
-                await api.post("/privacy/consent", { granted: true, version: "2026-01" });
-                setProfile((p) => (p ? { ...p, consent: true, consent_version: "2026-01" } : p));
-                setMessage("Consent granted.");
-              } catch (err) {
-                setError(err instanceof ApiError ? err.message : "Could not update consent.");
-              }
-            }}
-          >
-            Grant consent
-          </Button>
-          <Button
-            variant="outline"
-            onClick={async () => {
-              setError(null);
-              try {
-                await api.post("/privacy/consent", { granted: false, version: "2026-01" });
-                setProfile((p) => (p ? { ...p, consent: false } : p));
-                setMessage("Consent withdrawn.");
-              } catch (err) {
-                setError(err instanceof ApiError ? err.message : "Could not update consent.");
-              }
-            }}
-          >
-            Withdraw consent
-          </Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Your data</CardTitle>
-          <CardDescription>Export your data or permanently delete your account.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          <Button variant="outline" onClick={exportData}>
-            Export my data
-          </Button>
-
-          {!confirmDelete ? (
-            <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
-              Delete my account
-            </Button>
-          ) : (
-            <div className="flex flex-col gap-2 border-l-4 border-y border-r border-destructive/40 bg-destructive/5 p-4">
-              <p className="text-sm text-destructive">
-                This permanently deletes your account and all data. This cannot be undone. Type{" "}
-                <strong>DELETE</strong> to confirm.
-              </p>
-              <Input value={deleteText} onChange={(e) => setDeleteText(e.target.value)} placeholder="DELETE" />
-              <div className="flex gap-2">
-                <Button variant="destructive" disabled={deleteText !== "DELETE"} onClick={deleteAccount}>
-                  Permanently delete
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setConfirmDelete(false);
-                    setDeleteText("");
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
+          <div className="mt-7 grid gap-6 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <Label htmlFor="fullName">Full name</Label>
+              <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="region">Region</Label>
+              <Input id="region" value={region} onChange={(e) => setRegion(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="diet">Dietary preference</Label>
+              <Select id="diet" value={dietType} onChange={(e) => setDietType(e.target.value)}>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="vegan">Vegan</option>
+                <option value="non_vegetarian">Non-vegetarian</option>
+                <option value="eggetarian">Eggetarian</option>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="week">Current pregnancy week</Label>
+              <Input
+                id="week"
+                type="number"
+                min={1}
+                max={42}
+                value={currentWeek}
+                onChange={(e) => setCurrentWeek(Number(e.target.value))}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="dueDate">Due date</Label>
+              <Input id="dueDate" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+            </div>
+            <div className="flex flex-col gap-1.5 sm:col-span-2">
+              <Label htmlFor="first">First pregnancy?</Label>
+              <Select
+                id="first"
+                value={firstPregnancy ? "yes" : "no"}
+                onChange={(e) => setFirstPregnancy(e.target.value === "yes")}
+              >
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </Select>
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+            {pregnancy ? (
+              <span className="eyebrow-sm bg-sage-100 px-3 py-1.5 text-sage-600">
+                {pregnancy.stage.replace(/_/g, " ")} · Trimester {pregnancy.trimester}
+              </span>
+            ) : (
+              <span />
+            )}
+            <Button onClick={saveProfile} disabled={saving}>
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </div>
+        </section>
+
+        {/* consent + data */}
+        <div className="flex flex-col gap-6">
+          <section className="border border-border p-7">
+            <p className="eyebrow-sm text-accent">Consent</p>
+            <div className="mt-3 flex items-center gap-2.5">
+              <CircleCheck
+                className={`h-4 w-4 ${profile?.consent ? "text-sage-600" : "text-muted-foreground"}`}
+                aria-hidden="true"
+              />
+              <p className="text-sm font-semibold">
+                {profile?.consent ? "Data-sharing consent granted" : "Consent not granted"}
+                {profile?.consent_version ? ` · v${profile.consent_version}` : ""}
+              </p>
+            </div>
+            <div className="mt-5 flex gap-6">
+              <button
+                type="button"
+                className="eyebrow-sm text-accent transition-opacity hover:opacity-70"
+                onClick={async () => {
+                  setError(null);
+                  try {
+                    await api.post("/privacy/consent", { granted: true, version: "2026-01" });
+                    setProfile((p) => (p ? { ...p, consent: true, consent_version: "2026-01" } : p));
+                    setMessage("Consent granted.");
+                  } catch (err) {
+                    setError(err instanceof ApiError ? err.message : "Could not update consent.");
+                  }
+                }}
+              >
+                Grant consent
+              </button>
+              <button
+                type="button"
+                className="eyebrow-sm text-blush-500 transition-opacity hover:opacity-70"
+                onClick={async () => {
+                  setError(null);
+                  try {
+                    await api.post("/privacy/consent", { granted: false, version: "2026-01" });
+                    setProfile((p) => (p ? { ...p, consent: false } : p));
+                    setMessage("Consent withdrawn.");
+                  } catch (err) {
+                    setError(err instanceof ApiError ? err.message : "Could not update consent.");
+                  }
+                }}
+              >
+                Withdraw consent
+              </button>
+            </div>
+          </section>
+
+          <section className="border border-border p-7">
+            <p className="eyebrow-sm text-accent">Your data</p>
+
+            <button
+              type="button"
+              onClick={exportData}
+              className="mt-4 flex w-full items-center gap-2.5 border border-border bg-sage-100/60 px-4 py-3 text-sm font-semibold transition-colors hover:bg-sage-100"
+            >
+              <Download className="h-3.5 w-3.5" aria-hidden="true" />
+              Export my data
+            </button>
+
+            <div className="mt-6 border-t border-border pt-5">
+              <p className="eyebrow-sm text-blush-500">Danger zone</p>
+
+              {!confirmDelete ? (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="mt-3 flex w-full items-center gap-2.5 border border-blush-200 bg-blush-100 px-4 py-3 text-sm font-semibold text-blush-500 transition-colors hover:bg-blush-200"
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  Delete my account
+                </button>
+              ) : (
+                <div className="mt-3 flex flex-col gap-3 border-l-2 border-blush-500 bg-blush-100 p-4">
+                  <p className="text-sm leading-relaxed text-foreground/85">
+                    This permanently deletes your account and all data. This cannot be undone. Type{" "}
+                    <strong className="font-bold">DELETE</strong> to confirm.
+                  </p>
+                  <Input value={deleteText} onChange={(e) => setDeleteText(e.target.value)} placeholder="DELETE" />
+                  <div className="flex gap-3">
+                    <Button variant="destructive" disabled={deleteText !== "DELETE"} onClick={deleteAccount}>
+                      Permanently delete
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setConfirmDelete(false);
+                        setDeleteText("");
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <p className="mt-3 text-[11px] text-muted-foreground">Requires typing DELETE to confirm.</p>
+            </div>
+          </section>
+        </div>
+      </div>
     </main>
+  );
+}
+
+function ManageIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-7 w-7 text-accent"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1z" />
+    </svg>
   );
 }
 

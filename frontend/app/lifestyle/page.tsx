@@ -4,8 +4,6 @@ import * as React from "react";
 import { RequireAuth } from "@/components/require-auth";
 import { api, ApiError } from "@/lib/api";
 import type { LifestyleItem } from "@/lib/types";
-import { Select } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingState } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
@@ -35,53 +33,70 @@ function LifestyleContent() {
   const categories = Array.from(new Set(items.map((i) => i.category)));
 
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-10">
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">Lifestyle guidance</h1>
-        <p className="text-muted-foreground">Exercise and lifestyle recommendations for pregnancy.</p>
+    <main className="mx-auto w-full max-w-[1400px] px-6 py-10">
+      <div className="rise-in border-b border-border pb-9">
+        <p className="eyebrow text-accent">Lifestyle</p>
+        <h1 className="display mt-3 text-[2.5rem] leading-none">Movement, rest, rhythm.</h1>
+        <p className="mt-3 text-sm text-muted-foreground">Exercise and lifestyle recommendations for pregnancy.</p>
       </div>
-      <Select
-        className="max-w-xs"
-        value={category}
-        onChange={(e) => {
-          setCategory(e.target.value);
-          load(e.target.value);
-        }}
-      >
-        <option value="">All categories</option>
+
+      <div className="mt-6 flex flex-wrap items-center gap-2.5">
+        <span className="eyebrow-sm text-muted-foreground">Category:</span>
+        <button
+          type="button"
+          onClick={() => {
+            setCategory("");
+            load("");
+          }}
+          className={`eyebrow-sm border px-3.5 py-2 transition-colors ${
+            category === "" ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-accent hover:text-accent"
+          }`}
+        >
+          All
+        </button>
         {categories.map((c) => (
-          <option key={c} value={c}>
+          <button
+            key={c}
+            type="button"
+            onClick={() => {
+              setCategory(c);
+              load(c);
+            }}
+            className={`eyebrow-sm border px-3.5 py-2 transition-colors ${
+              category === c ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground hover:border-accent hover:text-accent"
+            }`}
+          >
             {c}
-          </option>
+          </button>
         ))}
-      </Select>
+      </div>
+
       {loading && <LoadingState label="Loading lifestyle guidance..." />}
       {!loading && error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mt-8">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
       {!loading && !error && items.length === 0 && (
-        <p className="text-sm text-muted-foreground">No lifestyle guidance found.</p>
+        <p className="mt-8 text-sm text-muted-foreground">No lifestyle guidance found.</p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+
+      <div className="mt-8 grid gap-px bg-border sm:grid-cols-2">
         {items.map((item) => (
-          <Card key={item.id}>
-            <CardHeader>
-              <CardTitle className="text-base">{item.title}</CardTitle>
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">{item.category}</p>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              <p className="text-sm text-foreground/90">{item.description}</p>
-              {item.restrictions.length > 0 && (
-                <p className="text-xs text-muted-foreground">Restrictions: {item.restrictions.join(", ")}</p>
-              )}
-              <div className="flex flex-wrap gap-1.5">
-                <EvidenceBadge level={item.evidence_status} />
-                <SafetyBadge status={item.safety_status} />
-              </div>
-            </CardContent>
-          </Card>
+          <div key={item.id} className="bg-background p-7">
+            <p className="eyebrow-sm text-accent">{item.category}</p>
+            <h2 className="display mt-2.5 text-2xl leading-[1.15]">{item.title}</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{item.description}</p>
+            {item.restrictions.length > 0 && (
+              <p className="mt-3 text-xs text-muted-foreground">
+                <span className="font-semibold text-foreground">Avoid if:</span> {item.restrictions.join(", ")}
+              </p>
+            )}
+            <div className="mt-5 flex flex-wrap gap-4 border-t border-border pt-4">
+              <EvidenceBadge level={item.evidence_status} />
+              <SafetyBadge status={item.safety_status} />
+            </div>
+          </div>
         ))}
       </div>
     </main>

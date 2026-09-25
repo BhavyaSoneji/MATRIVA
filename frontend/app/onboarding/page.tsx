@@ -9,8 +9,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
+function StepDot({ n, active, done }: { n: number; active: boolean; done: boolean }) {
+  return (
+    <span
+      className={`flex h-7 w-7 items-center justify-center text-[13px] font-bold ${
+        active || done ? "bg-accent text-primary-foreground" : "bg-sage-100 text-accent"
+      } ${active ? "animate-pulse-soft" : ""}`}
+    >
+      {n}
+    </span>
+  );
+}
 
 function OnboardingFlow() {
   const router = useRouter();
@@ -62,25 +73,48 @@ function OnboardingFlow() {
   };
 
   return (
-    <main className="mx-auto flex max-w-lg flex-col justify-center px-4 py-16">
-      <Card>
-        <CardHeader>
-          <CardTitle>Tell us about yourself ({step}/2)</CardTitle>
-          <CardDescription>
-            {step === 1 ? "A few quick details help us personalize your guidance." : "Now, your pregnancy details."}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-4">
-          {error && (
-            <Alert variant="destructive">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+    <main className="relative flex min-h-[calc(100vh-4rem)] items-center justify-center overflow-hidden px-6 py-16">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-[-14rem] h-[44rem] w-[44rem] -translate-x-1/2 animate-breathe rounded-full bg-[radial-gradient(circle,hsl(var(--sage-200)/0.5),transparent_70%)]"
+      />
+
+      <div className="relative w-full max-w-[38rem] border border-border bg-card p-11 shadow-plate">
+        <div className="flex items-center gap-2.5">
+          <StepDot n={1} active={step === 1} done={step > 1} />
+          <span className="h-px w-10 bg-border" />
+          <StepDot n={2} active={step === 2} done={false} />
+          <span className="eyebrow-sm ml-3 text-muted-foreground">
+            {step === 1 ? "About you · 1 of 2" : "Your pregnancy · 2 of 2"}
+          </span>
+        </div>
+
+        <h1 className="display mt-7 text-[1.9rem] leading-[1.1]">
+          {step === 1 ? "A little about you" : "Where things stand"}
+        </h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          {step === 1
+            ? "This shapes the guidance we show you — nothing here is shared without consent."
+            : "So the dashboard can speak to exactly where you are."}
+        </p>
+
+        {error && (
+          <Alert variant="destructive" className="mt-6">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        <div className="mt-9 grid gap-6 sm:grid-cols-2">
           {step === 1 ? (
             <>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <Label htmlFor="region">Region</Label>
-                <Input id="region" placeholder="e.g. North India" value={region} onChange={(e) => setRegion(e.target.value)} />
+                <Input
+                  id="region"
+                  placeholder="e.g. South India"
+                  value={region}
+                  onChange={(e) => setRegion(e.target.value)}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="diet">Dietary preference</Label>
@@ -119,7 +153,7 @@ function OnboardingFlow() {
                 <Label htmlFor="dueDate">Due date (optional)</Label>
                 <Input id="dueDate" type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1.5 sm:col-span-2">
                 <Label htmlFor="first">Is this your first pregnancy?</Label>
                 <Select
                   id="first"
@@ -132,20 +166,26 @@ function OnboardingFlow() {
               </div>
             </>
           )}
-          <div className="flex justify-between">
-            {step === 2 ? (
-              <Button variant="outline" onClick={() => setStep(1)} disabled={loading}>
-                Back
-              </Button>
-            ) : (
-              <span />
-            )}
-            <Button onClick={handleNext} disabled={loading}>
-              {loading ? "Saving..." : step === 1 ? "Next" : "Finish"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="mt-11 flex items-center justify-between border-t border-border pt-7">
+          {step === 2 ? (
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              disabled={loading}
+              className="eyebrow-sm text-muted-foreground transition-colors hover:text-accent disabled:opacity-50"
+            >
+              ← Back
+            </button>
+          ) : (
+            <span />
+          )}
+          <Button onClick={handleNext} disabled={loading}>
+            {loading ? "Saving…" : step === 1 ? "Next" : "Finish"}
+          </Button>
+        </div>
+      </div>
     </main>
   );
 }

@@ -105,6 +105,9 @@ export interface Citation {
   source_name: string;
   locator: string | null;
   evidence_level: string;
+  source_type?: string | null;
+  url?: string | null;
+  domain?: string | null;
 }
 
 export interface RecommendationResponse {
