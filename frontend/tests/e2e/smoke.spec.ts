@@ -4,7 +4,5 @@ import { expect, test } from "@playwright/test";
 test("home page loads and shows the app name and headline", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "MATRIVA" })).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Calm, evidence-based guidance for every stage of your pregnancy" })
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Forty weeks");
 });
