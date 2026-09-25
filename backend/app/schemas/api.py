@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 from datetime import date, datetime
+from datetime import date as _date
 from typing import Any
 from urllib.parse import urlparse
 
@@ -191,6 +192,14 @@ class Citation(BaseModel):
     source_name: str
     locator: str | None = None
     evidence_level: str
+    # "internal" (default) for the reviewed local knowledge base;
+    # "external_web" for a live Tavily web-search result (see
+    # app.rag.web_search) -- always paired with evidence_level "uncertain"
+    # and a real url/domain so the user can independently verify it, never
+    # presented with the same confidence as a reviewed medical guideline.
+    source_type: str = "internal"
+    url: str | None = None
+    domain: str | None = None
 
 
 class ChatResponse(APIModel):
@@ -448,6 +457,25 @@ class NextVisitResponse(APIModel):
     message: str
     source_id: str
     evidence_level: str
+
+
+class WellnessLogRequest(APIModel):
+    date: _date | None = None
+    water_intake_ml: float | None = Field(default=None, ge=0, le=10000)
+    sleep_hours: float | None = Field(default=None, ge=0, le=24)
+    activity_minutes: int | None = Field(default=None, ge=0, le=1440)
+
+
+class WellnessLogResponse(APIModel):
+    date: _date
+    water_intake_ml: float | None
+    sleep_hours: float | None
+    activity_minutes: int | None
+    updated_at: datetime
+
+
+class WellnessSummaryResponse(APIModel):
+    days: list[WellnessLogResponse]
 
 
 class DeleteResponse(APIModel):

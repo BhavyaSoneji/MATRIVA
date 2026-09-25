@@ -17,6 +17,7 @@ from sqlalchemy import (
     LargeBinary,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -61,6 +62,10 @@ class SourceType(StrEnum):
     ACADEMIC = "academic"
     TRADITIONAL = "traditional"
     INTERNAL = "internal"
+    # A live web search result (app.rag.web_search), never a reviewed local
+    # knowledge_sources row -- always paired with EvidenceLevel.UNCERTAIN,
+    # never persisted to knowledge_sources itself.
+    EXTERNAL_WEB = "external_web"
 
 
 class SafetyStatus(StrEnum):
@@ -116,6 +121,7 @@ class User(Base):
     recommendations: Mapped[list[Recommendation]] = relationship(back_populates="user", cascade="all, delete-orphan")
     feedback: Mapped[list[Feedback]] = relationship(back_populates="user", cascade="all, delete-orphan")
     consent_records: Mapped[list[ConsentRecord]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    wellness_logs: Mapped[list[DailyWellnessLog]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 class HealthProfile(Base):
@@ -191,6 +197,22 @@ class PregnancyProfile(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
 
     user: Mapped[User] = relationship(back_populates="pregnancy_profile")
+
+
+class DailyWellnessLog(Base):
+    __tablename__ = "daily_wellness_logs"
+    __table_args__ = (UniqueConstraint("user_id", "log_date", name="uq_wellness_user_date"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    log_date: Mapped[date] = mapped_column(Date, nullable=False)
+    water_intake_ml: Mapped[float | None] = mapped_column()
+    sleep_hours: Mapped[float | None] = mapped_column()
+    activity_minutes: Mapped[int | None] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+    user: Mapped[User] = relationship(back_populates="wellness_logs")
 
 
 class ConsentRecord(Base):

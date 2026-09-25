@@ -82,10 +82,19 @@ def validate_citations_against_packet(
 ) -> CitationValidationResult:
     """Convenience wrapper: builds the valid-id set from a #8 ContextPacket's
     actually-retrieved sources (chunk_id, document_id, and source_id are all
-    acceptable citation forms)."""
+    acceptable citation forms), plus any external web sources (web_id) the
+    Section 43 gate pulled in via app.rag.web_search -- a citation marker
+    like "[web1]" naming one of THOSE must not be stripped as unverifiable
+    just because it isn't a local knowledge-base id. This does not weaken
+    the check: the id still must resolve to something actually retrieved
+    (now including web results), and any URL/page text is still stripped
+    exactly as before -- web citations are surfaced to the user structurally
+    (see app.services.chat), not by trusting the model to print a raw URL."""
     valid_ids: set[str] = set()
     for source in context_packet.retrieved_sources:
         valid_ids.add(source.chunk_id)
         valid_ids.add(source.document_id)
         valid_ids.add(source.source_id)
+    for web_source in context_packet.web_sources:
+        valid_ids.add(web_source.web_id)
     return validate_citations(answer, valid_ids)

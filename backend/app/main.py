@@ -22,6 +22,7 @@ from app.api import (
     privacy,
     profile,
     recommendations,
+    wellness,
 )
 from app.api.deps import StaffUser
 from app.core.config import get_settings
@@ -168,3 +169,4 @@ app.include_router(feedback.router)
 app.include_router(privacy.router)
 app.include_router(admin.router)
 app.include_router(evaluations.router)
+app.include_router(wellness.router)

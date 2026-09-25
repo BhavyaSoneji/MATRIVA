@@ -34,6 +34,29 @@ class SourceEntry:
     content: str
 
 
+@dataclass(frozen=True)
+class WebSourceEntry:
+    """A live web search hit (see app.rag.web_search), reshaped for the
+    context packet so it renders as a clearly separate, lower-confidence
+    section of the prompt -- never mixed into RETRIEVED SOURCES.
+
+    Reuses this codebase's existing evidence_level/source_type vocabulary
+    (app.models.entities.EvidenceLevel/SourceType) rather than inventing a
+    parallel one: source_type is always "external_web" and evidence_level is
+    always "uncertain" -- an external, unverified page is never entitled to
+    the same confidence as a reviewed local knowledge-base entry, regardless
+    of how authoritative it looks.
+    """
+
+    web_id: str
+    title: str
+    url: str
+    domain: str
+    content: str
+    source_type: str = "external_web"
+    evidence_level: str = "uncertain"
+
+
 @dataclass
 class EvidenceSummary:
     domains: list[str]
@@ -50,9 +73,24 @@ class ContextPacket:
     evidence_summary: EvidenceSummary
     truncated: bool
     total_tokens: int
+    # Populated only when local retrieval was insufficient (Section 43) AND
+    # Tavily was configured and returned results -- see
+    # app.rag.pipeline.answer_query. Empty in every other case, including
+    # every existing caller/test that never passes `web_sources` to
+    # build_context_packet().
+    web_sources: list[WebSourceEntry] = field(default_factory=list)
 
     def to_prompt_text(self) -> str:
-        """Render the 5 required sections (Section 16) as LLM-ready text."""
+        """Render the required sections (Section 16) as LLM-ready text.
+
+        EXTERNAL WEB SOURCES is deliberately its own section, after RETRIEVED
+        SOURCES and before SAFETY RESULT, with explicit "unverified/external"
+        language in both the header and every entry -- this is the
+        structural half of "never presented with the same confidence as a
+        reviewed medical guideline" (the other half is the fixed
+        evidence_level/source_type on WebSourceEntry itself, which citation
+        rendering and post-checks key off of).
+        """
         context_lines = "\n".join(f"- {k}: {v}" for k, v in self.user_context.items() if v)
         sources_lines = "\n\n".join(
             f"[{s.chunk_id}] domain={s.domain} evidence_level={s.evidence_level} "
@@ -64,18 +102,26 @@ class ContextPacket:
             f"evidence_level_counts: {self.evidence_summary.evidence_level_counts}\n"
             f"needs_review: {self.evidence_summary.needs_review_chunk_ids or 'none'}"
         )
-        return (
-            "USER CONTEXT\n"
-            f"{context_lines or '(none provided)'}\n\n"
-            "USER QUESTION\n"
-            f"{self.user_question}\n\n"
-            "RETRIEVED SOURCES\n"
-            f"{sources_lines or '(no sources retrieved)'}\n\n"
-            "SAFETY RESULT\n"
-            f"{self.safety_result}\n\n"
-            "EVIDENCE METADATA\n"
-            f"{evidence_lines}"
-        )
+        sections = [
+            f"USER CONTEXT\n{context_lines or '(none provided)'}",
+            f"USER QUESTION\n{self.user_question}",
+            f"RETRIEVED SOURCES\n{sources_lines or '(no sources retrieved)'}",
+        ]
+        if self.web_sources:
+            web_lines = "\n\n".join(
+                f"[{w.web_id}] EXTERNAL/UNVERIFIED WEB SOURCE (not part of the reviewed "
+                f"local knowledge base) domain={w.domain} evidence_level={w.evidence_level} "
+                f"url={w.url}\n{w.content}"
+                for w in self.web_sources
+            )
+            sections.append(
+                "EXTERNAL WEB SOURCES (UNVERIFIED -- from a live web search, not the "
+                "reviewed local knowledge base; cite separately and never with the same "
+                "confidence as RETRIEVED SOURCES)\n" + web_lines
+            )
+        sections.append(f"SAFETY RESULT\n{self.safety_result}")
+        sections.append(f"EVIDENCE METADATA\n{evidence_lines}")
+        return "\n\n".join(sections)
 
 
 def build_context_packet(
@@ -86,6 +132,7 @@ def build_context_packet(
     *,
     max_tokens: int = DEFAULT_MAX_TOKENS,
     review_statuses: dict[str, str] | None = None,
+    web_sources: list[WebSourceEntry] | None = None,
 ) -> ContextPacket:
     """Assemble the structured context packet. `scored_chunks` is assumed
     already ranked best-first (output of #7's rerank()); truncation drops
@@ -152,4 +199,5 @@ def build_context_packet(
         ),
         truncated=truncated,
         total_tokens=running_tokens,
+        web_sources=list(web_sources or []),
     )

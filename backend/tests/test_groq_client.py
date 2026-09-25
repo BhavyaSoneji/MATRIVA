@@ -10,7 +10,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from groq import APIConnectionError, APIStatusError, APITimeoutError
 
 from app.llm import groq_client
-from app.llm.groq_client import GenerationError, generate_from_packet
+from app.llm.groq_client import (
+    GenerationError,
+    generate_from_packet,
+    stream_from_packet,
+)
 from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
 from app.rag.context_packet import build_context_packet
 from app.rag.multi_domain import MULTI_DOMAIN_PROMPT_ADDENDUM
@@ -232,3 +236,87 @@ def test_adversarial_retrieved_chunk_does_not_alter_system_instructions() -> Non
     assert "Ignore previous instructions" in user_message
     assert "RETRIEVED SOURCES" in user_message
     assert user_message.index("RETRIEVED SOURCES") < user_message.index("Ignore previous instructions")
+
+
+# --- stream_from_packet (streaming counterpart to generate_from_packet) ----
+
+
+def make_chunk_event(content: str | None):
+    return SimpleNamespace(choices=[SimpleNamespace(delta=SimpleNamespace(content=content))])
+
+
+class FakeStreamCompletions:
+    """Mimics the real SDK's `create(..., stream=True)`: returns an iterable
+    of chunk-shaped objects rather than a single completion."""
+
+    def __init__(self, chunks=None, error: Exception | None = None):
+        self.chunks = list(chunks or [])
+        self.error = error
+        self.calls: list[dict] = []
+
+    def create(self, **kwargs):
+        self.calls.append(kwargs)
+        if self.error is not None:
+            raise self.error
+        return iter(self.chunks)
+
+
+class FakeStreamClient:
+    def __init__(self, completions: FakeStreamCompletions):
+        self.chat = SimpleNamespace(completions=completions)
+
+
+def test_stream_from_packet_yields_each_delta_in_order() -> None:
+    completions = FakeStreamCompletions(
+        [make_chunk_event("Eat "), make_chunk_event("iron-rich "), make_chunk_event("foods.")]
+    )
+    client = FakeStreamClient(completions)
+
+    deltas = list(stream_from_packet(make_packet(), client=client))
+
+    assert deltas == ["Eat ", "iron-rich ", "foods."]
+    assert completions.calls[0]["stream"] is True
+
+
+def test_stream_from_packet_skips_empty_deltas_and_choiceless_chunks() -> None:
+    completions = FakeStreamCompletions(
+        [
+            make_chunk_event(None),
+            SimpleNamespace(choices=[]),
+            make_chunk_event("answer"),
+        ]
+    )
+    client = FakeStreamClient(completions)
+
+    assert list(stream_from_packet(make_packet(), client=client)) == ["answer"]
+
+
+def test_stream_from_packet_uses_the_same_system_prompt_as_the_blocking_path() -> None:
+    completions = FakeStreamCompletions([make_chunk_event("answer")])
+    client = FakeStreamClient(completions)
+
+    list(stream_from_packet(make_packet(), client=client))
+
+    system_message = completions.calls[0]["messages"][0]["content"]
+    assert system_message == SOURCE_GROUNDED_SYSTEM_PROMPT + "\n" + INJECTION_DEFENSE_ADDENDUM
+
+
+def test_stream_from_packet_propagates_a_mid_stream_failure() -> None:
+    """stream_from_packet itself does not retry or swallow errors -- see its
+    docstring; app.rag.pipeline.answer_query_stream is responsible for
+    turning this into a safe final answer rather than crashing the request."""
+
+    def broken_stream():
+        yield make_chunk_event("partial ")
+        raise APIConnectionError(request=_REQUEST)
+
+    class BrokenCompletions:
+        def create(self, **kwargs):
+            return broken_stream()
+
+    client = SimpleNamespace(chat=SimpleNamespace(completions=BrokenCompletions()))
+
+    generator = stream_from_packet(make_packet(), client=client)
+    assert next(generator) == "partial "
+    with pytest.raises(APIConnectionError):
+        next(generator)

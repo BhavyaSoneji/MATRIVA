@@ -57,6 +57,12 @@ class Settings(BaseSettings):
     embedding_api_key: str = ""
     embedding_model: str = "models/gemini-embedding-001"
 
+    # Tavily web search (issue: live web search as a supplementary evidence
+    # source). Left blank in every environment by default -- when unset, the
+    # chat pipeline's Section 43 "insufficient evidence" behavior is
+    # unchanged; web search is only ever attempted when this is configured.
+    tavily_api_key: str = ""
+
     @field_validator("debug", mode="before")
     @classmethod
     def parse_debug_flag(cls, value: object) -> bool:

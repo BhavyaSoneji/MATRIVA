@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from app.core.config import get_settings
+from app.rag.context_packet import WebSourceEntry
 from app.rag.retrieval import RetrievedChunk, build_context
 
 logger = logging.getLogger("matriva.generation")
@@ -14,6 +15,11 @@ class GenerationResult:
     text: str
     citation_ids: list[str]
     used_external_provider: bool = False
+    # Populated only when app.rag.pipeline.answer_query grounded this answer
+    # (partly or fully) in a live web search -- see app.rag.web_search and
+    # app.rag.context_packet.WebSourceEntry. Empty for every local-only
+    # answer, including every path that predates this feature.
+    web_citations: list[WebSourceEntry] = field(default_factory=list)
 
 
 def _local_grounded_answer(query: str, chunks: list[RetrievedChunk]) -> str:
