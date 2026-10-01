@@ -15,6 +15,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.models import KnowledgeChunk, KnowledgeDocument, KnowledgeSource, ReviewStatus
+from app.rag.local import authorities as authority_lexicon
 from app.rag.local.graph import KnowledgeGraph
 from app.rag.local.index import LocalIndex, Passage
 from app.rag.local.text import tokens
@@ -24,6 +25,9 @@ class Engine:
     """An index and the graph built from the same passages."""
 
     def __init__(self, passages: list[Passage]) -> None:
+        for p in passages:  # which classical authorities each traditional passage cites ("what does Caraka say ...")
+            if "authorities" not in p.meta and (p.meta.get("domain") == "ayurveda" or p.meta.get("source_type") == "traditional"):
+                p.meta["authorities"] = authority_lexicon.detect(p.text)
         self.index = LocalIndex(passages)
         self.graph = KnowledgeGraph.build([p.tokens for p in passages])
         self.by_id = {p.id: i for i, p in enumerate(passages)}
