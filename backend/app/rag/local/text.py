@@ -33,7 +33,7 @@ QUERY_SYNONYMS = {
     "gynaecologist": "doctor", "eat": "food", "eating": "food", "diet": "food", "meal": "food",
     "meals": "food", "foods": "food", "fetal": "fetus", "foetal": "fetus", "foetus": "fetus",
     "baby": "fetus", "tummy": "abdomen", "stomach": "abdomen", "safe": "safe", "unsafe": "unsafe",
-    "hemoglobin": "haemoglobin", "women": "woman", "mothers": "mother", "babies": "fetus", "anemia": "anaemia", "labor": "labour", "esophagus": "oesophagus",
+    "hemoglobin": "haemoglobin", "ayurvedic": "ayurveda", "ayurved": "ayurveda", "ayurvedik": "ayurveda", "women": "woman", "mothers": "mother", "babies": "fetus", "anemia": "anaemia", "labor": "labour", "esophagus": "oesophagus",
 }
 
 _WORD = re.compile(r"[a-z0-9]+")
@@ -120,3 +120,20 @@ def sentences(text: str) -> list[str]:
         if buf and len(buf.split()) >= 4:
             out.append(buf)
     return out
+
+
+_TRAILING_NUMBER = re.compile(r"\s\d{1,3}\.?$")
+_DEVANAGARI = re.compile(r"[\u0900-\u097f]")
+
+
+def is_prose(sentence: str, *, min_words: int = 6) -> bool:
+    """False for OCR debris, headings and list fragments: too short, mixed with Devanagari, ending in a stray
+    page/list number, digit-saturated, or with no function words. Dosages ("30-60 mg") are fine."""
+    ws = words(sentence)
+    if len(ws) < min_words or _DEVANAGARI.search(sentence) or _TRAILING_NUMBER.search(sentence.strip()):
+        return False
+    letters = sum(ch.isalpha() for ch in sentence)
+    digits = sum(ch.isdigit() for ch in sentence)
+    if digits > 0.15 * max(letters + digits, 1):
+        return False
+    return sum(w in STOPWORDS for w in ws) / len(ws) >= 0.15

@@ -34,6 +34,8 @@ EVIDENCE_WEIGHT = {
     "traditional": 0.55, "uncertain": 0.4, "not_established": 0.3,
 }
 _ANIMAL_CONCEPTS = frozenset({"meat", "fish", "liver"})
+# Asking "what does Ayurveda say..." is a request for traditional sources; prefer them (softly).
+TRADITIONAL_CUES = frozenset({"ayurveda", "charaka", "susruta", "sushruta", "vagbhata", "kashyapa", "samhita", "classical"})
 
 # Sufficiency gate -- when the evidence is too thin, answer nothing. Calibrated on evaluation/local_rag/questions.yaml
 # (every out-of-scope question refused; see that suite). The three signals, all idf-weighted so a rare word like
@@ -124,12 +126,12 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
     concepts = graph.detect(q_tokens)
     expanded = graph.expand(concepts)
 
-    # ---- filters (a stage-specific passage for another stage is out; unspecified stage applies to all)
+    # ---- filters. Region and domain are hard filters; pregnancy stage is only a preference (see the rerank):
+    # morning sickness is "first trimester" content, but a woman in week 22 may still ask about it.
     allowed = {
         i
         for i, p in enumerate(index.passages)
-        if (profile.stage is None or p.meta.get("stage") in (None, "all", profile.stage))
-        and (profile.region is None or p.meta.get("region") in (None, profile.region))
+        if (profile.region is None or p.meta.get("region") in (None, profile.region))
         and (domains is None or p.meta.get("domain") in domains)
     }
     if not allowed:  # never let a filter silently return nothing when the unfiltered corpus has candidates
@@ -173,16 +175,23 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
         prox = _proximity(p.tokens, matched)
         evidence = EVIDENCE_WEIGHT.get(str(p.meta.get("evidence_level", "")).lower(), 0.5)
         quality = float(p.meta.get("readability", 1.0))
-        stage_fit = 1.0 if profile.stage and p.meta.get("stage") == profile.stage else 0.0
+        passage_stage = p.meta.get("stage")
+        stage_fit = 1.0 if profile.stage and passage_stage == profile.stage else 0.0
+        title_cov = len(qset & frozenset(tokens(str(p.meta.get("title", ""))))) / len(qset)
         score = (
-            0.45 * f / top_fused
+            0.42 * f / top_fused
             + 0.20 * coverage
             + 0.10 * prox
             + 0.10 * concept_cov
-            + 0.05 * evidence
-            + 0.05 * quality
-            + 0.05 * stage_fit
+            + 0.08 * title_cov
+            + 0.04 * evidence
+            + 0.03 * quality
+            + 0.03 * stage_fit
         )
+        if profile.stage and passage_stage not in (None, "all", profile.stage):
+            score *= 0.93  # written for another stage: still reachable, just less preferred
+        if qset & TRADITIONAL_CUES and not (p.meta.get("domain") == "ayurveda" or p.meta.get("source_type") == "traditional"):
+            score *= 0.65
         if profile.diet in {"vegetarian", "vegan"} and (graph.passage_concepts[i] & _ANIMAL_CONCEPTS) and not (
             q_concepts & _ANIMAL_CONCEPTS
         ):
