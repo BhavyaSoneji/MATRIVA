@@ -18,15 +18,17 @@ import math
 from dataclasses import dataclass, field
 
 from app.rag.local.corpus import Engine
-from app.rag.local.retriever import Hit, Retrieval, UserProfile
-from app.rag.local.text import sentences, tokens
+from app.rag.local.retriever import TRADITIONAL_CUES, Hit, Retrieval, UserProfile
+from app.rag.local.text import is_prose, sentences, tokens
 
 MODERN_SECTION = "MODERN MEDICAL INFORMATION"
 TRADITIONAL_SECTION = "TRADITIONAL/AYURVEDIC INFORMATION"
 EVIDENCE_SECTION = "EVIDENCE STATUS"
 
+TRADITIONAL_NOTE = "_Traditional/Ayurvedic text, translated from classical sources. It is not modern clinical evidence._"
 MAX_PASSAGES = 4
 MAX_SENTENCE_WORDS = 55
+RELEVANCE_VS_BEST = 0.7  # a passage must reach this share of the best sentence's score to be quoted
 _STAGE_NAME = {"first_trimester": "first trimester", "second_trimester": "second trimester", "third_trimester": "third trimester"}
 
 
@@ -63,41 +65,64 @@ def _shorten(sentence: str) -> str:
     return cut.rstrip(" ,;:") + "…"
 
 
-def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str], engine: Engine) -> float:
+def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str], engine: Engine,
+                    title_tokens: frozenset[str] = frozenset()) -> float:
     toks = set(tokens(sentence))
     if not toks:
         return 0.0
     total = sum(q_idf.values()) or 1.0
-    overlap = sum(w for t, w in q_idf.items() if t in toks) / total
+    # a word in the document's TITLE counts too ("Ragi - Nutrient Profile" answers a question about ragi even if the
+    # sentence only says "calcium ~340 mg"), but a little less than a word in the sentence itself
+    overlap = sum(w * (1.0 if t in toks else 0.6 if t in title_tokens else 0.0) for t, w in q_idf.items()) / total
     concepts = engine.graph.detect_text(sentence)
     concept_cov = len(concept_ids & set(concepts)) / len(concept_ids) if concept_ids else 0.0
     n = len(sentence.split())
-    length_fit = 1.0 if 8 <= n <= 40 else (0.7 if n < 8 else max(0.5, 1 - (n - 40) / 80))
+    length_fit = 1.0 if 8 <= n <= 70 else (0.7 if n < 8 else max(0.6, 1 - (n - 70) / 120))  # list-style sentences are fine
     return (0.6 * overlap + 0.25 * concept_cov) * length_fit + 0.15 * overlap
 
 
 def _pick(engine: Engine, retrieval: Retrieval, hits: list[Hit]) -> list[Picked]:
+    """Choose the sentences that answer the question.
+
+    The top passage always speaks (up to three sentences). Any other passage only contributes if its best sentence is within reach of the best sentence anywhere
+    (so a nutrient table that merely mentions "iron" does not sit beside the guideline that actually says
+    how much), and then contributes a single sentence.
+    """
     q_idf = {t: engine.index.idf(t) for t in retrieval.query_tokens}
     concept_ids = set(retrieval.concepts)
+    ranked: list[tuple[Hit, list[tuple[float, str, int]]]] = []
+    top_score = hits[0].score if hits else 1.0
+    for hit in hits:
+        trust = 0.5 + 0.5 * (hit.score / top_score if top_score else 0.0)  # sentences inherit their passage's rank
+        title_tokens = frozenset(tokens(str(hit.meta.get("title", ""))))
+        scored = sorted(
+            ((trust * _score_sentence(s, q_idf, concept_ids, engine, title_tokens), s, n) for n, s in enumerate(sentences(hit.text)) if is_prose(s)),
+            key=lambda t: -t[0],
+        )
+        if scored:
+            ranked.append((hit, scored))
+    if not ranked:
+        return []
+    global_best = max(scored[0][0] for _, scored in ranked)
     picked: list[Picked] = []
     seen: list[frozenset[str]] = []
-    for hit in hits:
-        scored = sorted(
-            ((_score_sentence(s, q_idf, concept_ids, engine), s) for s in sentences(hit.text)), key=lambda t: -t[0]
-        )
-        if not scored:
-            continue
+    for position, (hit, scored) in enumerate(ranked):
         best = scored[0][0]
-        taken = 0
-        for score, sentence in scored:
-            if taken >= 2 or score < 0.12 or (taken >= 1 and score < 0.8 * best):
+        # the top-ranked passage always speaks; the others must be close to the best sentence found anywhere
+        if best < 0.06 or (position > 0 and (best < 0.12 or best < RELEVANCE_VS_BEST * global_best)):
+            continue
+        limit = 3 if position == 0 else 1  # the best passage may add up to two more sentences
+        follow_up = 0.45 if position == 0 else 1.0
+        chosen: list[tuple[int, Picked]] = []
+        for score, sentence, order in scored:
+            if len(chosen) >= limit or score < 0.06 or (chosen and score < follow_up * best):
                 break
             sig = frozenset(tokens(sentence))
             if any(len(sig & other) / max(len(sig | other), 1) > 0.7 for other in seen):
                 continue
             seen.append(sig)
-            picked.append(Picked(_shorten(sentence), score, hit))
-            taken += 1
+            chosen.append((order, Picked(_shorten(sentence), score, hit)))
+        picked.extend(p for _, p in sorted(chosen, key=lambda t: t[0]))  # read in the order the source wrote them
     return picked
 
 
@@ -115,9 +140,13 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     modern = [p for p in picked if not _is_traditional(p.hit)]
     traditional = [p for p in picked if _is_traditional(p.hit)]
 
+    # A question that asks for the Ayurvedic view leads with the traditional section; the sections stay separate.
+    traditional_first = bool(set(retrieval.query_tokens) & TRADITIONAL_CUES)
+    first, second = (traditional, modern) if traditional_first else (modern, traditional)
+
     # citation numbers by order of appearance in the final text
     order: list[Hit] = []
-    for p in modern + traditional:
+    for p in first + second:
         if all(h.id != p.hit.id for h in order):
             order.append(p.hit)
     number = {h.id: n for n, h in enumerate(order, start=1)}
@@ -129,12 +158,12 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     lead = f"Here is what the reviewed sources say about {topic}:" if topic else "Here is what the reviewed sources say:"
     lines: list[str] = []
     both = bool(modern) and bool(traditional)
+    modern_block = [f"**{MODERN_SECTION}**", *bullets(modern)]
+    traditional_block = [f"**{TRADITIONAL_SECTION}**", *bullets(traditional), TRADITIONAL_NOTE]
     if both:
-        lines += [lead, "", f"**{MODERN_SECTION}**", *bullets(modern), "", f"**{TRADITIONAL_SECTION}**", *bullets(traditional)]
-        lines.append("_Traditional text, translated from classical sources. It is not modern clinical evidence._")
+        lines += [lead, "", *(traditional_block + [""] + modern_block if traditional_first else modern_block + [""] + traditional_block)]
     elif traditional:
-        lines += [lead, "", *bullets(traditional)]
-        lines.append("_This is traditional/Ayurvedic text, translated from classical sources — not modern clinical evidence._")
+        lines += [lead, "", *bullets(traditional), TRADITIONAL_NOTE]
     else:
         lines += [lead, "", *bullets(modern)]
 
