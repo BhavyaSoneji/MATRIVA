@@ -46,6 +46,9 @@ export function SummaryWidget() {
       )}
       <Row k="Conditions" v={s.health.known_conditions.join(", ") || "none entered"} />
       <Row k="Allergies" v={s.health.allergies.join(", ") || "none entered"} />
+      <Row k="Medicines now" v={(s.health.current_medications ?? []).join(", ") || "none entered"} />
+      {s.health.blood_group && <Row k="Blood group" v={s.health.blood_group} />}
+      {(s.health.risk_factors ?? []).length > 0 && <Row k="History and risks" v={(s.health.risk_factors ?? []).map((r) => r.replace(/_/g, " ")).join(", ")} />}
       <Row k="Diet" v={s.health.diet ?? "not entered"} />
 
       <p className="eyebrow-sm mb-1 mt-5 text-muted-foreground">Latest readings</p>

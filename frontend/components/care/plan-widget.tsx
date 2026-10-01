@@ -7,7 +7,7 @@ import { WeekRing } from "@/components/week-ring";
 import { Frame } from "@/components/care/frame";
 import { Bell, CalendarCheck, Pill, BookOpen } from "lucide-react";
 
-export type CareAction = "checkin" | "summary" | "readings" | "screen" | "meals" | "plan";
+export type CareAction = "checkin" | "summary" | "readings" | "screen" | "meals" | "foods" | "plan";
 
 function fmt(iso: string) {
   return new Date(iso + "T00:00:00").toLocaleDateString(undefined, { day: "numeric", month: "short" });

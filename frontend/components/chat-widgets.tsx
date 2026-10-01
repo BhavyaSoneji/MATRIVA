@@ -21,6 +21,7 @@ import { PlanWidget, type CareAction } from "@/components/care/plan-widget";
 import { CheckinWidget } from "@/components/care/checkin-widget";
 import { ReadingsWidget } from "@/components/care/readings-widget";
 import { MealsWidget } from "@/components/care/meals-widget";
+import { FoodsWidget } from "@/components/care/foods-widget";
 import { ScreenWidget } from "@/components/care/screen-widget";
 import { SummaryWidget } from "@/components/care/summary-widget";
 import { Button } from "@/components/ui/button";
@@ -512,6 +513,8 @@ export function ChatWidget({
       return <ReadingsWidget />;
     case "meals":
       return <MealsWidget />;
+    case "foods":
+      return <FoodsWidget />;
     case "screen":
       return <ScreenWidget />;
     case "summary":

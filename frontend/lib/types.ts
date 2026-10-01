@@ -34,6 +34,10 @@ export interface ProfileUpdateRequest {
   dietary_restrictions?: string[];
   activity_restrictions?: string[];
   allergies?: string[];
+  current_medications?: string[];
+  risk_factors?: string[];
+  age_years?: number | null;
+  blood_group?: string | null;
   health_notes?: string | null;
   activity_level?: string | null;
   occupation?: string | null;

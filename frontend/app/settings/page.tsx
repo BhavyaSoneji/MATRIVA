@@ -13,7 +13,33 @@ import { Select } from "@/components/ui/select";
 import { LoadingState } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CareSettings } from "@/components/care/care-settings";
+import { SafetyProfileFields } from "@/components/care/safety-profile";
+import { EMPTY_SAFETY_PROFILE, fromHealth, toPayload, type SafetyProfileState } from "@/lib/safety-profile";
 import { CircleCheck, Download, Trash2 } from "lucide-react";
+
+/** Profile fields this page does not show, passed through unchanged so a save never erases them. */
+function keptFields(profile: ProfileResponse | null) {
+  const health = (profile?.health || {}) as Record<string, unknown>;
+  const lifestyle = (profile?.lifestyle || {}) as Record<string, unknown>;
+  const dietary = (profile?.dietary || {}) as Record<string, unknown>;
+  const cultural = (profile?.cultural || {}) as Record<string, unknown>;
+  return {
+    doctor_restrictions: (health.doctor_restrictions as string[]) || [],
+    dietary_restrictions: (health.dietary_restrictions as string[]) || [],
+    activity_restrictions: (health.activity_restrictions as string[]) || [],
+    health_notes: (health.notes as string) || undefined,
+    activity_level: (lifestyle.activity_level as string) || undefined,
+    occupation: (lifestyle.occupation as string) || undefined,
+    sleep_hours: (lifestyle.sleep_hours as number) ?? undefined,
+    stress_level: (lifestyle.stress_level as string) || undefined,
+    lifestyle_preferences: (lifestyle.preferences as string[]) || [],
+    cuisine: (dietary.cuisine as string) || undefined,
+    food_preferences: (dietary.food_preferences as string[]) || [],
+    language: (cultural.language as string) || undefined,
+    traditional_practice_preference: (cultural.traditional_practice_preference as string) || undefined,
+    cultural_notes: (cultural.cultural_notes as string) || undefined,
+  };
+}
 
 function SettingsContent() {
   const { logout } = useAuth();
@@ -26,6 +52,7 @@ function SettingsContent() {
   const [currentWeek, setCurrentWeek] = React.useState(8);
   const [dueDate, setDueDate] = React.useState("");
   const [firstPregnancy, setFirstPregnancy] = React.useState(true);
+  const [safety, setSafety] = React.useState<SafetyProfileState>(EMPTY_SAFETY_PROFILE);
   const [loading, setLoading] = React.useState(true);
   const [saving, setSaving] = React.useState(false);
   const [message, setMessage] = React.useState<string | null>(null);
@@ -41,6 +68,7 @@ function SettingsContent() {
           setFullName(p.value.full_name || "");
           setRegion((p.value.cultural?.region as string) || "");
           setDietType((p.value.dietary?.diet_type as string) || "vegetarian");
+          setSafety(fromHealth(p.value.health));
         }
         if (preg.status === "fulfilled") {
           setPregnancy(preg.value);
@@ -58,11 +86,14 @@ function SettingsContent() {
     setMessage(null);
     setError(null);
     try {
+      // PUT /profile replaces the whole profile, so send back everything this page does not edit.
       await api.put("/profile", {
         consent: true,
         full_name: fullName || undefined,
         region: region || undefined,
         diet_type: dietType,
+        ...keptFields(profile),
+        ...toPayload(safety),
       });
       await api.put("/pregnancy", {
         current_week: currentWeek,
@@ -130,6 +161,7 @@ function SettingsContent() {
       )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
+        <div className="flex flex-col gap-6">
         {/* profile */}
         <section className="border border-border p-8">
           <p className="eyebrow-sm text-accent">Profile & pregnancy</p>
@@ -183,7 +215,10 @@ function SettingsContent() {
             </div>
           </div>
 
-          <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+        </section>
+
+        <SafetyProfileFields value={safety} onChange={setSafety} />
+          <div className="flex items-center justify-between border border-border p-6">
             {pregnancy ? (
               <span className="eyebrow-sm bg-sage-100 px-3 py-1.5 text-sage-600">
                 {pregnancy.stage.replace(/_/g, " ")} · Trimester {pregnancy.trimester}
@@ -195,7 +230,7 @@ function SettingsContent() {
               {saving ? "Saving…" : "Save changes"}
             </Button>
           </div>
-        </section>
+        </div>
 
         {/* consent + data */}
         <div className="flex flex-col gap-6">

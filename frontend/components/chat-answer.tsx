@@ -132,6 +132,16 @@ export function ChatAnswer({
                 {heading[1]}
               </p>
             );
+          } else if (t.startsWith("⚠️")) {
+            out.push(
+              <p
+                key={key}
+                role="note"
+                className="border-l-2 border-accent bg-accent/10 px-3.5 py-2.5 text-[14.5px] leading-relaxed text-foreground"
+              >
+                <Inline text={t} citeId={citeId} />
+              </p>
+            );
           } else if (t.startsWith("> ")) {
             out.push(
               <p key={key} className="border-l-2 border-blush-500 bg-blush-100/60 px-3.5 py-2.5 text-[13.5px] leading-relaxed text-foreground/85">

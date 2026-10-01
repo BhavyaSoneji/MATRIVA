@@ -22,6 +22,7 @@ import { TodayCard } from "@/components/today-card";
 import { MicButton, SpeakButton } from "@/components/voice";
 import { LANGS, loadLang, saveLang, type Lang } from "@/lib/language";
 import { ChatAnswer } from "@/components/chat-answer";
+import { GuardrailNote, guardrailsOf } from "@/components/guardrail-note";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
 import {
@@ -37,6 +38,7 @@ import {
   ChevronDown,
   Plus,
   Apple,
+  Salad,
   Sprout,
   Dumbbell,
   CalendarHeart,
@@ -92,6 +94,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: "screen", label: "Safety check", command: "/check", icon: ShieldAlert, hint: "Is something worrying you?", widget: { type: "screen" } },
   { id: "readings", label: "Readings", command: "/readings", icon: Activity, hint: "Hb, BP, weight, sugar", widget: { type: "readings" } },
   { id: "meals", label: "Meals", command: "/meals", icon: Utensils, hint: "What you ate vs what you need", widget: { type: "meals" } },
+  { id: "foods", label: "What to eat", command: "/foods", icon: Salad, hint: "By month, from the book and by nutrient", widget: { type: "foods" } },
   { id: "summary", label: "Doctor summary", command: "/summary", icon: FileText, hint: "One page to print or show", widget: { type: "summary" } },
   { id: "week", label: "My week", command: "/week", icon: CalendarDays, hint: "Progress & milestones", widget: { type: "week" } },
   { id: "nutrition", label: "Nutrition", command: "/nutrition", icon: Apple, hint: "What to eat now", ask: { prompt: "What should I eat at my stage of pregnancy, and what should I avoid?", topic: "nutrition" } },
@@ -729,6 +732,8 @@ function ChatContent() {
                           <SafetyBadge status={m.safetyStatus} />
                         </div>
                       )}
+
+                      {!m.streaming && <GuardrailNote rules={guardrailsOf(m)} />}
 
                       {m.citations && m.citations.length > 0 && (
                         <div className="mt-5 flex flex-col gap-2 border-t border-border pt-4">

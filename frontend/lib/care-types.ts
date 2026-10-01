@@ -157,7 +157,16 @@ export interface DoctorSummary {
   generated_on: string;
   name: string | null;
   pregnancy: { week: number; day: number; trimester: number; edd: string; lmp: string; dates_from: string; next_visit: PlanVisit | null } | null;
-  health: { known_conditions: string[]; allergies: string[]; doctor_restrictions: string[]; diet: string | null };
+  health: {
+    known_conditions: string[];
+    allergies: string[];
+    doctor_restrictions: string[];
+    diet: string | null;
+    current_medications?: string[];
+    risk_factors?: string[];
+    blood_group?: string | null;
+    age_years?: number | null;
+  };
   readings: { latest: Record<string, Reading>; trend: Record<string, Reading[]>; weight_gain: WeightGain | null };
   iron_tablets: { days: number; checked_in: number; ifa_answered: number; ifa_taken: number; ifa_rate: number | null; ifa_streak: number };
   symptoms_last_14_days: Record<string, number>;
@@ -166,4 +175,53 @@ export interface DoctorSummary {
   nutrition: { days_logged: number; average_per_day: Record<string, number>; rows: NutrientRow[] } | null;
   questions_for_doctor: string[];
   disclaimer: string;
+}
+
+export interface FoodGuideBookItem {
+  authority: string;
+  text: string;
+  page: number;
+  paraphrased?: boolean;
+}
+
+export interface FoodGuideNeed {
+  id: string;
+  label: string;
+  reason: string;
+}
+
+export interface FoodGuideFood {
+  name: string;
+  category: string;
+  serving_g: number;
+  amount: number;
+  percent: number | null;
+}
+
+export interface FoodGuide {
+  week: number | null;
+  month: number | null;
+  diet: string | null;
+  traditional: {
+    book: { title: string; author: string; chapter: string; section: string; scan_pages: string; note: string };
+    evidence_level: string;
+    month: number | null;
+    months_available: number[];
+    foods: FoodGuideBookItem[];
+    medicated: FoodGuideBookItem[];
+    procedures: FoodGuideBookItem[];
+    skipped_for_diet?: number;
+    medicated_note?: string;
+    rationale?: { page: string; points: string[] };
+    avoid?: { page: string; items: { authority: string; text: string; page: number; modern?: string }[] };
+  };
+  modern: {
+    needs: FoodGuideNeed[];
+    need: { id: string; label: string; reason: string; unit: string; daily_allowance: number | null; tip?: string | null } | null;
+    foods: FoodGuideFood[];
+    empty_note?: string;
+    sources?: { name: string; url: string }[];
+  };
+  avoid_modern: { name: string; why: string; sources: { name: string; url: string }[] }[];
+  notes: string[];
 }
