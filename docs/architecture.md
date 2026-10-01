@@ -1,4 +1,59 @@
-# Backend architecture
+# Architecture
+
+MATRIVA is one chat workspace in front of one FastAPI backend. Everything that decides what a patient is told, the safety rules, the retrieval, the guard rails and the care logic, runs in the backend, in code and data that can be read and tested.
+
+```mermaid
+flowchart TB
+    subgraph FE["Frontend · Next.js 16 · React 19"]
+      CH[Chat workspace]
+      CARDS[Cards: plan · check-in · readings · meals · foods · summary · book · map]
+      SET[Settings · safety profile · privacy]
+      ADM[Admin: documents · evaluation · feedback]
+    end
+    subgraph BE["Backend · FastAPI modular monolith"]
+      MW[Middleware: CORS · request id · rate limit · security headers · metrics]
+      API[Routers]
+      SAFE[safety/: pre-check · post-check · injection defence]
+      GR[safety/guardrails/: 1,231 rules · output check]
+      RAG[rag/local: offline engine · rag/pipeline: optional Groq + Gemini]
+      CARE[services/care: dating · plan · tracking · readings · meals · food guide · summary · privacy]
+    end
+    DB[(SQLite dev · PostgreSQL + pgvector prod)]
+    DATA[(app/data: YAML rules · ontology · book index · USDA foods)]
+    CH --> MW
+    CARDS --> MW
+    SET --> MW
+    ADM --> MW
+    MW --> API
+    API --> SAFE --> GR --> RAG
+    API --> CARE
+    RAG --> DB
+    CARE --> DB
+    GR --> DATA
+    RAG --> DATA
+    CARE --> DATA
+```
+
+## Modules
+
+| Folder in `backend/app/` | Responsibility |
+|---|---|
+| `api/` | HTTP routers: auth, profile, chat, care, knowledge, recommendations, resources, wellness, privacy, feedback, admin, evaluations |
+| `core/` | Settings, database, security (hashing, JWT), rate limiter, Redis client, observability |
+| `safety/` | Pre-check classifier, post-check validator, prompt-injection defence |
+| `safety/guardrails/` | The rule engine: registry loader, matcher, request context, output check |
+| `rag/local/` | The offline engine: index, semantic space, graph, retriever, composer, book |
+| `rag/` (other files) | The optional external pipeline: query rewriting, hybrid retrieval, reranking, context packet, translation |
+| `llm/` | Groq client, prompts, grounded generator (external engine only) |
+| `evidence/` | Citation validation, Ayurveda provenance |
+| `services/` | Chat orchestration, profile, personalisation, recommendations, stage, audit, evaluation |
+| `services/care/` | Dating, plan, screening, tracking, readings, meals, food guide, summary, privacy purge and export |
+| `models/`, `schemas/`, `repositories/` | SQLAlchemy entities, Pydantic contracts, knowledge queries |
+| `data/` | YAML and JSON that are data, not code: guard-rail rules, care rules, food guide, ontology, book index, nutrient table, resource library |
+
+## Original sketch
+
+The diagram below is the first design of the request path. It is kept because the trust boundaries that follow still apply.
 
 MATRIVA uses a modular monolith. The API, safety layer, RAG adapter, domain engines, and
 persistence share one deployable backend while remaining separated by folders and contracts.
