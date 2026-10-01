@@ -361,8 +361,8 @@ npm run dev                        # http://localhost:3000
 
 **3. Try it in five minutes**
 
-1. Open <http://localhost:3000>, sign up, and accept consent.
-2. In onboarding, give your week (or last period, or due date).
+1. Open <http://localhost:3000> and sign up.
+2. In onboarding, give your week (or last period, or due date) and accept the consent.
 3. Type `/plan`, then `/foods`, then ask *"Can I take paracetamol?"* and watch it refuse and explain.
 4. In **Settings**, add a condition and a medicine, then ask a symptom question again: the warning is now personal.
 5. The chat will say it has no reviewed source for most nutrition questions until an admin approves documents: see *Load the real knowledge* below.
