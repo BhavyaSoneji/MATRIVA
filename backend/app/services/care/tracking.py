@@ -11,7 +11,6 @@ from sqlalchemy.orm import Session
 from app.models import DailyCheckin, HealthReading, User
 from app.services.care import plan as plan_module
 from app.services.care.dating import Dating
-from app.services.care.rules import rules
 from app.services.care.screening import red_flag_level
 
 SYMPTOMS = ["nausea", "vomiting", "headache", "back pain", "swelling", "heartburn", "constipation", "tiredness", "cramps", "dizziness", "leg cramps", "poor sleep"]

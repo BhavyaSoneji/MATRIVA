@@ -14,7 +14,6 @@ same order, so the numbers line up with the citation list shown under the answer
 
 from __future__ import annotations
 
-import math
 import re
 from dataclasses import dataclass, field
 
@@ -239,7 +238,7 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     # ---- personalisation, all deterministic
     notes: list[str] = []
     stage_hits = [h for h in order if h.meta.get("stage") == profile.stage] if profile.stage else []
-    if stage_hits:
+    if stage_hits and profile.stage:
         notes.append(f"Some of this is specific to your stage ({_STAGE_NAME.get(profile.stage, profile.stage)}).")
     chosen_tokens = {t for p in picked for t in tokens(p.sentence)}
     for allergy in profile.allergies:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date
 
 from fastapi import APIRouter, File, HTTPException, Query, UploadFile, status
 from sqlalchemy import select
@@ -103,7 +103,8 @@ def put_checkin(payload: CheckinRequest, user: CurrentUser, db: DBSession) -> di
         record_safety_event(db, user_id=user.id, query_hash=hash_for_log("checkin"), risk_level=out["triage_level"],
                             matched_rule_ids=out["red_flags"], action="checkin_red_flag")
     db.commit()
-    result = screening_module.assess({f: True for f in out["red_flags"]}, week, _contact(db, user)) if out["red_flags"] else None
+    flags = out["red_flags"] if out else []
+    result = screening_module.assess({f: True for f in flags}, week, _contact(db, user)) if flags else None
     return {"checkin": out, "triage": result}
 
 

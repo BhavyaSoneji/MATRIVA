@@ -358,4 +358,4 @@ def test_citations_carry_the_chunk_level_locator(client: TestClient, admin_heade
     client.post("/admin/documents/bulk-approve", headers=admin_headers, json={"ids": ids})
     res = client.post("/chat", headers=auth_headers, json={"message": "What is dauhrda in Ayurveda?"}).json()
     locators = [c["locator"] for c in res["citations"]]
-    assert locators and any(l and l.startswith("Ch. ") and "scanned p" in l for l in locators), locators
+    assert locators and any(loc and loc.startswith("Ch. ") and "scanned p" in loc for loc in locators), locators

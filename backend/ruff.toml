@@ -1,0 +1,7 @@
+# Ruff's default rules (E and F). The version is pinned in requirements-dev.txt so CI and laptops agree.
+target-version = "py311"
+
+[lint.per-file-ignores]
+# These set sys.path or environment variables before importing the app, on purpose.
+"tests/conftest.py" = ["E402"]
+"scripts/ingest_real_knowledge.py" = ["E402"]

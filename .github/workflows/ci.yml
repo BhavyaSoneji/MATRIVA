@@ -16,12 +16,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pip install ruff mypy
+      # requirements-dev.txt pins ruff and mypy, so CI and a laptop report the same findings.
+      - run: pip install -r requirements-dev.txt
+      # Each step runs even if an earlier one failed, so one problem cannot hide the others.
       - run: ruff check .
+        if: always()
       - run: python scripts/secret_scan.py --root ..
+        if: always()
       - run: mypy app/
+        if: always()
       - run: pytest
+        if: always()
 
   ingestion:
     runs-on: ubuntu-latest

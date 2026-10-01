@@ -10,7 +10,7 @@ question are added; the expansion has a low weight so it can refine ranking but 
 
 from __future__ import annotations
 
-from collections import Counter
+from collections import Counter, defaultdict
 
 from app.rag.local.index import LocalIndex
 
@@ -32,7 +32,7 @@ def expansion_terms(
     if not top:
         return {}
     total = sum(max(s, 1e-9) for _, s in top)
-    weights: Counter[str] = Counter()
+    weights: dict[str, float] = defaultdict(float)
     for i, score in top:
         p = index.passages[i]
         counts = Counter(p.tokens)
@@ -47,6 +47,6 @@ def expansion_terms(
             weights[term] += share * (tf / length) * index.idf(term)
     if not weights:
         return {}
-    best = weights.most_common(terms)
+    best = sorted(weights.items(), key=lambda kv: kv[1], reverse=True)[:terms]
     peak = best[0][1]
     return {t: EXPANSION_WEIGHT * w / peak for t, w in best}

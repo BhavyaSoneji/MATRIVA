@@ -70,8 +70,9 @@ def resolve(db: Session, user: User, today: date | None = None) -> Dating | None
     today = today or today_utc()
     row = db.execute(select(PregnancyDating).where(PregnancyDating.user_id == user.id)).scalar_one_or_none()
     if row is not None:
-        lmp = row.lmp_date or (row.edd_date - timedelta(days=GESTATION_DAYS))
-        return build(lmp, row.source, today, row.pre_pregnancy_weight_kg)
+        lmp = row.lmp_date or (row.edd_date - timedelta(days=GESTATION_DAYS) if row.edd_date else None)
+        if lmp is not None:  # a row with neither date cannot be dated; fall back to the plain week below
+            return build(lmp, row.source, today, row.pre_pregnancy_weight_kg)
     profile = db.execute(select(PregnancyProfile).where(PregnancyProfile.user_id == user.id)).scalar_one_or_none()
     if profile is None:
         return None
@@ -107,7 +108,7 @@ def save(
         validate_lmp(lmp, today)
     else:
         source = "week"
-        if not 1 <= week <= MAX_WEEK:
+        if week is None or not 1 <= week <= MAX_WEEK:
             raise DatingError("The week must be between 1 and 42.")
         lmp = today - timedelta(days=(week - 1) * 7)
     if pre_pregnancy_weight_kg is not None and not 25 <= pre_pregnancy_weight_kg <= 200:

@@ -327,3 +327,20 @@ def test_chat_logs_a_meal_and_reports_gaps(client: TestClient, me) -> None:
 def test_without_consent_chat_does_not_store_health_numbers(client: TestClient, auth_headers) -> None:
     client.post("/chat", headers=auth_headers, json={"message": "My Hb is 9.8 today"})
     assert client.get("/care/readings", headers=auth_headers).json()["readings"] == []
+
+
+def test_a_dating_row_with_no_dates_falls_back_to_the_plain_week_instead_of_crashing(client: TestClient, auth_headers) -> None:
+    """A row with neither a last period nor a due date used to raise a TypeError (None minus a timedelta)."""
+    from app.core.db import SessionLocal
+    from app.models import PregnancyDating, User
+
+    client.put("/profile", headers=auth_headers, json={"consent": True, "consent_version": "v1.0"})
+    client.put("/pregnancy", headers=auth_headers, json={"current_week": 12, "first_pregnancy": True})
+    with SessionLocal() as db:
+        user = db.query(User).one()
+        row = db.query(PregnancyDating).filter_by(user_id=user.id).one_or_none() or PregnancyDating(user_id=user.id, source="week")
+        row.lmp_date = row.edd_date = None
+        db.add(row)
+        db.commit()
+        d = dating.resolve(db, user, TODAY)
+        assert d is not None and d.week == 12

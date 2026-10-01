@@ -39,7 +39,7 @@ def build(db: Session, user: User, today: date) -> dict[str, Any]:
 
     since = today - timedelta(days=WINDOW_DAYS - 1)
     checkins = list(db.execute(select(DailyCheckin).where(DailyCheckin.user_id == user.id, DailyCheckin.check_date >= since).order_by(DailyCheckin.check_date)).scalars().all())
-    red_flags = [{"date": c.check_date.isoformat(), "flags": tracking.checkin_payload(c, d.week if d else None)["red_flags"]}
+    red_flags = [{"date": c.check_date.isoformat(), "flags": (tracking.checkin_payload(c, d.week if d else None) or {}).get("red_flags", [])}
                  for c in checkins if (c.red_flags or c.baby_movement == "reduced")]
     screening = db.execute(select(ScreeningRecord).where(ScreeningRecord.user_id == user.id).order_by(ScreeningRecord.created_at.desc())).scalars().first()
 

@@ -7,7 +7,6 @@ app/data/care_rules.yaml and are marked pending clinical review.
 
 from __future__ import annotations
 
-from datetime import date
 from typing import Any
 
 from sqlalchemy.orm import Session

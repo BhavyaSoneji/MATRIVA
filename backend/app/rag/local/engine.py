@@ -52,6 +52,8 @@ def answer_local(
             continue
         document = db.get(KnowledgeDocument, chunk.document_id)
         source = db.get(KnowledgeSource, chunk.source_id)
+        if document is None or source is None:
+            continue  # the passage's document or source was removed after the index was built
         chunks.append(RetrievedChunk(chunk=chunk, document=document, source=source, score=hit.score))
     citation_ids = list(dict.fromkeys(item.source.id for item in chunks[:4]))
     return GenerationResult(text=composed.text, citation_ids=citation_ids, trace=composed.trace), chunks

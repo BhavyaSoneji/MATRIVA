@@ -35,7 +35,8 @@ def build_user_context(db: Session, user: User | None, language: str | None = No
     terms: list[str] = []
     allergy_list: list[str] = []
     if pregnancy:
-        notes.append(f"week {pregnancy.current_week} of pregnancy ({stage.replace('_', ' ')})")
+        stage_label = (stage or "").replace("_", " ")
+        notes.append(f"week {pregnancy.current_week} of pregnancy ({stage_label})")
         notes.append("first pregnancy" if pregnancy.first_pregnancy else "has been pregnant before")
     if dietary:
         if dietary.diet_type:

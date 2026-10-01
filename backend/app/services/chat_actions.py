@@ -30,7 +30,7 @@ _WATER_RE = re.compile(
 )
 _SLEEP_RE = re.compile(rf"\bslept\s+(?:for\s+|about\s+|around\s+)?{_NUM}\s*(?:hours?|hrs?|h)\b", re.IGNORECASE)
 _ACTIVITY_RE = re.compile(
-    rf"\b(?:walked|exercised|jogged|swam|worked out|did (?:some )?(?:yoga|stretching|exercise|pilates))\b[^.?!\d]{{0,30}}?(\d+)\s*(?:minutes?|mins?)\b",
+    r"\b(?:walked|exercised|jogged|swam|worked out|did (?:some )?(?:yoga|stretching|exercise|pilates))\b[^.?!\d]{0,30}?(\d+)\s*(?:minutes?|mins?)\b",
     re.IGNORECASE,
 )
 

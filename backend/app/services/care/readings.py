@@ -98,10 +98,10 @@ def weight_gain(rows: list[HealthReading], dating: Dating | None) -> dict[str, A
     weights = [r for r in rows if r.kind == "weight" and r.value]
     if not weights:
         return None
-    base = dating.pre_pregnancy_weight_kg if dating and dating.pre_pregnancy_weight_kg else None
-    base_label = "pre-pregnancy weight" if base else "first recorded weight"
-    base = base or weights[0].value
-    latest = weights[-1].value
+    pre_pregnancy = dating.pre_pregnancy_weight_kg if dating and dating.pre_pregnancy_weight_kg else None
+    base_label = "pre-pregnancy weight" if pre_pregnancy else "first recorded weight"
+    base = float(pre_pregnancy or weights[0].value or 0)
+    latest = float(weights[-1].value or 0)
     cfg = rules()["readings"]["weight"]
     lo, hi = cfg["total_gain_range"]
     return {"baseline_kg": base, "baseline": base_label, "latest_kg": latest, "gain_kg": round(latest - base, 1),

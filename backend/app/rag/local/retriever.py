@@ -27,7 +27,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from app.rag.local import authorities as authority_lexicon
 from app.rag.local import feedback
 from app.rag.local.corpus import Engine
 from app.rag.local.index import K1
@@ -150,7 +149,8 @@ def _proximity(passage_tokens: list[str], matched: set[str]) -> float:
     if len(matched) < 2:
         return 0.0
     positions = [(pos, t) for pos, t in enumerate(passage_tokens) if t in matched]
-    need, have, best, left = len(matched), {}, None, 0
+    have: dict[str, int] = {}
+    need, best, left = len(matched), None, 0
     for right, (pos_r, tok_r) in enumerate(positions):
         have[tok_r] = have.get(tok_r, 0) + 1
         while len(have) == need:
@@ -383,7 +383,8 @@ def _search_one(engine: Engine, query: str, plan: QueryPlan, profile: UserProfil
         return index.idf(term) if index.df.get(term) else max_idf
 
     total = sum(weight(t) for t in content) or 1.0
-    best_sentence, union = 0.0, set()
+    best_sentence = 0.0
+    union: set[str] = set()
     for hit in chosen[:TOP_FOR_EVIDENCE]:
         union |= hit.covered
         for sent in sentences(hit.text) or [hit.text]:
