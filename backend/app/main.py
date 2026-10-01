@@ -39,6 +39,7 @@ from app.core.observability import (
 from app.core.rate_limit import rate_limiter
 from app.core.redis import connect_redis
 from app.core.security import validate_runtime_security
+from app.safety.guardrails import load_registry
 
 settings = get_settings()
 configure_logging()
@@ -48,6 +49,7 @@ logger = logging.getLogger("matriva.api")
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     validate_runtime_security()
+    load_registry()  # an invalid guard-rail rule file must stop the boot, not surprise a patient
     if settings.auto_create_tables:
         init_db()
     app.state.redis = connect_redis()
