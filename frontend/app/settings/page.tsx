@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { LoadingState } from "@/components/ui/spinner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CareSettings } from "@/components/care/care-settings";
 import { CircleCheck, Download, Trash2 } from "lucide-react";
 
 function SettingsContent() {
@@ -245,6 +246,8 @@ function SettingsContent() {
               </button>
             </div>
           </section>
+
+          <CareSettings />
 
           <section className="border border-border p-7">
             <p className="eyebrow-sm text-accent">Your data</p>
