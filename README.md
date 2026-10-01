@@ -454,15 +454,40 @@ matriva/
 
 ## 📚 Documentation
 
+Start with [`docs/README.md`](./docs/README.md), the index. The most useful pages by what you want to do:
+
+**Understand what it does**
+
+| Doc | About |
+|---|---|
+| [🩺 Care features](./docs/care-features.md) | Inputs, user journey, limits, suggested pilot |
+| [🥗 What to eat](./docs/food-guide.md) | The book's month-wise regimen and nutrient food lists |
+| [🔐 Privacy](./docs/privacy.md) | What is stored, for how long, and how to remove it |
+| [❓ FAQ](./docs/faq.md) · [📖 Glossary](./docs/glossary.md) | Common questions, and the Ayurveda, clinical and RAG terms |
+
+**Understand how it is safe**
+
+| Doc | About |
+|---|---|
+| [🔒 Guard rails](./docs/guardrails.md) | The 1,231 rules, how a question is checked, and the limits |
+| [🛡️ Safety](./docs/safety.md) · [⚖️ Compliance](./docs/COMPLIANCE.md) | The safety model and policy alignment |
+| [🧑‍⚕️ Clinical review](./docs/clinical-review.md) | What a clinician, pharmacist or native speaker needs to check |
+
+**Build, run and extend it**
+
+| Doc | About |
+|---|---|
+| [🏛️ Architecture](./docs/architecture.md) · [🔌 API](./docs/api.md) · [🔎 RAG](./docs/rag.md) · [🔎 Local RAG](./docs/local-rag.md) | Engineering reference |
+| [⚙️ Configuration](./docs/configuration.md) · [🚢 Deployment](./docs/deployment.md) · [🧪 Testing](./docs/testing.md) | Settings, shipping, and how it is tested |
+| [📚 Data sources](./docs/data-sources.md) | Every source the app relies on |
+| [🤝 Contributing](./CONTRIBUTING.md) · [🔒 Security](./SECURITY.md) | How to help, and how to report a vulnerability |
+
+**History and scope**
+
 | Doc | About |
 |---|---|
 | [📝 Tech blog](./docs/TECH_BLOG.md) | How and why it was built, with what worked and what didn't |
-| [🔎 Local RAG](./docs/local-rag.md) | The offline engine, ablations, held-out results |
-| [🥗 What to eat](./docs/food-guide.md) | The book's month-wise regimen and nutrient food lists |
-| [🩺 Care features](./docs/care-features.md) | Inputs, user journey, limits, suggested pilot |
-| [🔒 Guard rails](./docs/guardrails.md) · [🛡️ Safety](./docs/safety.md) · [⚖️ Compliance](./docs/COMPLIANCE.md) | The 1,231 rules, how a question is checked, and policy alignment |
-| [🏛️ Architecture](./docs/architecture.md) · [🔌 API](./docs/api.md) · [🚢 Deployment](./docs/deployment.md) | Engineering reference |
-| [📋 Features](./docs/FEATURES.md) · [🗓️ Progress log](./PROGRESS.md) | Scope and history |
+| [📋 Features](./docs/FEATURES.md) · [🗺️ Roadmap](./docs/roadmap.md) · [🗓️ Progress log](./PROGRESS.md) | Scope, what is next, and history |
 | [🏆 Submission](./docs/SUBMISSION.md) · [🖥️ Frontend](./frontend/README.md) · [🌱 Seed data](./database/seed/README.md) | Round 1 write-up, frontend setup, demo seed |
 
 ---
