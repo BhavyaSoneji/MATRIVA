@@ -414,7 +414,7 @@ cd ingestion && pytest tests/                 # 43 tests
 cd evaluation && pytest tests/                # 36 tests
 cd frontend && npm run lint && npm run typecheck && npm run build
 cd frontend && npx playwright test            # 12 end-to-end tests, API mocked
-python backend/app/safety/guardrails          # not a test: prints what the guard rails contain
+cd backend && python -m app.safety.guardrails  # not a test: prints what the guard rails contain
 python evaluation/local_rag/run.py            # retrieval quality on the question sets
 ```
 
