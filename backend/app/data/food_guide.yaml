@@ -1,0 +1,118 @@
+# What to eat, by month and by need.
+#
+# 1. `book` is the Month-wise dietary regimen of the Prasuti Tantra (Prof. Premvati Tiwari): chapter 5, "Antenatal care",
+#    scanned pages 135-140; the foods it lists as unsuitable are on scanned pages 141-142. Each entry gives the authority (Caraka, Susruta, Vagbhata, Bhela, Harita), the book's own English
+#    wording, and the scanned page. `paraphrased: true` marks wording that the OCR damaged and that was restated, not quoted.
+#    kind: food = an everyday food; medicated = prepared with named herbs (a medicine, never advised here); procedure = an
+#    enema or other treatment (never advised here). tags: dairy, non_veg (used to respect a vegetarian or vegan diet).
+#    This is TRADITIONAL (Ayurvedic) knowledge, not modern clinical evidence.
+# 2. `needs` map a need to the nutrient in the USDA food table (foods_nutrients.json) and to the NIH daily allowance in
+#    care_rules.yaml. Foods are ranked by how much of the nutrient one everyday serving gives.
+# Nothing here has been reviewed by a clinician.
+
+book:
+  title: Prasuti Tantra evam Stri Roga (Ayurvedic obstetrics and gynaecology)
+  author: Prof. Premvati Tiwari
+  chapter: "5. Signs / symptoms of pregnancy and antenatal care"
+  section: Month-wise dietary regimen for pregnant woman (garbhini masanumasika pathya)
+  scan_pages: "135-142"
+  evidence_level: traditional
+  note: >-
+    This is what classical Ayurvedic authors wrote, as translated in the book. It is traditional knowledge, not modern clinical
+    evidence, and it has not been reviewed by a clinician. Where it differs from modern guidance or your doctor's advice, follow
+    your doctor.
+
+months:
+  1:
+    items:
+      - {authority: Caraka, kind: food, tags: [dairy], page: 135, text: "Having doubt of conception from the first month itself she should take non-medicated milk repeatedly in desired quantity (considering her digestive power and strength). Congenial diet should be taken in morning and evening."}
+      - {authority: Susruta, kind: food, tags: [], page: 135, text: "Sweet, cold and liquid diet should be taken from first to third month."}
+      - {authority: Vagbhata I, kind: food, tags: [], page: 135, text: "Sweet, cold, liquid and congenial diet should be taken twice, i.e. morning and evening. Massage of oil and rubbing of unguent should be avoided."}
+      - {authority: Vagbhata I, kind: medicated, tags: [dairy], page: 135, text: "For the first twelve days she should take ghrta extracted from milk (clarified butter extracted from milk) and medicated with Saliparni and palasa; water already boiled with gold or silver and cooled be taken as an after drink."}
+      - {authority: Harita, kind: medicated, tags: [dairy], page: 135, text: "During first month out of madhuyasti, paritsaka and madhukapuspa available drugs should be taken with butter and honey followed by use of sweetened milk."}
+  2:
+    items:
+      - {authority: Caraka and Vagbhata I, kind: medicated, tags: [dairy], page: 135, text: "Milk medicated with madhura drugs."}
+      - {authority: Susruta, kind: food, tags: [], page: 135, text: "Sweet, cold and liquid diet."}
+      - {authority: Harita, kind: medicated, tags: [dairy], page: 135, text: "Sweetened milk treated with kakoli."}
+  3:
+    items:
+      - {authority: Caraka and Vagbhata I, kind: food, tags: [dairy], page: 135, text: "Milk with honey and ghrta."}
+      - {authority: Susruta, kind: food, tags: [dairy], page: 135, text: "Sweet, cold and liquid diet, specially cooked sasti rice with milk."}
+      - {authority: Harita, kind: food, tags: [], page: 136, paraphrased: true, text: "Krsara, a preparation of rice and pulse."}
+  4:
+    items:
+      - {authority: Caraka, kind: food, tags: [dairy], page: 136, text: "Butter extracted from milk in the quantity of one aksa, or milk with butter."}
+      - {authority: Susruta, kind: food, tags: [dairy, non_veg], page: 136, text: "Cooked sasti rice with curd, dainty and pleasant food mixed with milk and butter and meat of wild animals."}
+      - {authority: Vagbhata I, kind: food, tags: [dairy], page: 136, text: "Milk with one aksa of butter."}
+      - {authority: Bhela, kind: food, tags: [dairy], page: 136, text: "Milk with butter."}
+      - {authority: Harita, kind: medicated, tags: [], page: 136, text: "Medicated cooked rice."}
+  5:
+    items:
+      - {authority: Caraka and Vagbhata I, kind: food, tags: [dairy], page: 136, text: "Ghrta prepared with butter extracted from milk."}
+      - {authority: Susruta, kind: food, tags: [dairy, non_veg], page: 136, text: "Cooked sasti rice with milk, meat of wild animals along with dainty food mixed with milk and ghrta."}
+      - {authority: Bhela, kind: food, tags: [], page: 136, paraphrased: true, text: "Yavagu (rice gruel)."}
+      - {authority: Harita, kind: food, tags: [dairy], page: 136, text: "Payasa (rice cooked with milk and sweetened)."}
+  6:
+    items:
+      - {authority: Caraka and Vagbhata I, kind: medicated, tags: [dairy], page: 136, text: "Ghrta (prepared from milk) medicated with the drugs of madhura group."}
+      - {authority: Susruta, kind: medicated, tags: [dairy], page: 136, text: "Ghrta or rice gruel medicated with goksuru."}
+      - {authority: Bhela, kind: food, tags: [dairy], page: 136, text: "Ghrta prepared with butter extracted from milk."}
+      - {authority: Harita, kind: food, tags: [dairy], page: 136, text: "Sweetened curd."}
+  7:
+    items:
+      - {authority: Caraka and Vagbhata I, kind: medicated, tags: [dairy], page: 137, text: "Same as in sixth month."}
+      - {authority: Susruta, kind: medicated, tags: [dairy], page: 137, text: "Ghrta medicated with prthakparnyadi (vidarigandhadi) group of drugs."}
+      - {authority: Harita, kind: food, tags: [dairy], page: 137, text: "Ghrtakhanda (a sweet dish)."}
+  8:
+    items:
+      - {authority: Caraka, kind: food, tags: [dairy], page: 137, text: "In this month rice gruel prepared with milk and mixed with ghrta should be given."}
+      - {authority: Susruta, kind: food, tags: [non_veg], page: 138, text: "She should be given unctuous gruels and meat-soup of wild animals."}
+      - {authority: Vagbhata II, kind: food, tags: [dairy], page: 138, text: "Liquid diet prepared with ghrta and milk."}
+      - {authority: Harita, kind: food, tags: [dairy], page: 138, text: "Ghrtapuraka (a kind of sweet preparation)."}
+      - {authority: Susruta and Vagbhata, kind: procedure, tags: [], page: 137, paraphrased: true, text: "Enemas (asthapana and anuvasana basti) with herbal decoctions are described for this month."}
+  9:
+    items:
+      - {authority: Vagbhata II, kind: food, tags: [non_veg], page: 138, text: "Meat-soup with cooked rice and fat (preferably ghrta), or rice gruel mixed with a good quantity of fat."}
+      - {authority: Susruta, kind: food, tags: [non_veg], page: 138, paraphrased: true, text: "Unctuous gruel and meat-soup of wild animals up to the time of delivery."}
+      - {authority: Bhela, kind: food, tags: [], page: 138, paraphrased: true, text: "Rice gruel is given in this month."}
+      - {authority: Harita, kind: food, tags: [], page: 138, text: "In ninth and tenth month different varieties of cereals should be used."}
+      - {authority: Caraka, Vagbhata I and Bhela, kind: procedure, tags: [], page: 138, paraphrased: true, text: "Enema with medicated oil, and a vaginal tampon of the same oil, are described for this month."}
+
+# The book's own reasoning for the regimen (scanned page 139). Kept as the book's interpretation, not as modern evidence.
+rationale:
+  page: "139-140"
+  points:
+    - "During the first trimester most women have nausea and vomiting and cannot take a proper diet; cold and sweet liquid diet and milk prevent dehydration and supply nourishment."
+    - "From the fourth month the muscular tissue of the fetus grows and more protein is needed, which is supplied by meat-soup."
+    - "By the end of the second trimester many women have swelling of the feet and other effects of water retention; the book gives goksuru, a diuretic, in the sixth month."
+    - "Many women have constipation in late pregnancy from the pressure of the uterus on the bowels; the book gives an enema in the eighth month."
+    - "Milk and the drugs of the madhura group are advised for the whole of pregnancy; the book says milk is a whole diet."
+
+# Foods the book lists as unsuitable (scanned pages 140-141), by authority. `modern` says where modern guidance differs.
+avoid:
+  page: "141-142"
+  items:
+    - {authority: Caraka, page: 141, text: "Excessive use of heavy, hot and pungent substances; intoxicating substances and wine; excessive use of meat."}
+    - {authority: Susruta, page: 141, text: "She should not eat dried up, stale, putrified or wet (moistened) food."}
+    - {authority: Vagbhata II, page: 142, text: "Use of pungent, hot, heavy and hard-to-digest food, and wine or meat."}
+    - {authority: Harita, page: 142, text: "Pulses, edibles producing burning sensation in the abdomen, heavy or sour substances, hot milk, clay, surana (elephant-foot yam), garlic and onion.", modern: "Dal and other pulses are recommended by ICMR-NIN and WHO as a main source of iron and protein, and neither pulses, garlic nor onion are on the NHS list of foods to avoid. Where the book and modern guidance differ, follow modern guidance and your doctor."}
+    - {authority: Yogaratnakara, page: 142, text: "Polluted and incompatible food."}
+
+# Modern food guide: need -> nutrient. Values come from the USDA table (per everyday serving); allowances from care_rules.yaml.
+needs:
+  iron: {label: "Iron", reason: "low haemoglobin, tiredness", nutrient: iron, unit: mg, pair: vitamin C, tip: "Plant iron is absorbed better with a vitamin C food (lemon, amla, guava, orange) in the same meal, and worse with tea, coffee or calcium tablets at the same time. Food alone rarely reaches the pregnancy iron allowance, which is why the government programme gives iron and folic acid tablets: ask your ANM or doctor."}
+  calcium: {label: "Calcium", reason: "bones and teeth for you and the baby", nutrient: calcium, unit: mg, tip: "Milk, curd, ragi, sesame and green leaves all count. Calcium and iron are best taken at different meals."}
+  protein: {label: "Protein", reason: "the baby's growth, especially from the fourth month", nutrient: protein, unit: g, tip: "Combine dal with rice or roti, add curd, milk, paneer, eggs if you eat them, nuts and seeds."}
+  folate: {label: "Folate", reason: "the baby's spine and brain, and your red blood cells", nutrient: "folate (DFE)", unit: mcg, tip: "Dals, green leaves and oranges are good food sources. Folic acid tablets are advised separately by your doctor or ANM."}
+  vitamin_c: {label: "Vitamin C", reason: "helps you absorb iron and supports healing", nutrient: vitamin C, unit: mg, tip: "Eat these fresh and lightly cooked; long cooking loses vitamin C."}
+  vitamin_b12: {label: "Vitamin B12", reason: "nerves and red blood cells", nutrient: vitamin B12, unit: mcg, tip: "Only animal foods and dairy give B12. If you are vegan, no plant food reliably supplies it: please ask your doctor about it."}
+  zinc: {label: "Zinc", reason: "growth and immunity", nutrient: zinc, unit: mg}
+  magnesium: {label: "Magnesium", reason: "muscles, including leg cramps", nutrient: magnesium, unit: mg}
+  vitamin_a: {label: "Vitamin A", reason: "the baby's eyes and immunity", nutrient: "vitamin A (RAE)", unit: mcg, tip: "Orange and green vegetables and fruit are the safe source. Liver is very high in vitamin A and is not advised in pregnancy."}
+  fibre: {label: "Fibre", reason: "constipation", nutrient: fibre, unit: g, target: 28, tip: "Drink enough water as you add fibre. If constipation continues, ask your doctor rather than taking a laxative."}
+sources:
+  values: {name: "USDA FoodData Central (SR Legacy): per-100 g values in foods_nutrients.json", url: "https://fdc.nal.usda.gov/"}
+  allowance: {name: "NIH Office of Dietary Supplements: recommended allowances in pregnancy", url: "https://ods.od.nih.gov/"}
+  fibre: {name: "National Academies DRI: adequate intake of fibre in pregnancy, 28 g a day", url: "https://nap.nationalacademies.org/"}
+  guideline: {name: "ICMR-NIN Dietary Guidelines for Indians", url: "https://www.nin.res.in/"}

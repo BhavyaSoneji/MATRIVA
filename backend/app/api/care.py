@@ -22,12 +22,14 @@ from app.schemas.care import (
 from app.services.audit import record_audit, record_safety_event
 from app.core.security import hash_for_log
 from app.services.care import dating as dating_module
+from app.services.care import foodguide as foodguide_module
 from app.services.care import meals as meals_module
 from app.services.care import readings as readings_module
 from app.services.care import screening as screening_module
 from app.services.care import summary as summary_module
 from app.services.care import tracking
 from app.services.care.plan import build_plan
+from app.services.personalization import build_user_context
 from app.services.profile import ConsentRequired, has_consent
 
 router = APIRouter(prefix="/care", tags=["care"])
@@ -266,3 +268,20 @@ def delete_contact(user: CurrentUser, db: DBSession) -> DeleteResponse:
         db.delete(row)
         db.commit()
     return DeleteResponse(message="Emergency contact removed")
+
+
+# ----------------------------------------------------------------------------------------------- what to eat
+@router.get("/food-guide")
+def food_guide(
+    user: CurrentUser,
+    db: DBSession,
+    need: str | None = Query(default=None, max_length=24),
+    month: int | None = Query(default=None, ge=1, le=9),
+) -> dict[str, object]:
+    """The book's regimen for this month and, for a chosen need, the foods that give most of that nutrient."""
+    d = dating_module.resolve(db, user, dating_module.today_utc())
+    context = build_user_context(db, user)
+    try:
+        return foodguide_module.build(d.week if d else None, month, need, context.diet, list(context.allergies))
+    except KeyError as exc:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Unknown need: {need}") from exc

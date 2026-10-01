@@ -121,6 +121,25 @@ def day_totals(db: Session, user: User, day: date) -> tuple[list[MealLog], dict[
 
 GAP_NUTRIENTS = ("iron", "calcium", "folate (DFE)", "protein", "vitamin C")
 _SERVING_FOR_SUGGESTION = {"legume": 150, "grain": 150, "dairy_egg": 150, "meat_fish": 100, "vegetable": 100, "fruit": 100, "nut_seed": 30}
+# The USDA values for these are for the dry grain or the seed, so a realistic serving is smaller than the category default.
+_DRY_GRAINS = ("amaranth grain", "oats", "sorghum", "whole wheat flour")
+_SEEDS = ("flaxseed", "chia", "sesame", "pumpkin seeds")
+
+
+def serving_for(food: dict[str, Any]) -> int:
+    """An everyday serving in grams for suggesting a food (not for parsing what someone ate)."""
+    name = food["name"].lower()
+    if name.startswith(_DRY_GRAINS):
+        return 50
+    if name.startswith(_SEEDS):
+        return 15
+    if name.startswith("ghee"):
+        return 10
+    if name.startswith("whole wheat bread"):
+        return 60  # two slices
+    if name.startswith(("dried figs", "dates", "raisins")):
+        return 40
+    return _SERVING_FOR_SUGGESTION[food["category"]]
 
 
 def gaps(totals: dict[str, float], diet: str | None = None, allergies: list[str] | None = None) -> dict[str, Any]:
@@ -144,8 +163,8 @@ def _suggest(low: list[str], diet: str | None, allergies: list[str]) -> list[dic
                 continue
             if f["name"].lower().startswith(("chicken liver",)):
                 continue  # NHS advises avoiding liver in pregnancy
-            amount = f["per_100g"].get(nutrient, 0.0) * _SERVING_FOR_SUGGESTION[f["category"]] / 100
+            amount = f["per_100g"].get(nutrient, 0.0) * serving_for(f) / 100
             ranked.append((amount, f))
         ranked.sort(key=lambda t: -t[0])
-        out.append({"nutrient": nutrient, "foods": [{"name": f["name"], "serving_g": _SERVING_FOR_SUGGESTION[f["category"]], "amount": round(a, 1)} for a, f in ranked[:4]]})
+        out.append({"nutrient": nutrient, "foods": [{"name": f["name"], "serving_g": serving_for(f), "amount": round(a, 1)} for a, f in ranked[:4]]})
     return out
