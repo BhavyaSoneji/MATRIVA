@@ -50,3 +50,19 @@ def test_embed_chunk_contents_embeds_each_content(monkeypatch: pytest.MonkeyPatc
     results = embeddings.embed_chunk_contents(["a", "bb", "ccc"], api_key="test-key")
 
     assert results == [[1], [2], [3]]
+
+
+def test_embedding_key_comes_from_settings_not_only_the_process_environment(monkeypatch) -> None:
+    """Regression: a key in backend/.env reaches Settings but not os.environ."""
+    from types import SimpleNamespace
+
+    import app.rag.embeddings as embeddings
+
+    seen: dict[str, str] = {}
+    monkeypatch.delenv("EMBEDDING_API_KEY", raising=False)
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+    monkeypatch.setattr(embeddings, "get_settings", lambda: SimpleNamespace(embedding_api_key="from-settings"))
+    monkeypatch.setattr(embeddings.genai, "configure", lambda api_key: seen.update(key=api_key))
+    monkeypatch.setattr(embeddings.genai, "embed_content", lambda **kw: {"embedding": [0.1, 0.2]})
+    assert embeddings.embed_text("hello") == [0.1, 0.2]
+    assert seen["key"] == "from-settings"

@@ -9,6 +9,8 @@ import os
 
 import google.generativeai as genai
 
+from app.core.config import get_settings
+
 # text-embedding-004 has been retired; gemini-embedding-001 is the current
 # model but defaults to 3072 dimensions, so output_dimensionality is pinned
 # to EMBEDDING_DIM to match the fixed-width pgvector column below.
@@ -18,7 +20,8 @@ EMBEDDING_DIM = 768
 
 def embed_text(text: str, *, api_key: str | None = None, model: str = EMBEDDING_MODEL) -> list[float]:
     """Embed a single string via the Gemini embedding API."""
-    key = api_key or os.environ.get("EMBEDDING_API_KEY") or os.environ.get("GEMINI_API_KEY")
+    # Settings first: a key in backend/.env reaches Settings but not os.environ (same fix as groq_client).
+    key = api_key or get_settings().embedding_api_key or os.environ.get("EMBEDDING_API_KEY") or os.environ.get("GEMINI_API_KEY")
     if not key:
         raise RuntimeError(
             "Gemini API key not configured (set EMBEDDING_API_KEY or GEMINI_API_KEY)"
