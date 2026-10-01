@@ -149,6 +149,8 @@ def build_context_packet(
         "pregnancy_stage": user_context.pregnancy_stage,
         "region": user_context.region,
         "context_terms": user_context.context_terms,
+        "about_the_user": "; ".join(user_context.profile_notes),
+        "reply_language": user_context.reply_language,
     }
 
     question_tokens = _token_count(user_question)

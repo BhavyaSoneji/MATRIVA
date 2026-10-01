@@ -55,6 +55,9 @@ class UserContext:
     pregnancy_stage: str | None = None
     region: str | None = None
     context_terms: list[str] = field(default_factory=list)  # e.g. diet/preference keywords
+    # Human-readable personalisation lines for the model (week, diet, allergies...). Never names/contact details.
+    profile_notes: list[str] = field(default_factory=list)
+    reply_language: str | None = None  # e.g. "Hindi"; None = English
 
 
 def _stage_relevance(chunk: KnowledgeChunk, context: UserContext) -> float:
