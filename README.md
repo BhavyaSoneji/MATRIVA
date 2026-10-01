@@ -121,7 +121,7 @@ Just chatting works too: saying *"my Hb is 9.8"* or *"I ate 2 roti and dal"* rec
 | **Languages** | English · हिन्दी · Hinglish · ગુજરાતી (questions, warnings and refusals) |
 | **Works offline** | Yes. The default engine needs no API key and no internet |
 | **Guard rails** | 1,231 sourced rules (918 medicines, 205 herbs, foods and exposures, 108 more) |
-| **Knowledge base** | 668 approved-once-reviewed passages: the Prasuti Tantra (567) plus WHO, NHS, ICMR-NIN and Government of India guidance (101) |
+| **Knowledge base** | 668 passages that answer questions once an admin approves them: the Prasuti Tantra (567) plus WHO, NHS, ICMR-NIN and Government of India guidance (101) |
 | **Tests** | 513 backend · 43 ingestion · 36 evaluation · 12 end-to-end |
 | **Clinical review** | **Pending**: see [honest limits](#-honest-limits) |
 
