@@ -130,7 +130,23 @@ See [`care-features.md`](care-features.md) for the full inputs and journey.
 - **Cache headers:** a per-resource cache header fought a global `no-store` middleware, so we reverted rather than clever our way around it.
 - **Screenshots are generated, not staged.** The README images come from a script that registers a demo user, seeds readings and meals through the API, and captures the real UI.
 
-## 10. What we would do next
+## 10. Guard rails: 1,231 rules, and what went wrong on the way
+
+The first safety layer was about fifty phrases. It caught *"heavy bleeding"* but knew nothing about medicines, so the obvious next question, *"can I take paracetamol?"*, went straight to retrieval. The rule we settled on is stricter than any single guideline: **the chat never says yes to a medicine, gives a dose, or tells anyone to start, stop or change one.** It explains and sends the person to a doctor.
+
+That became a rule engine with rules as data: one rule per medicine (918), plus herbs, foods, exposures, warning signs, risky requests and rules tied to the person's own conditions, each with a source, in four languages. A final check on the answer itself replaces anything that gives a dose or calls a medicine safe, whatever wrote it.
+
+What we got wrong first, which is the useful part:
+
+- **We padded.** Our first pass at "1,000+ rules" had separate rules for *olanzapine* and *olanzapine tablet*, dose-number aliases like *atorvastatin 10*, and a few things that were not drugs at all. The count looked right and meant nothing. We deleted the duplicates and now report only what survives, with a test that a phrase triggers one rule per kind.
+- **We cried wolf.** Words like *show*, *tea*, *salt*, *weed*, *ice* and *travel* are triggers in some context and ordinary in every other. A fuzzy match turned *mental* into a pain-relief brand. The fix was a test that runs every ordinary question in the retrieval benchmarks through the rules and fails if any is blocked. A guard rail that cries wolf teaches people to ignore it, which is its own safety failure.
+- **A question about a warning sign is not a warning sign.** *"What are the warning signs of pre-eclampsia?"* was escalated as a seizure because the word *eclampsia* matched. Now a general question gets information plus one line ("if this is happening to you now, get help"), while *"my baby is moving less"* always escalates.
+- **A prescribed medicine is not the same as a stray one.** *"My doctor prescribed Thyronorm, what should I avoid eating?"* should not be refused. It becomes a caution. A drug that harms the baby is never waved through.
+- **We almost said too much ourselves.** A refusal about paracetamol first carried the reason *"often the pain medicine doctors consider first"*, which reads like a recommendation. We rewrote it. Reading real replies end to end caught what the tests did not.
+- **Hindi and Gujarati broke a regex.** The usual "strip punctuation" pattern deletes Devanagari and Gujarati vowel signs, which Python does not count as letters. A test question in Hindi found it.
+- **The honest limit.** The rules were written from public knowledge and cite the reference they are consistent with. Nobody has checked each one against its source, and no clinician or pharmacist has signed them off. Reviewing them is the next job, and [`clinical-review.md`](./clinical-review.md) is written for the reviewer.
+
+## 11. What we would do next
 
 1. **Clinical review** of `care_rules.yaml` and native-speaker review of the Hindi and Gujarati safety phrases. Nothing else matters more before real use.
 2. **A pilot** with one clinic: 20–30 mothers for 8 weeks, measuring check-in streaks, visits kept and flags raised.
@@ -138,7 +154,7 @@ See [`care-features.md`](care-features.md) for the full inputs and journey.
 4. **More sources**, reviewed by a person: the gate is only as good as what's behind it.
 5. **Close the paraphrase gap** with a small local embedding model, kept optional so the engine still runs anywhere.
 
-## 11. Takeaways
+## 12. Takeaways
 
 - A refusal is a feature. The gate that says *"I can't answer that from a reviewed source"* is what makes every other answer trustworthy.
 - Build the offline path first. It makes the system testable, cheap and independent of any vendor.
