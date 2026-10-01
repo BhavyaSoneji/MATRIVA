@@ -32,7 +32,7 @@ Modern guidelines and classical Ayurveda, reconciled week by week. Every answer 
 <img alt="clinical review" src="https://img.shields.io/badge/clinical_review-pending-E5484D?style=flat-square"/>
 </p>
 
-[**Features**](#-what-it-does) · [**Screenshots**](#-see-it) · [**How it works**](#-how-an-answer-is-made) · [**Safety**](#-safety-by-design) · [**Run it**](#-run-it) · [**Tech blog**](./docs/TECH_BLOG.md) · [**Limits**](#-honest-limits)
+[**What it is**](#-what-is-matriva) · [**Features**](#-what-it-does) · [**See it**](#-see-it) · [**How it works**](#-how-an-answer-is-made) · [**Safety**](#-safety-by-design) · [**What to eat**](#-what-to-eat) · [**Run it**](#-run-it) · [**Docs**](#-documentation) · [**Limits**](#-honest-limits) · [**Roadmap**](#-roadmap)
 
 </div>
 
