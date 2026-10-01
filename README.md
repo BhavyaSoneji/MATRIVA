@@ -213,6 +213,17 @@ A scanned, bilingual copy of **Prasuti Tantra** was OCR'd, its English prose ext
 
 ---
 
+## 🥗 What to eat
+
+`/foods` shows two things, kept apart and labelled:
+
+- **From the book.** The month-wise dietary regimen of the *Prasuti Tantra* (chapter 5): for the month you are in, what Caraka, Susruta, Vagbhata, Bhela and Harita advise, in the book's own English wording with the authority and the scanned page. It is **traditional knowledge, not modern evidence**.
+- **By nutrient.** Pick iron, calcium, protein, folate, vitamin C, B12, zinc, magnesium, vitamin A or fibre and see the foods that give the most per everyday serving (USDA values) next to the NIH pregnancy allowance. Vegetarian, vegan and allergy filters apply, and liver is never suggested.
+
+**Foods only.** The book also describes herb-medicated ghee and enemas. They sit in a collapsed "not food, not advice" section, because MATRIVA does not advise on medicines or treatments. Every quoted entry is tested against the OCR of the book so nothing is invented. Details: [`docs/food-guide.md`](./docs/food-guide.md).
+
+---
+
 ## 🛡️ Safety by design
 
 Safety is its own layer, written as plain rules that behave the same way every time. It is never delegated to a language model, and if it fails, MATRIVA fails closed.
