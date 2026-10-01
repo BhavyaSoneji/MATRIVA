@@ -527,3 +527,93 @@ class EvaluationRun(Base):
     error: Mapped[str | None] = mapped_column(Text)
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+# ---------------------------------------------------------------------------------------------------------------------
+# Care features: dating, check-ins, readings, meals, screening, emergency contact. All personal health data: every row is
+# removed when the user withdraws consent or deletes their account (see app.services.care.privacy).
+# ---------------------------------------------------------------------------------------------------------------------
+
+
+class PregnancyDating(Base):
+    """How far along the pregnancy is, from a date rather than a number that goes stale: last menstrual period or due date."""
+
+    __tablename__ = "pregnancy_dating"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    lmp_date: Mapped[date | None] = mapped_column(Date)
+    edd_date: Mapped[date | None] = mapped_column(Date)
+    source: Mapped[str] = mapped_column(String(12), default="lmp", nullable=False)  # lmp | edd | week
+    pre_pregnancy_weight_kg: Mapped[float | None] = mapped_column()
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+class EmergencyContact(Base):
+    __tablename__ = "emergency_contacts"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    phone: Mapped[str] = mapped_column(String(32), nullable=False)
+    relation: Mapped[str | None] = mapped_column(String(60))
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+class DailyCheckin(Base):
+    __tablename__ = "daily_checkins"
+    __table_args__ = (UniqueConstraint("user_id", "check_date", name="uq_checkin_user_date"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    check_date: Mapped[date] = mapped_column(Date, nullable=False)
+    mood: Mapped[int | None] = mapped_column(Integer)  # 1 (very low) .. 5 (very good)
+    symptoms: Mapped[list[str]] = mapped_column(JSON, default=list)
+    baby_movement: Mapped[str | None] = mapped_column(String(20))  # normal | reduced | not_yet
+    ifa_taken: Mapped[bool | None] = mapped_column(Boolean)
+    note: Mapped[str | None] = mapped_column(Text)
+    red_flags: Mapped[list[str]] = mapped_column(JSON, default=list)  # screening question ids ticked
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
+
+
+class HealthReading(Base):
+    __tablename__ = "health_readings"
+    __table_args__ = (Index("ix_readings_user_kind_date", "user_id", "kind", "reading_date"),)
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    kind: Mapped[str] = mapped_column(String(20), nullable=False)  # hb | bp | weight | glucose
+    reading_date: Mapped[date] = mapped_column(Date, nullable=False)
+    value: Mapped[float | None] = mapped_column()  # hb g/dL, weight kg, glucose mg/dL
+    systolic: Mapped[int | None] = mapped_column(Integer)
+    diastolic: Mapped[int | None] = mapped_column(Integer)
+    context: Mapped[str | None] = mapped_column(String(30))  # e.g. fasting / after_meal for glucose
+    note: Mapped[str | None] = mapped_column(Text)
+    source: Mapped[str] = mapped_column(String(20), default="manual", nullable=False)  # manual | report | ocr | chat
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
+class MealLog(Base):
+    __tablename__ = "meal_logs"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    meal_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
+    meal_type: Mapped[str | None] = mapped_column(String(20))
+    raw_text: Mapped[str] = mapped_column(Text, nullable=False)
+    items: Mapped[list[dict[str, Any]]] = mapped_column(JSON, default=list)
+    totals: Mapped[dict[str, float]] = mapped_column(JSON, default=dict)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
+
+
+class ScreeningRecord(Base):
+    __tablename__ = "screening_records"
+
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=new_id)
+    user_id: Mapped[str] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    week: Mapped[int | None] = mapped_column(Integer)
+    level: Mapped[str] = mapped_column(String(20), nullable=False)  # emergency | urgent | soon | none
+    flagged: Mapped[list[str]] = mapped_column(JSON, default=list)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
