@@ -422,8 +422,14 @@ def answer_question(
     deliberately not treated as a live clinical model result.
     """
 
-    retrieved, scoring_mode = retrieve_chunks_scored(db, query, domain=domain, stage=stage, region=region)
     settings = get_settings()
+    if settings.rag_engine == "local":
+        # Offline pipeline: no LLM, no embedding API, no web search (app/rag/local).
+        from app.rag.local.engine import answer_local
+
+        return answer_local(db, query, stage=stage, region=region, profile=profile)
+
+    retrieved, scoring_mode = retrieve_chunks_scored(db, query, domain=domain, stage=stage, region=region)
     # Normally zero local retrieval means an immediate, deterministic
     # "no evidence" result -- but when both Groq and Tavily are configured,
     # answer_query() below still has a shot at grounding the answer in a
@@ -512,8 +518,17 @@ def answer_question_stream(
     to stream from), so they're emitted as a single "delta" + "final" pair,
     exactly like `answer_query_stream` does for its own short-circuit case.
     """
-    retrieved, scoring_mode = retrieve_chunks_scored(db, query, domain=domain, stage=stage, region=region)
     settings = get_settings()
+    if settings.rag_engine == "local":
+        from app.rag.local.engine import answer_local, stream_pieces
+
+        generation, chunks = answer_local(db, query, stage=stage, region=region, profile=profile)
+        for piece in stream_pieces(generation.text) if generation.text else ():
+            yield ChatStreamEvent(kind="delta", text=piece)
+        yield ChatStreamEvent(kind="final", text=generation.text, generation=generation, chunks=chunks)
+        return
+
+    retrieved, scoring_mode = retrieve_chunks_scored(db, query, domain=domain, stage=stage, region=region)
 
     if not settings.llm_api_key:
         # No live model configured at all -- reuse the exact non-streaming

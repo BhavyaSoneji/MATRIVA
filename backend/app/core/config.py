@@ -49,7 +49,11 @@ class Settings(BaseSettings):
     rate_limit_chat_per_minute: int = Field(default=30, ge=1, le=1000)
     rate_limit_general_per_minute: int = Field(default=120, ge=1, le=5000)
 
-    # Optional external providers
+    # Which engine answers questions. "local" = the offline pipeline in app/rag/local (no LLM, no embeddings,
+    # no network). "external" = the Groq/Gemini pipeline (needs LLM_API_KEY / EMBEDDING_API_KEY).
+    rag_engine: str = Field(default="local", pattern="^(local|external)$")
+
+    # Optional external providers (only used when rag_engine=external)
     llm_provider: str = "groq"
     llm_api_key: str = ""
     llm_model: str = "openai/gpt-oss-120b"

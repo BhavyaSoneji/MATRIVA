@@ -20,6 +20,8 @@ class GenerationResult:
     # app.rag.context_packet.WebSourceEntry. Empty for every local-only
     # answer, including every path that predates this feature.
     web_citations: list[WebSourceEntry] = field(default_factory=list)
+    # Retrieval trace from the local engine (concepts, per-passage scores) for the "how this was answered" panel.
+    trace: dict | None = None
 
 
 def _local_grounded_answer(query: str, chunks: list[RetrievedChunk]) -> str:

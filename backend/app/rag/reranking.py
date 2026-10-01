@@ -60,6 +60,8 @@ class UserContext:
     reply_language: str | None = None  # e.g. "Hindi"; None = English
     # The user's words when the search query was translated/expanded (so the model sees what was really asked).
     original_question: str | None = None
+    diet: str | None = None  # e.g. "vegetarian"
+    allergies: list[str] = field(default_factory=list)  # only ever filled when the user gave consent
 
 
 def _stage_relevance(chunk: KnowledgeChunk, context: UserContext) -> float:

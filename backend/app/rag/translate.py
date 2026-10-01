@@ -78,8 +78,8 @@ def llm_translate(text: str) -> str | None:
     from app.core.config import get_settings
 
     settings = get_settings()
-    if not settings.llm_api_key:
-        return None
+    if settings.rag_engine != "external" or not settings.llm_api_key:
+        return None  # the local engine never calls an external model
     try:
         from groq import Groq
 

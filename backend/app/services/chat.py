@@ -289,6 +289,7 @@ def process_chat(
     recommendations = []
     retrieval_latency_ms = 0.0
     generation_latency_ms = 0.0
+    trace: dict | None = None
     if decision.risk.value in {"urgent_escalation", "high_risk"}:
         answer = decision.response or "Please contact a qualified maternity-care professional for an urgent review."
         safety_status = decision.status
@@ -300,6 +301,7 @@ def process_chat(
         generation, chunks = answer_question(db, query, stage=stage, region=region, profile=user_context)
         retrieval_latency_ms = round((time.perf_counter() - retrieval_started) * 1000, 2)
         sources = _unique_sources(chunks)
+        trace = generation.trace
         if generation.text:
             generation_latency_ms = retrieval_latency_ms
         finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id)
@@ -341,6 +343,7 @@ def process_chat(
         "citation_validation": "passed" if citations else "not_applicable",
         "web_search_used": any(c.source_type == "external_web" for c in citations),
         "request_id": request_id,
+        **({"engine": "local", "trace": trace} if trace else {}),
     }
     log_event(
         "chat.completed",
@@ -442,6 +445,7 @@ def stream_chat(
     recommendations: list[Any] = []
     retrieval_latency_ms = 0.0
     generation_latency_ms = 0.0
+    trace: dict | None = None
 
     if decision.risk.value in {"urgent_escalation", "high_risk"}:
         # Section 20: safety short-circuit -- exactly like process_chat, the
@@ -477,6 +481,7 @@ def stream_chat(
         retrieval_latency_ms = round((time.perf_counter() - retrieval_started) * 1000, 2)
         sources = _unique_sources(chunks)
         generation = final_generation or GenerationResult(text="", citation_ids=[])
+        trace = generation.trace
         if generation.text:
             generation_latency_ms = retrieval_latency_ms
         finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id)
@@ -545,6 +550,7 @@ def stream_chat(
         "web_search_used": any(item.source_type == "external_web" for item in citations),
         "request_id": request_id,
         "user_message_id": user_message.id,
+        **({"engine": "local", "trace": trace} if trace else {}),
     }
     log_event(
         "chat.completed",

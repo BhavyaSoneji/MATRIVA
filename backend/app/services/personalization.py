@@ -33,6 +33,7 @@ def build_user_context(db: Session, user: User | None, language: str | None = No
 
     notes: list[str] = []
     terms: list[str] = []
+    allergy_list: list[str] = []
     if pregnancy:
         notes.append(f"week {pregnancy.current_week} of pregnancy ({stage.replace('_', ' ')})")
         notes.append("first pregnancy" if pregnancy.first_pregnancy else "has been pregnant before")
@@ -50,6 +51,7 @@ def build_user_context(db: Session, user: User | None, language: str | None = No
             allergies = sorted({*(health.allergies or []), *(dietary.allergies if dietary else [])})
             if allergies:
                 notes.append("allergies: " + ", ".join(allergies))
+                allergy_list = allergies
             if health.known_conditions:
                 notes.append("known conditions: " + ", ".join(health.known_conditions))
             restrictions = [*(health.doctor_restrictions or []), *(health.dietary_restrictions or []), *(health.activity_restrictions or [])]
@@ -66,4 +68,6 @@ def build_user_context(db: Session, user: User | None, language: str | None = No
         context_terms=terms,
         profile_notes=notes,
         reply_language=reply_language,
+        diet=dietary.diet_type if dietary else None,
+        allergies=allergy_list,
     )
