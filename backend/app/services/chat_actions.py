@@ -11,11 +11,13 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from datetime import date
 
 from sqlalchemy.orm import Session
 
 from app.models import User
 from app.schemas.api import WellnessLogRequest
+from app.services.care.rules import rules
 from app.services.wellness import get_daily_log, upsert_daily_log
 
 ML_PER_GLASS = 250
@@ -108,3 +110,74 @@ def apply_wellness_statement(db: Session, user: User, message: str) -> ChatActio
     if parsed.activity_minutes is not None:
         parts.append(f"{parsed.activity_minutes} minutes of activity (today: {log.activity_minutes} min)")
     return ChatActionResult(summary="Logged " + ", ".join(parts) + ". Open /log to see your week.")
+
+
+# ----------------------------------------------------------------------------------------------- readings and meals
+_READING_CUE = re.compile(r"\b(?:my|today|was|is|came|checked|measured|report|reading|got)\b", re.I)
+_MEAL_RE = re.compile(r"\b(?:i|we)\s+(?:just\s+)?(?:ate|had|have eaten|eaten|am eating|was eating)\b(?P<food>[^.?!]{3,200})", re.I)
+
+
+def apply_reading_statement(db: Session, user: User, message: str) -> ChatActionResult | None:
+    """"My Hb is 10.2" / "BP was 120/80 today": record it, and say plainly what it means (or that it needs a doctor)."""
+    if "?" in message or len(message) > 200 or not _READING_CUE.search(message):
+        return None
+    from app.services.care import readings as readings_module
+    from app.services.profile import has_consent
+
+    candidates = readings_module.parse_report_text(message)
+    if not candidates or not has_consent(db, user.id):
+        return None
+    lines, urgent = [], False
+    for c in candidates[:3]:
+        row = readings_module.add(
+            db, user, c["kind"], date.fromisoformat(c["date"]), value=c.get("value"), systolic=c.get("systolic"),
+            diastolic=c.get("diastolic"), context=c.get("context"), source="chat",
+        )
+        out = readings_module.payload(row)
+        what = f"{out['systolic']}/{out['diastolic']} mmHg" if row.kind == "bp" else f"{out['value']:g} {out['unit']}"
+        label = rules()["readings"][row.kind]["label"].lower()
+        lines.append(f"Recorded your {label}: {what}.")
+        for flag in out["flags"]:
+            lines.append(flag["message"])
+            urgent = urgent or flag["level"] == "urgent"
+    if urgent:
+        lines.append("This needs attention today: open /check for a quick safety check, or call your doctor or 112.")
+    return ChatActionResult(summary=" ".join(lines) + " See your trend with /readings.")
+
+
+def apply_meal_statement(db: Session, user: User, message: str) -> ChatActionResult | None:
+    """"I had 2 roti and dal for lunch": log it and show how it adds up for the day."""
+    if "?" in message or len(message) > 300:
+        return None
+    m = _MEAL_RE.search(message)
+    if not m:
+        return None
+    from app.services.care import dating as dating_module
+    from app.services.care import meals as meals_module
+    from app.services.profile import has_consent
+
+    if not has_consent(db, user.id):
+        return None
+    day = dating_module.today_utc()
+    row, parsed = meals_module.log(db, user, day, m.group("food"))
+    if row is None:
+        return None
+    _, totals = meals_module.day_totals(db, user, day)
+    gaps = meals_module.gaps(totals)
+    low = [r for r in gaps["rows"] if r["percent"] < 50][:2]
+    said = ", ".join(f"{i['name'].split(' (')[0].lower()} ({i['grams']:g} g)" for i in row.items)
+    text = f"Logged {said}. About {row.totals.get('protein', 0):.0f} g protein and {row.totals.get('iron', 0):.1f} mg iron in this meal."
+    if low:
+        text += " So far today you are low on " + " and ".join(r["nutrient"] for r in low) + " (see /meals for ideas)."
+    if parsed["unknown"]:
+        text += " I did not recognise: " + "; ".join(parsed["unknown"]) + "."
+    return ChatActionResult(summary=text + " Portions are approximate.")
+
+
+def apply_any_statement(db: Session, user: User, message: str) -> ChatActionResult | None:
+    """The first of: water/sleep/activity, a health reading, a meal."""
+    return (
+        apply_wellness_statement(db, user, message)
+        or apply_reading_statement(db, user, message)
+        or apply_meal_statement(db, user, message)
+    )

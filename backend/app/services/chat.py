@@ -42,7 +42,7 @@ from app.schemas.api import (
     SourceResponse,
 )
 from app.services.audit import active_safety_rules, record_safety_event
-from app.services.chat_actions import apply_wellness_statement
+from app.services.chat_actions import apply_any_statement
 from app.services.personalization import build_user_context
 from app.services.recommendation import generate_recommendations
 from app.services.stage import calculate_stage
@@ -116,7 +116,7 @@ def _prepare_turn(db: Session, payload: MessageRequest, user: User | None, decis
     history = _recent_user_messages(db, payload, user)
     query = to_english_query(resolve_followup(payload.message, history), language=payload.language)
     action = (
-        apply_wellness_statement(db, user, payload.message)
+        apply_any_statement(db, user, payload.message)
         if user is not None and decision.risk.value in {"safe_general", "low_concern"}
         else None
     )
