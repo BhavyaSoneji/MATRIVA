@@ -38,6 +38,7 @@ class Picked:
     sentence: str
     score: float
     hit: Hit
+    pointer: bool = False  # a "see this page" pointer, not a quoted sentence
 
 
 @dataclass
@@ -137,6 +138,13 @@ def _pick(engine: Engine, retrieval: Retrieval, hits: list[Hit]) -> list[Picked]
         # the top-ranked passage always speaks; the others must be close to the best sentence found anywhere
         if best < 0.06 or (position > 0 and (best < 0.12 or best < RELEVANCE_VS_BEST * global_best)):
             continue
+        specific = {t for t in retrieval.query_tokens if t not in TRADITIONAL_CUES}
+        if position > 0 and specific:
+            # a supporting passage must speak about what was actually asked, not just share "ayurveda"
+            scored = [row for row in scored if specific & set(tokens(row[1]))]
+            if not scored:
+                continue
+            best = scored[0][0]
         limit = 3 if position == 0 else 1  # the best passage may add up to two more sentences
         follow_up = 0.45 if position == 0 else 1.0
         chosen: list[tuple[int, Picked]] = []
@@ -166,6 +174,28 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     modern = [p for p in picked if not _is_traditional(p.hit)]
     traditional = [p for p in picked if _is_traditional(p.hit)]
     asked_for_traditional = bool(set(retrieval.query_tokens) & TRADITIONAL_CUES)
+
+    # The book's structure finds the right section even where the scan of its English is too damaged to quote.
+    # Say so, and point at the page, instead of silently answering from a weaker source.
+    quoted = {p.hit.id for p in picked}
+    for hit in hits[:2]:
+        if (
+            _is_traditional(hit)
+            and hit.meta.get("chapter")
+            and hit.id not in quoted
+            and hit.score >= 0.8 * hits[0].score
+            and (hit is hits[0] or asked_for_traditional)
+            and not any(p.hit.meta.get("locator") == hit.meta.get("locator") and p.pointer for p in traditional)
+        ):
+            place = str(hit.meta.get("locator") or f"Chapter {hit.meta['chapter']}").replace(" \u00b7 ", ", ")
+            pointer = Picked(
+                f"The Prasuti Tantra covers this in {place}, but the scanned English text there is too damaged "
+                "to quote reliably - please read the original page.", 0.0, hit, pointer=True,
+            )
+            if hit is hits[0]:
+                traditional.insert(0, pointer)  # the best match leads
+            else:
+                traditional.append(pointer)
     if traditional and not asked_for_traditional and modern:
         # Modern sources already answer it, and nobody asked for the classical view: leave scanned text out.
         picked = modern
@@ -228,7 +258,8 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     used = order  # sources shown are exactly the sources cited, in citation order
     quotes: dict[str, list[str]] = {}
     for p in picked:
-        quotes.setdefault(p.hit.id, []).append(p.sentence)
+        if not p.pointer:
+            quotes.setdefault(p.hit.id, []).append(p.sentence)
     trace = {
         "engine": "local",
         "confidence": retrieval.confidence,
