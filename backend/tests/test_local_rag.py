@@ -329,3 +329,33 @@ def test_book_endpoints_report_review_state(client: TestClient, admin_headers, a
     assert {int(k) for k in review} == set(range(1, 12)) and set(review.values()) == {"pending"}
     assert client.get("/knowledge/book/glossary?q=milk", headers=auth_headers).json()["results"] is not None
     assert client.get("/knowledge/book").status_code in (401, 403)
+
+
+def test_damaged_scan_gets_a_pointer_to_the_page_instead_of_garbage() -> None:
+    damaged = passage(
+        "ch5-1", "tetic regimen prescribed for the woman having ys that by this the woman remains ar हा superior and ne se etna regimen from first to ninth month her garbhadharini kukgsi",
+        domain="ayurveda", source="book", level="traditional", title="Prasuti Tantra - Chapter 5: Signs",
+        chapter=5, section="Monthwise dietary regimen for pregnant woman",
+        locator="Ch. 5 › Monthwise dietary regimen for pregnant woman · scanned p. 139",
+    )
+    eng = Engine([damaged] + CORPUS[:1])
+    out = compose(eng, search(eng, "ayurveda monthwise dietary regimen for pregnant woman from first to ninth month"))
+    assert "scanned p. 139" in out.text and "too damaged to quote" in out.text and "[1]" in out.text
+    assert out.used[0].id == "ch5-1"
+    assert all(not p["quotes"] for p in out.trace["passages"] if p["chapter"] == 5)  # a pointer is not a quote
+
+
+def test_citations_carry_the_chunk_level_locator(client: TestClient, admin_headers, auth_headers) -> None:
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import scripts.ingest_real_knowledge as ingest
+
+    with SessionLocal() as db:
+        ingest.ingest_book_chapters(db, dry_run=False)
+        ids = [d.id for d in db.query(KnowledgeDocument).all()]
+    client.post("/admin/documents/bulk-approve", headers=admin_headers, json={"ids": ids})
+    res = client.post("/chat", headers=auth_headers, json={"message": "What is dauhrda in Ayurveda?"}).json()
+    locators = [c["locator"] for c in res["citations"]]
+    assert locators and any(l and l.startswith("Ch. ") and "scanned p" in l for l in locators), locators
