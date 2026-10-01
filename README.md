@@ -517,6 +517,25 @@ Start with [`docs/README.md`](./docs/README.md), the index. The most useful page
 
 ---
 
+## 🗺️ Roadmap
+
+What is left is mostly not code. It needs people:
+
+| Next | Why | Tracker |
+|---|---|---|
+| A clinician reviews `care_rules.yaml` and the guard rails | Nothing may reach real patients before this | #75, #82 |
+| A pharmacist checks the 918 medicine rules against their references | The rules are a strong first draft, not a drug database | [`docs/clinical-review.md`](./docs/clinical-review.md) |
+| Native speakers review Hindi and Gujarati | Emergency wording must be right | #91 |
+| A legal review under the DPDP Act (retention, breach process) | Health data | #81 |
+| Push or SMS reminders | Reminders only show while the app is open | #83 |
+| Close retrieval gaps and out-of-scope leaks | Known weak spots | #84, #85 |
+| Answers in Hindi and Gujarati | Today only questions and refusals are | #86 |
+| A pilot: one clinic, 20 to 30 mothers, 8 weeks | Real use is the real test | #89 |
+
+The full list, with the reasoning, is in [`docs/roadmap.md`](./docs/roadmap.md).
+
+---
+
 ## 👥 Team
 
 | | Workstream | Owner |
