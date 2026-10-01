@@ -517,6 +517,18 @@ Start with [`docs/README.md`](./docs/README.md), the index. The most useful page
 
 ---
 
+## ❓ Quick answers
+
+- **Does it need an API key?** No. The default engine is offline. Groq and Gemini are optional (`RAG_ENGINE=external`).
+- **Can it tell me which medicine to take?** No, never. Not even a common one.
+- **Why does it sometimes say it has no reviewed source?** Because only approved documents can answer, and nothing is shown that cannot be sourced. That is the point.
+- **Is my health data sent to an AI model?** Not in the default engine. Your safety profile is never sent to one.
+- **Can I use it for a real patient today?** No. Clinical review is still pending.
+
+More in the [FAQ](./docs/faq.md).
+
+---
+
 ## 🗺️ Roadmap
 
 What is left is mostly not code. It needs people:
