@@ -64,7 +64,7 @@ function OnboardingFlow() {
     try {
       await submitProfile();
       await submitPregnancy();
-      router.push("/dashboard");
+      router.push("/chat");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong saving your details.");
     } finally {
