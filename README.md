@@ -160,19 +160,26 @@ Just chatting works too: saying *"my Hb is 9.8"* or *"I ate 2 roti and dal"* rec
 flowchart LR
     Q([Question]) --> S1{{🛡️ Safety pre-check<br/>EN · HI · Hinglish · GU}}
     S1 -- urgent --> E[🚑 Escalate: 112 · hospital · contact]
-    S1 -- ok --> U[Understand<br/>concepts · stage · intent]
+    S1 -- ok --> GR{{🔒 Guard rails<br/>1,231 rules · your profile}}
+    GR -- emergency --> E
+    GR -- medicine · risky request --> B[🚫 Refuse and send to a doctor]
+    GR -- ok or caution --> U[Understand<br/>concepts · stage · intent]
     U --> R[🔎 Hybrid retrieval]
     R --> F[⚖️ Weighted RRF fusion]
     F --> K[Rerank · MMR diversity]
     K --> G{📏 Evidence<br/>sufficient?}
     G -- no --> N[“I don’t have a reviewed source for that”]
     G -- yes --> C[✍️ Compose with ordered citations]
-    C --> S2{{🛡️ Safety post-check}}
-    S2 --> A([Answer + sources + evidence level])
+    C --> O{{🔒 Output check<br/>no dose · no “safe to take”}}
+    O --> S2{{🛡️ Safety post-check}}
+    S2 --> A([Answer + notices + sources + evidence level])
     style E fill:#E5484D,color:#fff
+    style B fill:#E5484D,color:#fff
     style N fill:#F5A623,color:#000
     style A fill:#2ea44f,color:#fff
     style S1 fill:#FFE5E5
+    style GR fill:#FFE5E5
+    style O fill:#FFE5E5
     style S2 fill:#FFE5E5
 ```
 
