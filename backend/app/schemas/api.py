@@ -25,6 +25,7 @@ class MessageRequest(APIModel):
     message: str = Field(min_length=1, max_length=4000)
     conversation_id: str | None = Field(default=None, max_length=64)
     session_context: dict[str, Any] = Field(default_factory=dict)
+    language: str | None = Field(default=None, pattern="^(en|hi|gu)$")
 
     @field_validator("message")
     @classmethod
@@ -212,6 +213,7 @@ class ChatResponse(APIModel):
     citations: list[Citation] = Field(default_factory=list)
     evidence: dict[str, Any] = Field(default_factory=dict)
     recommendations: list[RecommendationResponse] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list)
 
 
 class ChatHistoryResponse(APIModel):
