@@ -153,18 +153,16 @@ def _entry(food: dict, display: str, subdomain: str, note: str | None) -> dict:
             if pct >= 10:
                 shares.append(f"{label} {round(pct)}%")
     parts = [
-        f"{display}: nutrient values per 100 g from USDA FoodData Central (SR Legacy record "
-        f"\"{food['description']}\"): " + ", ".join(facts) + ".",
+        f"{display} provides, per 100 g: " + ", ".join(facts) + f" (USDA FoodData Central, SR Legacy record \"{food['description']}\")."
     ]
     if shares:
         parts.append(
-            "Share of the US recommended daily allowance for pregnancy provided by 100 g: "
-            + ", ".join(shares) + "."
+            f"100 g of {display} gives about " + ", ".join(shares) + " of the US recommended daily allowance for pregnancy."
         )
     if note:
         parts.append(note)
     parts.append(
-        "These are laboratory values for US samples; Indian varieties and cooking methods differ "
+        f"These are laboratory values for US samples of {display}; Indian varieties and cooking methods differ "
         "(see IFCT 2017). Portion size and the rest of the day's diet matter more than any single food."
     )
     fdc = food["fdcId"]
