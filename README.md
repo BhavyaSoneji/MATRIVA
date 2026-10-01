@@ -68,19 +68,32 @@ So MATRIVA answers only from approved sources, refuses what it cannot source, ne
 
 Everything lives in **one chat window**. Ask in your own words, tap a sidebar shortcut, or type `/` for commands. There are no feature pages to hunt through.
 
+**Plan and track**
+
 | | Command | What you give it | What you get back |
 |---|---|---|---|
 | 🗓️ | `/plan` | Last period date, due date, or current week | Exact week and day, due date, visit calendar (FOGSI), free PMSMA check-up on the 9th, iron-folic-acid course, this week's tasks |
 | 💚 | `/checkin` | Mood, symptoms, baby movement, iron tablet (20 seconds) | Streaks, reminders, and an immediate warning card if an answer is a danger sign |
-| 🛡️ | `/check` | Yes/no questions filtered by your week | **Emergency / urgent / soon** outcome with one-tap **112**, your emergency contact and a hospital map link |
-| 🩸 | `/readings` | Hb, BP, weight, sugar — typed, pasted from a report, or photographed | Trend chart and flags that cite their source (WHO Hb < 11; BP 140/90 and 160/110) |
-| 🥗 | `/foods` | Nothing (uses your week and diet) | What to eat this month **from the Prasuti Tantra** (quoted, with authority and page, labelled traditional), and the foods richest in iron, calcium, protein and more, with a vegetarian, vegan and allergy filter. Foods only, never medicines |
+| 🩸 | `/readings` | Hb, BP, weight, sugar: typed, pasted from a report, or photographed | Trend chart and flags that cite their source (WHO Hb < 11; BP 140/90 and 160/110) |
 | 🍛 | `/meals` | "2 roti, 1 katori dal, curd" | Approximate nutrients vs a pregnancy day, and vegetarian/allergy-aware foods to close the gaps |
-| 📄 | `/summary` | Nothing — built from the above | One printable page for your doctor, with questions you may want to ask |
-| 📖 | `/book` | A term, e.g. *stanya* | The **Prasuti Tantra** book by chapter, authorities cited, bilingual glossary |
+| 📄 | `/summary` | Nothing, it is built from the above | One printable page for your doctor, with your conditions, medicines and questions you may want to ask |
+
+**Stay safe**
+
+| | Command | What you give it | What you get back |
+|---|---|---|---|
+| 🛡️ | `/check` | Yes/no questions filtered by your week | **Emergency / urgent / soon** outcome with one-tap **112**, your emergency contact and a hospital map link |
+| 🔒 | *(automatic)* | Anything you type | Guard rails that refuse medicine advice, escalate emergencies and add cautions. [How they work](./docs/guardrails.md) |
+
+**Learn**
+
+| | Command | What you give it | What you get back |
+|---|---|---|---|
+| 🥗 | `/foods` | Nothing (uses your week and diet) | What to eat this month **from the Prasuti Tantra** (quoted, with authority and page, labelled traditional), and the foods richest in iron, calcium, protein and more, with a vegetarian, vegan and allergy filter. Foods only, never medicines |
+| 📖 | `/book` | A term, e.g. *stanya* | The **Prasuti Tantra** by chapter, authorities cited, bilingual glossary |
 | 🕸️ | `/map` | The last question asked | How the topics in the answer connect (knowledge graph) |
-| 🥗 | `/nutrition` `/ayurveda` `/lifestyle` | — | Cited answers for your trimester, with related videos and articles |
-| 📚 | `/library` `/evidence` | — | ~85 live-verified videos, NHS/WHO/ACOG/Govt. of India pages and PubMed papers |
+| 🌿 | `/nutrition` `/ayurveda` `/lifestyle` | Nothing | Cited answers for your trimester, with related videos and articles |
+| 📚 | `/library` `/evidence` | Nothing | ~85 live-verified videos, NHS/WHO/ACOG/Govt. of India pages and PubMed papers |
 
 **It never advises on medicines.** Ask *"can I take paracetamol?"* and MATRIVA will not say yes, give a dose, or suggest a tablet: it explains why and sends you to your doctor. The same goes for herbs, Ayurvedic products, stopping or changing a prescribed medicine, home abortion or induction, finding out the baby's sex (illegal under the PCPNDT Act) and anyone asking it to act as a doctor. Emergencies (heavy bleeding, baby not moving, seizure, thoughts of ending your life) go straight to 112 and the right helpline. Details: [`docs/guardrails.md`](./docs/guardrails.md).
 
