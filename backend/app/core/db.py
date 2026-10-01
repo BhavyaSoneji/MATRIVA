@@ -8,7 +8,15 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-connect_args = {"check_same_thread": False} if settings.database_url.startswith("sqlite") else {}
+# `timeout`: SQLite's own default busy-wait is effectively 0, so any two
+# requests that touch the DB at the same moment (FastAPI runs sync routes in
+# a thread pool, so this is ordinary concurrency, not a rare race) raise
+# "database is locked" as an unhandled 500 instead of one simply waiting a
+# beat for the other's write to finish -- reproduced locally under nothing
+# more than a couple of quick, ordinary successive chat requests. 15s covers
+# any single request's DB work with room to spare without masking a
+# genuinely stuck connection.
+connect_args = {"check_same_thread": False, "timeout": 15} if settings.database_url.startswith("sqlite") else {}
 engine = create_engine(
     settings.database_url,
     connect_args=connect_args,
