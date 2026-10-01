@@ -26,7 +26,6 @@ The spellings follow the *Prasuti Tantra* (Prof. Premvati Tiwari), which transli
 | **Sutika** | A woman after childbirth; *sutika paricharya* is postnatal care |
 | **Stanya** | Breast milk; **dhatri** is a wet nurse |
 | **Vata, pitta, kapha** | The three *doshas*, the body's functional principles in Ayurveda. The book explains many pregnancy symptoms through them |
-| **Pesi** | A stage of the embryo's development in the book's month-by-month account |
 
 ### Authorities cited in the book
 
