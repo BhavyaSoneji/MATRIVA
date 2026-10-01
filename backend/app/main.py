@@ -22,6 +22,7 @@ from app.api import (
     privacy,
     profile,
     recommendations,
+    resources,
     wellness,
 )
 from app.api.deps import StaffUser
@@ -170,3 +171,4 @@ app.include_router(privacy.router)
 app.include_router(admin.router)
 app.include_router(evaluations.router)
 app.include_router(wellness.router)
+app.include_router(resources.router)
