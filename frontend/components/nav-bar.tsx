@@ -5,17 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 
-const links = [
-  { href: "/dashboard", label: "Overview" },
-  { href: "/nutrition", label: "Nutrition" },
-  { href: "/ayurveda", label: "Ayurveda" },
-  { href: "/lifestyle", label: "Lifestyle" },
-  { href: "/recommendations", label: "For you" },
-  { href: "/chat", label: "Companion" },
-  { href: "/guidance", label: "Guidance" },
-  { href: "/sources", label: "Evidence" },
-  { href: "/settings", label: "Settings" },
-];
+const links = [{ href: "/chat", label: "Companion" }];
 
 const adminLinks = [
   { href: "/admin/documents", label: "Documents" },
@@ -40,6 +30,7 @@ export function NavBar() {
   };
 
   const allLinks = user?.role === "admin" ? [...links, ...adminLinks] : links;
+  const accountLinks = [{ href: "/settings", label: "Settings" }];
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md">
@@ -50,7 +41,7 @@ export function NavBar() {
         </Link>
 
         {user && (
-          <nav className="hidden flex-1 items-center justify-center gap-7 overflow-x-auto xl:flex">
+          <nav className="hidden flex-1 items-center justify-center gap-7 overflow-x-auto md:flex">
             {allLinks.map((link) => (
               <Link key={link.href} href={link.href} className={navClass(pathname === link.href)}>
                 {link.label}
@@ -62,7 +53,11 @@ export function NavBar() {
         <div className="flex shrink-0 items-center gap-5">
           {user ? (
             <>
-              <span className="hidden text-xs text-muted-foreground lg:inline">{user.email}</span>
+              {accountLinks.map((link) => (
+                <Link key={link.href} href={link.href} className={navClass(pathname === link.href)}>
+                  {link.label}
+                </Link>
+              ))}
               <button
                 type="button"
                 onClick={handleLogout}
@@ -87,15 +82,6 @@ export function NavBar() {
         </div>
       </div>
 
-      {user && (
-        <nav className="flex gap-6 overflow-x-auto border-t border-border px-6 py-2.5 xl:hidden">
-          {allLinks.map((link) => (
-            <Link key={link.href} href={link.href} className={navClass(pathname === link.href)}>
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-      )}
     </header>
   );
 }
