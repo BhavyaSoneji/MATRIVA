@@ -46,10 +46,12 @@ retrieval-augmented generation, an independent safety layer, and transparent sou
 - The full local stack (PostgreSQL/pgvector, Redis, FastAPI, Next.js) runs via Docker Compose, and
   each service's production Dockerfile has been built and smoke-tested independently.
 
-**Known, honestly-reported limitation:** the hallucination/grounding evaluation suite
-(`evaluation/hallucination/`) currently passes 3 of 11 out-of-corpus test questions — see
-[Limitations](#limitations) below and `PROGRESS.md` (2026-09-24, issue #19) for the investigation.
-This is a real, measured gap in retrieval precision, not a documentation placeholder.
+**Known limitation (measured):** with a live embedding key the hallucination/grounding suite
+(`evaluation/hallucination/`) passes 11 of 11 out-of-corpus questions (see
+`evaluation/reports/hallucination_eval_report.json`). In keyword-only mode (no embedding key) that
+standalone harness still fails them, because it uses the older "any shared word" sufficiency check.
+The live API applies a relevance floor in keyword mode (`MIN_KEYWORD_RELEVANCE`, 0.3), so a single
+incidental shared word no longer counts as evidence there. See `PROGRESS.md` (2026-09-24, issue #19).
 
 ---
 
@@ -309,11 +311,10 @@ python scripts/verify_pgvector_live.py
   (`knowledge/seed/seed.yaml`), not comprehensive coverage of any domain.
 - **Clinical rules require sign-off**: this codebase does not invent or certify medical thresholds.
   Ayurvedic content is explicitly marked `PENDING_CLINICAL_REVIEW` until a Clinical Lead signs off.
-- **Retrieval precision gap, honestly measured**: the hallucination/grounding suite
-  (`evaluation/hallucination/`) currently passes only 3 of 11 out-of-corpus questions — a question
-  on a related-but-uncovered topic can retrieve a loosely-matching chunk and get an attempted
-  answer instead of an "insufficient evidence" response. This is tracked as open issue #19; see
-  `PROGRESS.md` (2026-09-24) for the investigation.
+- **Retrieval precision in keyword-only mode**: without an embedding key, retrieval is keyword-based
+  and the standalone hallucination harness fails its out-of-corpus questions (with a key it passes
+  11/11). The live API's relevance floor (0.3) mitigates this, but embeddings are the real fix —
+  keep an embedding key configured and re-embed approved documents. Tracked as issue #19.
 - **Branch protection is not yet enabled** on `main` (tracked as open issue #21) — CODEOWNERS
   routing exists, but merges are not currently gated by required review/CI in GitHub settings.
 - Not a substitute for professional medical advice, diagnosis, or emergency care at any stage.
