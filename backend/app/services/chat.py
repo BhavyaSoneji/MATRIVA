@@ -24,6 +24,7 @@ from app.models import (
 )
 from app.rag.followup import resolve_followup
 from app.rag.pipeline import answer_question, answer_question_stream
+from app.rag.translate import to_english_query
 from app.rag.retrieval import RetrievedChunk
 from app.repositories.knowledge import source_payload
 from app.safety.classifier import (
@@ -113,7 +114,7 @@ def _prepare_turn(db: Session, payload: MessageRequest, user: User | None, decis
     the (possibly follow-up-resolved) retrieval query, and any wellness statement to log."""
     user_context = build_user_context(db, user, payload.language)
     history = _recent_user_messages(db, payload, user)
-    query = resolve_followup(payload.message, history)
+    query = to_english_query(resolve_followup(payload.message, history), language=payload.language)
     action = (
         apply_wellness_statement(db, user, payload.message)
         if user is not None and decision.risk.value in {"safe_general", "low_concern"}
@@ -326,7 +327,7 @@ def process_chat(
         sources=[item.model_dump(mode="json") for item in sources],
     )
 
-    if user is not None and stage:
+    if user is not None and stage and action is None:
         recommendations = generate_recommendations(db, user, intent=intent, limit=3)
 
     evidence = {
@@ -349,7 +350,7 @@ def process_chat(
     )
     suggestions = (
         []
-        if decision.risk.value in {"urgent_escalation", "high_risk"}
+        if action is not None or decision.risk.value in {"urgent_escalation", "high_risk"}
         else suggest_followups(intent, stage, asked=[payload.message, *history])
     )
     response = ChatResponse(
@@ -529,7 +530,7 @@ def stream_chat(
         sources=[item.model_dump(mode="json") for item in sources],
     )
 
-    if user is not None and stage:
+    if user is not None and stage and action is None:
         recommendations = generate_recommendations(db, user, intent=intent, limit=3)
 
     evidence = {
@@ -553,7 +554,7 @@ def stream_chat(
     )
     suggestions = (
         []
-        if decision.risk.value in {"urgent_escalation", "high_risk"}
+        if action is not None or decision.risk.value in {"urgent_escalation", "high_risk"}
         else suggest_followups(intent, stage, asked=[payload.message, *history])
     )
     yield format_sse_event(
