@@ -70,6 +70,11 @@ export function FoodsWidget() {
               {t.skipped_for_diet} more entr{t.skipped_for_diet === 1 ? "y" : "ies"} for this month use ingredients outside your diet and are not shown.
             </p>
           )}
+          {(t.skipped_for_allergy ?? 0) > 0 && (
+            <p className="mt-2 text-[12px] text-muted-foreground" role="note">
+              {t.skipped_for_allergy} entr{t.skipped_for_allergy === 1 ? "y" : "ies"} for this month contain something you are allergic to and {t.skipped_for_allergy === 1 ? "is" : "are"} not shown.
+            </p>
+          )}
           {(t.medicated.length > 0 || t.procedures.length > 0) && (
             <details className="mt-3 border border-border p-3 text-[13px]">
               <summary className="cursor-pointer text-muted-foreground">Treatments the book also describes (not food, not advice)</summary>
@@ -108,6 +113,11 @@ export function FoodsWidget() {
             </Chip>
           ))}
         </div>
+        {(guide.modern.allergy_notes ?? []).map((n) => (
+          <p key={n} className="mt-3 border-l-2 border-accent bg-accent/10 px-3 py-2 text-[12.5px]" role="note">
+            {n}
+          </p>
+        ))}
         {guide.modern.need && (
           <div className="mt-4">
             <p className="text-[13px] text-muted-foreground">

@@ -29,7 +29,7 @@ No API key is needed: `RAG_ENGINE=local` is the default. Settings are listed in 
 | `app/models/`, `app/schemas/` | SQLAlchemy entities and Pydantic contracts |
 | `alembic/versions/` | Migrations `0001` to `0005` |
 | `scripts/` | `ingest_real_knowledge.py`, `build_book_index.py`, `secret_scan.py`, `verify_pgvector_live.py` |
-| `tests/` | 513 tests |
+| `tests/` | 534 tests |
 
 ## Scripts
 

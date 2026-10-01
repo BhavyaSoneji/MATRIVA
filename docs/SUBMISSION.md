@@ -29,7 +29,7 @@ This document describes the Round 1 build. The project has moved on; the README 
 | Interface | A dashboard and separate pages | One chat workspace with cards: plan, check-in, readings, meals, food guide, summary |
 | Tracking | None | Dating, daily check-ins, readings with sourced flags, a meal log, a printable doctor summary |
 | Food | Seed food entries | The Prasuti Tantra's month-wise regimen (quoted, traditional) and nutrient food lists |
-| Tests | Demo scenario | 513 backend, 43 ingestion, 36 evaluation, 12 end-to-end |
+| Tests | Demo scenario | 534 backend, 43 ingestion, 36 evaluation, 12 end-to-end |
 | Clinical review | Pending | **Still pending**, for everything |
 
 ## Problem

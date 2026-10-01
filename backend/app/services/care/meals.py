@@ -154,12 +154,14 @@ def gaps(totals: dict[str, float], diet: str | None = None, allergies: list[str]
 
 def _suggest(low: list[str], diet: str | None, allergies: list[str]) -> list[dict[str, Any]]:
     banned = {"vegetarian": {"meat_fish"}, "vegan": {"meat_fish", "dairy_egg"}}.get((diet or "").lower(), set())
-    blocked = [a.lower() for a in allergies]
+    from app.services.care import allergens
+
+    avoid = allergens.resolve(allergies)
     out = []
     for nutrient in low:
         ranked = []
         for f in foods().values():
-            if f["category"] in banned or any(b in f["name"].lower() or b in " ".join(f["aliases"]) for b in blocked):
+            if f["category"] in banned or allergens.food_blocked(f, avoid):
                 continue
             if f["name"].lower().startswith(("chicken liver",)):
                 continue  # NHS advises avoiding liver in pregnancy

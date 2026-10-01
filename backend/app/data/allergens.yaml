@@ -1,0 +1,61 @@
+# Allergens people actually type, and the food words each one covers.
+#
+# aliases: what a person might enter (English, Hindi names, common spellings), matched as whole words.
+# words:   food words that contain the allergen, matched as whole words (plural tolerant) in a food's name and
+#          aliases, and in the book's wording. "egg" matches "Egg" but never "Eggplant".
+# exact_aliases: matched only when the whole entry is that word (a bare "nuts" is tree nuts AND peanuts).
+# The aim is to err on the side of leaving a food out. Anything that cannot be matched is reported, not ignored.
+groups:
+  tree_nuts:
+    label: tree nuts
+    aliases: [nut, nuts, tree nut, tree nuts, almond, badam, walnut, akhrot, cashew, kaju, pistachio, pista, hazelnut, pecan, "dry fruit", "dry fruits"]
+    words: [almond, badam, walnut, akhrot, cashew, kaju, pistachio, pista, hazelnut, pecan, macadamia]
+  peanut:
+    label: peanuts
+    aliases: [peanut, peanuts, groundnut, groundnuts, moongphali, mungfali]
+    exact_aliases: [nut, nuts]   # a bare "nuts" means peanuts too; "tree nuts" does not
+    words: [peanut, groundnut, moongphali]
+  dairy:
+    label: milk and dairy
+    aliases: [dairy, milk, "milk product", "milk products", lactose, "lactose intolerant", "lactose intolerance", casein, curd, dahi, yogurt, yoghurt, paneer, cheese, ghee, butter, doodh]
+    words: [milk, yogurt, yoghurt, curd, dahi, cheese, paneer, ghee, butter, ghrta, navanita, payasa, kshira, cream, anhydrous]
+  egg:
+    label: egg
+    aliases: [egg, eggs, anda]
+    words: [egg]
+  fish:
+    label: fish
+    aliases: [fish, seafood, machhi, machli, rohu, salmon, sardine, sardines, carp]
+    words: [fish, carp, rohu, salmon, sardine]
+  shellfish:
+    label: shellfish
+    aliases: [shellfish, prawn, prawns, shrimp, crab, lobster, oyster, mussel, seafood]
+    words: [shellfish, prawn, shrimp, crab, lobster, oyster, mussel]
+  gluten:
+    label: gluten and wheat
+    aliases: [gluten, wheat, atta, maida, barley, rye, celiac, coeliac, "gluten free"]
+    words: [wheat, atta, maida, bread, barley, rye, oats, oat, cereal, semolina, sooji, suji]
+  soy:
+    label: soya
+    aliases: [soy, soya, soybean, soybeans, tofu]
+    words: [soy, soya, soybean, tofu]
+  sesame:
+    label: sesame
+    aliases: [sesame, til]
+    words: [sesame, til]
+  lentils:
+    label: lentils and dal
+    aliases: [lentil, lentils, dal, daal, masoor, toor, arhar]
+    words: [lentil, masoor, dal, toor, arhar]
+  legumes:
+    label: legumes and pulses
+    aliases: [legume, legumes, pulse, pulses, beans, chana, chickpea, chickpeas, rajma]
+    words: [lentil, masoor, dal, toor, arhar, chickpea, chana, rajma, bean, moong, cowpea, lobia, soybean, tofu, kidney]
+  honey:
+    label: honey
+    aliases: [honey, shahad, madhu]
+    words: [honey, madhu]
+  meat:
+    label: meat
+    aliases: [meat, chicken, mutton, beef, pork, lamb, "red meat"]
+    words: [meat, chicken, mutton, beef, pork, lamb, jangala]

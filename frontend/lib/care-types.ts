@@ -211,6 +211,7 @@ export interface FoodGuide {
     medicated: FoodGuideBookItem[];
     procedures: FoodGuideBookItem[];
     skipped_for_diet?: number;
+    skipped_for_allergy?: number;
     medicated_note?: string;
     rationale?: { page: string; points: string[] };
     avoid?: { page: string; items: { authority: string; text: string; page: number; modern?: string }[] };
@@ -220,6 +221,7 @@ export interface FoodGuide {
     need: { id: string; label: string; reason: string; unit: string; daily_allowance: number | null; tip?: string | null } | null;
     foods: FoodGuideFood[];
     empty_note?: string;
+    allergy_notes?: string[];
     sources?: { name: string; url: string }[];
   };
   avoid_modern: { name: string; why: string; sources: { name: string; url: string }[] }[];

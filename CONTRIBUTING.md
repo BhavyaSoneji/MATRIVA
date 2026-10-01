@@ -10,7 +10,7 @@ cd backend && python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 cp ../.env.example .env              # set JWT_SECRET to 32+ random characters
 alembic upgrade head
-pytest -q                            # 513 tests should pass
+pytest -q                            # 534 tests should pass
 cd ../frontend && npm install && npm run dev
 ```
 

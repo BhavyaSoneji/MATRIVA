@@ -4,7 +4,7 @@ What is tested, how to run it, and what a passing run does and does not prove.
 
 | Suite | Where | Tests | Run |
 |---|---|---:|---|
-| Backend | `backend/tests/` | 513 | `cd backend && pytest -q` |
+| Backend | `backend/tests/` | 534 | `cd backend && pytest -q` |
 | Ingestion | `ingestion/tests/` | 43 | `cd ingestion && pytest tests/` |
 | Evaluation harnesses | `evaluation/tests/` | 36 | `cd evaluation && pytest tests/` |
 | Frontend end-to-end | `frontend/tests/e2e/` | 12 | `cd frontend && npx playwright test` |

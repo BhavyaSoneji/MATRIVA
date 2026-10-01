@@ -10,7 +10,7 @@
 Modern guidelines and classical Ayurveda, reconciled week by week. Every answer names its source, or says plainly that it can't.
 
 <p>
-<img alt="backend tests" src="https://img.shields.io/badge/backend_tests-513_passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white"/>
+<img alt="backend tests" src="https://img.shields.io/badge/backend_tests-534_passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white"/>
 <img alt="e2e" src="https://img.shields.io/badge/e2e-12_passing-2ea44f?style=for-the-badge&logo=playwright&logoColor=white"/>
 <img alt="vulnerabilities" src="https://img.shields.io/badge/npm_audit-0_vulnerabilities-2ea44f?style=for-the-badge&logo=npm&logoColor=white"/>
 </p>
@@ -122,7 +122,7 @@ Just chatting works too: saying *"my Hb is 9.8"* or *"I ate 2 roti and dal"* rec
 | **Works offline** | Yes. The default engine needs no API key and no internet |
 | **Guard rails** | 1,231 sourced rules (918 medicines, 205 herbs, foods and exposures, 108 more) |
 | **Knowledge base** | 668 passages that answer questions once an admin approves them: the Prasuti Tantra (567) plus WHO, NHS, ICMR-NIN and Government of India guidance (101) |
-| **Tests** | 513 backend · 43 ingestion · 36 evaluation · 12 end-to-end |
+| **Tests** | 534 backend · 43 ingestion · 36 evaluation · 12 end-to-end |
 | **Clinical review** | **Pending**: see [honest limits](#-honest-limits) |
 
 ---
@@ -323,7 +323,7 @@ A modular monolith **on purpose**: RAG, safety, API, ingestion and evaluation ar
 
 | Suite | Result |
 |---|---|
-| Backend (unit, integration, RAG, care features, guard rails) | **513 passing** |
+| Backend (unit, integration, RAG, care features, guard rails) | **534 passing** |
 | Ingestion | **43 passing** |
 | Evaluation harnesses | **36 passing** |
 | Frontend end-to-end (Playwright, mocked API) | **12 passing** |
@@ -408,7 +408,7 @@ EMBEDDING_API_KEY=...
 <summary><b>Run the tests</b></summary>
 
 ```bash
-cd backend && pytest -q                       # 513 tests
+cd backend && pytest -q                       # 534 tests
 cd backend && ruff check . && mypy app/       # lint and types
 cd ingestion && pytest tests/                 # 43 tests
 cd evaluation && pytest tests/                # 36 tests
@@ -441,7 +441,7 @@ matriva/
 │   ├── app/data/             ontology.yaml, care_rules.yaml, food_guide.yaml, foods_nutrients.json, book_index.json, library.yaml
 │   ├── app/data/guardrails/  the rule files (medicines, herbs, foods, symptoms, requests, conditions, output)
 │   ├── alembic/versions/     migrations 0001 to 0005
-│   └── tests/                513 tests
+│   └── tests/                534 tests
 ├── ingestion/                OCR, chunking, book-structure recovery
 ├── evaluation/               retrieval / generation / safety / hallucination harnesses + held-out sets
 ├── knowledge/                seed guidelines, foods, the Ayurveda source, resource library builder

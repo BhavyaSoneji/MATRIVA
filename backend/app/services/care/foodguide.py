@@ -21,6 +21,7 @@ from typing import Any
 import yaml
 
 from app.safety.guardrails import load_registry
+from app.services.care import allergens
 from app.services.care.meals import serving_for
 from app.services.care.rules import foods, rules
 
@@ -54,7 +55,7 @@ def _allowed(tags: list[str], diet: str | None) -> bool:
     return not (diet == "vegan" and "dairy" in tags)
 
 
-def traditional(month: int | None, diet: str | None) -> dict[str, Any]:
+def traditional(month: int | None, diet: str | None, allergies: list[str] | None = None) -> dict[str, Any]:
     g = guide()
     book = dict(g["book"])
     out: dict[str, Any] = {
@@ -64,10 +65,13 @@ def traditional(month: int | None, diet: str | None) -> dict[str, Any]:
     if month is None:
         return {**out, "foods": [], "medicated": [], "procedures": []}
     items = g["months"][month]["items"]
-    shown = [{k: i[k] for k in ("authority", "text", "page") if k in i} | {"paraphrased": bool(i.get("paraphrased"))}
-             for i in items if i["kind"] == "food" and _allowed(i.get("tags", []), diet)]
+    avoid = allergens.resolve(allergies or [])
+    candidates = [i for i in items if i["kind"] == "food" and _allowed(i.get("tags", []), diet)]
+    kept = [i for i in candidates if not allergens.text_blocked(i["text"], avoid)]
+    shown = [{k: i[k] for k in ("authority", "text", "page") if k in i} | {"paraphrased": bool(i.get("paraphrased"))} for i in kept]
     skipped = sum(1 for i in items if i["kind"] == "food" and not _allowed(i.get("tags", []), diet))
     out["foods"] = shown
+    out["skipped_for_allergy"] = len(candidates) - len(kept)
     out["medicated"] = [{k: i[k] for k in ("authority", "text", "page")} for i in items if i["kind"] == "medicated"]
     out["procedures"] = [{k: i[k] for k in ("authority", "text", "page")} for i in items if i["kind"] == "procedure"]
     out["skipped_for_diet"] = skipped
@@ -80,13 +84,13 @@ def traditional(month: int | None, diet: str | None) -> dict[str, Any]:
     return out
 
 
-def _is_blocked(food: dict[str, Any], banned: set[str], allergies: list[str], diet: str | None) -> bool:
+def _is_blocked(food: dict[str, Any], banned: set[str], avoid: allergens.Allergies, diet: str | None) -> bool:
     name = food["name"].lower()
     if food["category"] in banned or any(n in name for n in _NEVER):
         return True
     if (diet or "").lower() == "vegetarian" and name.startswith("egg"):
         return True
-    return any(a and (a in name or a in " ".join(food["aliases"])) for a in allergies)
+    return allergens.food_blocked(food, avoid)
 
 
 def modern(need: str | None, diet: str | None, allergies: list[str]) -> dict[str, Any]:
@@ -102,10 +106,10 @@ def modern(need: str | None, diet: str | None, allergies: list[str]) -> dict[str
     target = spec.get("target") or rules()["nutrition_targets"]["per_day"].get(nutrient)
     d = (diet or "").lower()
     banned = {"vegetarian": {"meat_fish"}, "eggetarian": {"meat_fish"}, "vegan": {"meat_fish", "dairy_egg"}}.get(d, set())
-    blocked = [a.lower() for a in allergies if a]
+    avoid = allergens.resolve(allergies)
     ranked = []
     for f in foods().values():
-        if _is_blocked(f, banned, blocked, diet):
+        if _is_blocked(f, banned, avoid, diet):
             continue
         serving = serving_for(f)
         amount = f["per_100g"].get(nutrient, 0.0) * serving / 100
@@ -122,12 +126,22 @@ def modern(need: str | None, diet: str | None, allergies: list[str]) -> dict[str
         "tip": spec.get("tip"),
     }
     out["foods"] = rows
+    out["allergy_notes"] = allergy_notes(avoid)
     if not rows:
         out["empty_note"] = "None of the foods in this table fits your diet and allergies for this nutrient. Please ask your doctor or dietitian."
     sources = [g["sources"]["values"]]
     sources.append(g["sources"]["allowance"] if need != "fibre" else g["sources"]["fibre"])
     out["sources"] = sources
     return out
+
+
+def allergy_notes(avoid: allergens.Allergies) -> list[str]:
+    notes = []
+    if avoid.groups:
+        notes.append("Left out because of your allergies: " + ", ".join(avoid.labels()) + ".")
+    for word in allergens.unrecognised(avoid, list(foods().values())):
+        notes.append(f"We could not match your allergy to \"{word}\" to any food in this list, so nothing was left out for it. Please check each food yourself.")
+    return notes
 
 
 def avoid_foods() -> list[dict[str, Any]]:
@@ -149,7 +163,7 @@ def build(week: int | None, month: int | None, need: str | None, diet: str | Non
     m = month or month_of(week)
     return {
         "week": week, "month": m,
-        "traditional": traditional(m, diet),
+        "traditional": traditional(m, diet, allergies),
         "modern": modern(need, diet, allergies),
         "avoid_modern": avoid_foods(),
         "diet": diet,

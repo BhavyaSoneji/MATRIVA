@@ -42,7 +42,8 @@ Each entry is `kind: food`, `medicated` (prepared with named herbs) or `procedur
 ## What stops it giving bad suggestions
 
 - A test checks that every quoted entry really appears in the OCR text of the book, so nothing is invented. Four entries were restated because of OCR damage and are marked.
-- A vegetarian is never offered meat, fish, egg or liver; a vegan is never offered dairy or egg; a listed allergy removes the food. Liver is never suggested (very high in preformed vitamin A).
+- A vegetarian is never offered meat, fish, egg or liver; a vegan is never offered dairy or egg; Liver is never suggested (very high in preformed vitamin A).
+- **Allergies are expanded, not just matched.** What you type ("dairy", "lactose", "tree nuts", "fish", "gluten", "soya", "I am allergic to milk") is turned into the foods it covers, using `backend/app/data/allergens.yaml`, and matched as whole words: "egg" removes Egg but not Eggplant, "dairy" removes milk, curd, paneer and ghee, and a bare "nuts" means tree nuts and peanuts. The same filter applies to the nutrient lists, the book's regimen (milk, ghee, butter, honey, meat and cereals are tagged by their wording) and the `/meals` suggestions. The card says what was left out, and **an allergy it cannot match is reported, never silently ignored**: it tells you to check each food yourself.
 - No plant food reliably gives vitamin B12, so a vegan who asks for it is told so and sent to a doctor, not given a list.
 - Dry grains and seeds use a realistic dry serving (for example 50 g of oats, 15 g of seeds), not the cooked 150 g that would make them look far richer than they are.
 - The book's list of unsuitable foods includes pulses, garlic and onion (Harita). The card shows it with the note that ICMR-NIN recommends pulses and the NHS does not list pulses, garlic or onion as foods to avoid, and says to follow modern guidance and your doctor.
@@ -51,4 +52,5 @@ Each entry is `kind: food`, `medicated` (prepared with named herbs) or `procedur
 
 - The book is a translation of classical texts through an imperfect scan. Four entries are restated, and a few Sanskrit terms (*sasti*, *aksa*, *madhura* group) are left as the book has them.
 - Traditional advice is not tested by modern trials, and it has not been reviewed by a clinician. The nutrient values are approximate USDA values for a limited list of 67 foods, not a full Indian food table.
+- Allergen groups cover the common ones (tree nuts, peanuts, dairy, egg, fish, shellfish, gluten, soya, sesame, lentils, honey, meat) plus any single food in the table. Cross-reactions and rarer allergens are not modelled. It errs on the side of leaving a food out.
 - It gives foods in general, not a diet plan. With diabetes, high blood pressure, anaemia, allergies or any condition, ask your doctor or a dietitian for your own plan; the chat's guard rails still apply to anything you ask about.

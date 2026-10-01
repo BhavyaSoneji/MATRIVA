@@ -167,3 +167,84 @@ def test_the_book_guide_file_parses_as_yaml_with_every_need_defined() -> None:
     for key, spec in needs.items():
         assert spec["label"] and spec["unit"], key
         assert spec["nutrient"] in allowance or spec.get("target"), key
+
+
+# ---- allergies (issue #93) ----------------------------------------------------------------------------------------------
+
+from app.services.care import allergens  # noqa: E402
+from app.services.care.meals import gaps  # noqa: E402
+
+# allergy as a person types it -> words that must never appear in a suggested food
+ALLERGY_CASES = {
+    "dairy": ["milk", "yogurt", "cottage cheese", "ghee"],
+    "lactose": ["milk", "yogurt", "cottage cheese", "ghee"],
+    "milk products": ["milk", "yogurt", "cottage cheese", "ghee"],
+    "fish": ["carp", "salmon", "sardine"],
+    "tree nuts": ["almond", "walnut", "cashew", "pistachio"],
+    "nuts": ["almond", "walnut", "cashew", "pistachio", "peanut"],
+    "peanut": ["peanut"],
+    "gluten": ["wheat", "bread", "oats"],
+    "wheat": ["wheat", "bread"],
+    "soya": ["soybean", "tofu"],
+    "sesame": ["sesame"],
+    "egg": ["egg (hard"],
+    "lentils": ["lentil"],
+    "I am allergic to milk": ["milk", "yogurt"],
+}
+
+
+@pytest.mark.parametrize("allergy", list(ALLERGY_CASES))
+def test_category_allergies_remove_every_food_in_the_category(allergy: str) -> None:
+    for need in foodguide.guide()["needs"]:
+        names = " | ".join(r["name"].lower() for r in foodguide.modern(need, None, [allergy])["foods"])
+        for word in ALLERGY_CASES[allergy]:
+            assert word not in names, (allergy, need, word, names)
+
+
+def test_allergies_match_whole_words_so_egg_keeps_eggplant_and_pea_keeps_chickpeas() -> None:
+    by_name = {f["name"]: f for f in foods().values()}
+    assert allergens.food_blocked(by_name["Egg (hard-boiled)"], allergens.resolve(["egg"]))
+    assert not allergens.food_blocked(by_name["Eggplant (baingan, cooked)"], allergens.resolve(["egg"]))
+    assert allergens.food_blocked(by_name["Green peas (matar, cooked)"], allergens.resolve(["pea"]))
+    assert not allergens.food_blocked(by_name["Chickpeas (chana)"], allergens.resolve(["pea"]))
+    assert not allergens.food_blocked(by_name["Almonds (badam)"], allergens.resolve(["peanut"]))
+    assert not allergens.food_blocked(by_name["Peanuts (moongphali, dry-roasted)"], allergens.resolve(["tree nuts"]))
+
+
+def test_a_single_food_allergy_is_matched_directly() -> None:
+    assert "mango" not in " ".join(r["name"].lower() for r in foodguide.modern("vitamin_c", None, ["mango"])["foods"])
+
+
+def test_an_allergy_that_cannot_be_matched_is_reported_not_ignored() -> None:
+    notes = foodguide.modern("protein", None, ["xyzzy"])["allergy_notes"]
+    assert notes and "xyzzy" in notes[0] and "check each food yourself" in notes[0]
+    assert foodguide.modern("protein", None, ["dairy"])["allergy_notes"] == ["Left out because of your allergies: milk and dairy."]
+    assert foodguide.modern("protein", None, [])["allergy_notes"] == []
+
+
+def test_the_books_regimen_respects_allergies_too() -> None:
+    assert any("milk" in f["text"].lower() for f in foodguide.traditional(1, None, [])["foods"])
+    t = foodguide.traditional(1, None, ["milk"])
+    assert not any(w in f["text"].lower() for f in t["foods"] for w in ("milk", "ghrta", "butter"))
+    assert t["skipped_for_allergy"] >= 1
+    # honey, meat and cereals are covered as well
+    assert not any("honey" in f["text"].lower() for f in foodguide.traditional(3, None, ["honey"])["foods"])
+    assert not any("meat" in f["text"].lower() for f in foodguide.traditional(4, None, ["meat"])["foods"])
+    assert not any("cereals" in f["text"].lower() for f in foodguide.traditional(9, None, ["gluten"])["foods"])
+
+
+def test_meal_suggestions_respect_allergies_the_same_way() -> None:
+    rows = gaps({}, None, ["dairy", "fish"])["suggestions"]
+    offered = " | ".join(f["name"].lower() for s in rows for f in s["foods"])
+    assert offered and not any(w in offered for w in ("milk", "yogurt", "cheese", "ghee", "carp", "salmon", "sardine"))
+
+
+def test_the_endpoint_applies_a_dairy_allergy_from_the_profile(client: TestClient, auth_headers: dict[str, str]) -> None:
+    _profile(client, auth_headers, "non_vegetarian", ["dairy"])
+    client.put("/care/dating", headers=auth_headers, json={"current_week": 2})  # month 1 has a milk entry
+    body = client.get("/care/food-guide?need=calcium", headers=auth_headers).json()
+    names = " ".join(f["name"].lower() for f in body["modern"]["foods"])
+    assert "milk" not in names and "yogurt" not in names and "ghee" not in names
+    assert not any("milk" in f["text"].lower() for f in body["traditional"]["foods"])
+    assert body["traditional"]["skipped_for_allergy"] >= 1
+    assert any("milk and dairy" in n for n in body["modern"]["allergy_notes"])

@@ -73,14 +73,14 @@ const GUIDE = {
     evidence_level: "traditional", month: 5, months_available: [1, 2, 3, 4, 5, 6, 7, 8, 9],
     foods: [{ authority: "Harita", text: "Payasa (rice cooked with milk and sweetened).", page: 136, paraphrased: false }],
     medicated: [{ authority: "Caraka", text: "Ghrta medicated with the drugs of madhura group.", page: 136 }],
-    procedures: [], skipped_for_diet: 1,
+    procedures: [], skipped_for_diet: 1, skipped_for_allergy: 1,
     medicated_note: "The book also describes milk, ghee or rice prepared with named herbs, and enemas. MATRIVA does not advise on them.",
     rationale: { page: "139-140", points: ["Cold and sweet liquid diet prevents dehydration."] },
     avoid: { page: "141-142", items: [{ authority: "Harita", text: "Pulses, garlic and onion.", page: 142, modern: "Dal is recommended by ICMR-NIN." }] },
   },
   modern: {
     needs: [{ id: "iron", label: "Iron", reason: "low haemoglobin" }, { id: "calcium", label: "Calcium", reason: "bones" }],
-    need: null, foods: [],
+    need: null, foods: [], allergy_notes: ["Left out because of your allergies: milk and dairy."],
   },
   avoid_modern: [{ name: "Raw eggs", why: "can carry salmonella", sources: [{ name: "NHS", url: "https://www.nhs.uk/" }] }],
   notes: ["Foods only. MATRIVA does not advise on medicines."],
@@ -122,6 +122,8 @@ test("what to eat: the book's month, the medicated preparations kept apart, and 
   await expect(page.getByText("Payasa (rice cooked with milk and sweetened).")).toBeVisible();
   await expect(page.getByText(/Harita · scanned p\. 136/)).toBeVisible();
   await expect(page.getByText(/1 more entry for this month use ingredients outside your diet/)).toBeVisible();
+  await expect(page.getByText(/1 entry for this month contain something you are allergic to/)).toBeVisible();
+  await expect(page.getByText("Left out because of your allergies: milk and dairy.")).toBeVisible();
   // the herb-medicated preparation is not shown as food: it sits in a collapsed "not advice" section
   await expect(page.getByText("Ghrta medicated with the drugs of madhura group.")).toBeHidden();
   await page.getByText(/Treatments the book also describes/).click();
