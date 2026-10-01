@@ -14,6 +14,9 @@ depends_on = None
 
 
 def upgrade() -> None:
+    bind = op.get_bind()
+    if "daily_wellness_logs" in sa.inspect(bind).get_table_names():
+        return
     op.create_table(
         "daily_wellness_logs",
         sa.Column("id", sa.String(length=32), primary_key=True),
