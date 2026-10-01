@@ -67,5 +67,30 @@ def test_approving_ingested_documents_activates_held_back_rows(client: TestClien
     assert len(res.json()["approved"]) == len(ids)
 
     with SessionLocal() as db:
-        assert db.query(FoodItem).filter(FoodItem.active.is_(True)).count() == 5
+        assert db.query(FoodItem).filter(FoodItem.active.is_(True)).count() == db.query(FoodItem).count()
         assert db.query(Guideline).filter(Guideline.status == "active").count() == 1
+
+
+def test_approved_seed_content_is_discoverable_by_natural_questions(client: TestClient, admin_headers: dict[str, str], monkeypatch) -> None:
+    """The content is only worth shipping if real questions find the right document."""
+    from app.rag.retrieval import retrieve_chunks_scored
+
+    monkeypatch.setattr(ingest_module, "embed_text", lambda text, api_key=None: None)
+    with SessionLocal() as db:
+        ingest_module.ingest_seed_yaml(db, api_key=None, dry_run=False)
+        ids = [d.id for d in db.query(KnowledgeDocument).all()]
+    assert client.post("/admin/documents/bulk-approve", headers=admin_headers, json={"ids": ids}).status_code == 200
+
+    expectations = {
+        "How much iron is in lentils?": "Lentils",
+        "What helps with morning sickness?": "Morning Sickness",
+        "Can I eat liver while pregnant?": "liver",
+        "How much folic acid should I take?": "Folic Acid",
+        "When should I call the midwife about contractions?": "Labour",
+        "How much caffeine is okay?": "Caffeine",
+    }
+    with SessionLocal() as db:
+        for question, expected in expectations.items():
+            hits, _mode = retrieve_chunks_scored(db, question, limit=5)
+            titles = [h.document.title for h in hits]
+            assert any(expected.lower() in t.lower() for t in titles), (question, titles)
