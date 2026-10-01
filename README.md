@@ -10,8 +10,8 @@
 Modern guidelines and classical Ayurveda, reconciled week by week. Every answer names its source, or says plainly that it can't.
 
 <p>
-<img alt="backend tests" src="https://img.shields.io/badge/backend_tests-378_passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white"/>
-<img alt="e2e" src="https://img.shields.io/badge/e2e-9_passing-2ea44f?style=for-the-badge&logo=playwright&logoColor=white"/>
+<img alt="backend tests" src="https://img.shields.io/badge/backend_tests-513_passing-2ea44f?style=for-the-badge&logo=pytest&logoColor=white"/>
+<img alt="e2e" src="https://img.shields.io/badge/e2e-12_passing-2ea44f?style=for-the-badge&logo=playwright&logoColor=white"/>
 <img alt="vulnerabilities" src="https://img.shields.io/badge/npm_audit-0_vulnerabilities-2ea44f?style=for-the-badge&logo=npm&logoColor=white"/>
 </p>
 <p>
@@ -28,6 +28,7 @@ Modern guidelines and classical Ayurveda, reconciled week by week. Every answer 
 <p>
 <img alt="offline" src="https://img.shields.io/badge/RAG-works_offline,_no_API_key-8A2BE2?style=flat-square"/>
 <img alt="languages" src="https://img.shields.io/badge/languages-English_·_हिन्दी_·_ગુજરાતી-FF8C00?style=flat-square"/>
+<img alt="guard rails" src="https://img.shields.io/badge/guard_rails-1,231_rules-2ea44f?style=flat-square"/>
 <img alt="clinical review" src="https://img.shields.io/badge/clinical_review-pending-E5484D?style=flat-square"/>
 </p>
 
@@ -50,12 +51,15 @@ Everything lives in **one chat window**. Ask in your own words, tap a sidebar sh
 | 💚 | `/checkin` | Mood, symptoms, baby movement, iron tablet (20 seconds) | Streaks, reminders, and an immediate warning card if an answer is a danger sign |
 | 🛡️ | `/check` | Yes/no questions filtered by your week | **Emergency / urgent / soon** outcome with one-tap **112**, your emergency contact and a hospital map link |
 | 🩸 | `/readings` | Hb, BP, weight, sugar — typed, pasted from a report, or photographed | Trend chart and flags that cite their source (WHO Hb < 11; BP 140/90 and 160/110) |
+| 🥗 | `/foods` | Nothing (uses your week and diet) | What to eat this month **from the Prasuti Tantra** (quoted, with authority and page, labelled traditional), and the foods richest in iron, calcium, protein and more, with a vegetarian, vegan and allergy filter. Foods only, never medicines |
 | 🍛 | `/meals` | "2 roti, 1 katori dal, curd" | Approximate nutrients vs a pregnancy day, and vegetarian/allergy-aware foods to close the gaps |
 | 📄 | `/summary` | Nothing — built from the above | One printable page for your doctor, with questions you may want to ask |
 | 📖 | `/book` | A term, e.g. *stanya* | The **Prasuti Tantra** book by chapter, authorities cited, bilingual glossary |
 | 🕸️ | `/map` | The last question asked | How the topics in the answer connect (knowledge graph) |
 | 🥗 | `/nutrition` `/ayurveda` `/lifestyle` | — | Cited answers for your trimester, with related videos and articles |
 | 📚 | `/library` `/evidence` | — | ~85 live-verified videos, NHS/WHO/ACOG/Govt. of India pages and PubMed papers |
+
+**It never advises on medicines.** Ask *"can I take paracetamol?"* and MATRIVA will not say yes, give a dose, or suggest a tablet: it explains why and sends you to your doctor. The same goes for herbs, Ayurvedic products, stopping or changing a prescribed medicine, home abortion or induction, finding out the baby's sex (illegal under the PCPNDT Act) and anyone asking it to act as a doctor. Emergencies (heavy bleeding, baby not moving, seizure, thoughts of ending your life) go straight to 112 and the right helpline. Details: [`docs/guardrails.md`](./docs/guardrails.md).
 
 Just chatting works too: saying *"my Hb is 9.8"* or *"I ate 2 roti and dal"* records it (with consent; questions are never recorded).
 
@@ -144,6 +148,8 @@ A scanned, bilingual copy of **Prasuti Tantra** was OCR'd, its English prose ext
 
 ## 🛡️ Safety by design
 
+**1,231 guard-rail rules**, each with a source, in English, Hinglish, हिन्दी and ગુજરાતી: 918 medicines (including Indian brand names and typos), 205 herbs, foods and exposures, 44 rules tied to your own conditions, 28 warning signs, 15 standing reminders, 9 request rules and 12 checks on the bot's own answer. Tell MATRIVA your conditions, medicines, allergies, age and blood group in Settings and the warnings become personal: a headache is an emergency if you have high blood pressure; a penicillin allergy is called out. Nothing is sent to an AI model.
+
 ```mermaid
 flowchart TB
     subgraph Rules["Independent of any LLM"]
@@ -155,6 +161,7 @@ flowchart TB
     D --> E[Never an unrestricted medical answer]
 ```
 
+- 🔒 **Medicine questions are never answered.** Not even paracetamol; not a dose, not "safe to take". Cautions go in front of an ordinary answer, and the rule behind each one is one click away with its source.
 - 🚫 Safety is its **own module**, never delegated to a language model; if it fails, the system **fails closed**.
 - 🏷️ Ayurvedic content is always labelled *traditional* and never presented as modern evidence.
 - 🧱 Retrieved text is **data, never instructions** (prompt-injection defence).
@@ -207,10 +214,10 @@ A modular monolith **on purpose**: RAG, safety, API, ingestion and evaluation ar
 
 | Suite | Result |
 |---|---|
-| Backend (unit, integration, RAG, care features) | **378 passing** |
+| Backend (unit, integration, RAG, care features, guard rails) | **513 passing** |
 | Ingestion | **43 passing** |
 | Evaluation harnesses | **36 passing** |
-| Frontend end-to-end (Playwright, mocked API) | **9 passing** |
+| Frontend end-to-end (Playwright, mocked API) | **12 passing** |
 | Lint · type-check · production build | clean |
 | `npm audit` (production) | **0 vulnerabilities** |
 
@@ -295,9 +302,9 @@ matriva/
 │   ├── app/api/              auth, profile, chat, care, knowledge, admin, privacy, feedback …
 │   ├── app/rag/local/        offline engine: index, semantic, graph, retriever, composer, book
 │   ├── app/services/care/    dating, plan, screening, tracking, readings, meals, summary, privacy
-│   ├── app/safety/           classifier, post-check, prompt-injection defence
-│   ├── app/data/             ontology.yaml, care_rules.yaml, foods_nutrients.json, book_index.json, library.yaml
-│   └── tests/                378 tests
+│   ├── app/safety/           classifier, post-check, prompt-injection defence, guardrails/ (1,231-rule engine)
+│   ├── app/data/             ontology.yaml, care_rules.yaml, guardrails/ (rule files), foods_nutrients.json, book_index.json, library.yaml
+│   └── tests/                513 tests
 ├── ingestion/                OCR, chunking, book-structure recovery
 ├── evaluation/               retrieval / generation / safety / hallucination harnesses + held-out sets
 ├── knowledge/                seed guidelines, foods, Ayurveda source, resource library builder
@@ -312,8 +319,9 @@ matriva/
 |---|---|
 | [📝 Tech blog](./docs/TECH_BLOG.md) | How and why it was built, with what worked and what didn't |
 | [🔎 Local RAG](./docs/local-rag.md) | The offline engine, ablations, held-out results |
+| [🥗 What to eat](./docs/food-guide.md) | The book's month-wise regimen and nutrient food lists |
 | [🩺 Care features](./docs/care-features.md) | Inputs, user journey, limits, suggested pilot |
-| [🛡️ Safety](./docs/safety.md) · [⚖️ Compliance](./docs/COMPLIANCE.md) | Safety model and policy alignment |
+| [🔒 Guard rails](./docs/guardrails.md) · [🛡️ Safety](./docs/safety.md) · [⚖️ Compliance](./docs/COMPLIANCE.md) | The 1,231 rules, how a question is checked, and policy alignment |
 | [🏛️ Architecture](./docs/architecture.md) · [🔌 API](./docs/api.md) · [🚢 Deployment](./docs/deployment.md) | Engineering reference |
 | [📋 Features](./docs/FEATURES.md) · [🗓️ Progress log](./PROGRESS.md) | Scope and history |
 | [🏆 Submission](./docs/SUBMISSION.md) · [🖥️ Frontend](./frontend/README.md) · [🌱 Seed data](./database/seed/README.md) | Round 1 write-up, frontend setup, demo seed |
@@ -323,6 +331,7 @@ matriva/
 ## ⚠️ Honest limits
 
 - **Not clinically reviewed.** Every threshold, schedule and screening question cites a source (WHO, FOGSI, ICMR-NIN, NHS) and is marked `pending_clinical_review` in [`care_rules.yaml`](./backend/app/data/care_rules.yaml). A clinician must review it before real use. The Hindi and Gujarati warning phrases need native-speaker review.
+- **The guard rails are not clinically verified.** The 1,231 rules were written from public pregnancy-safety knowledge and each names the reference it is consistent with; nobody has yet checked each rule line by line against its reference, and no clinician or pharmacist has signed them off. They err towards "ask your doctor". Unlisted brand names, heavy misspelling, and a medicine described without a name are not recognised. See [`docs/guardrails.md`](./docs/guardrails.md#honest-limits).
 - **Approved on instruction, not by a reviewer.** The book and seeded guidelines were approved so answers could flow; they are flagged as not clinically reviewed.
 - **The book OCR is imperfect.** Only English prose is used and damaged passages are not quoted.
 - **Nutrient numbers are estimates** — USDA per-100g data and everyday portions (a *katori*, a roti).

@@ -11,11 +11,15 @@ What MATRIVA asks for, how a mother uses it, and what she gets back. All of it i
 | `/check` | Yes/no questions filtered by week | Emergency / urgent / soon outcome with one-tap 112, her emergency contact, and a hospital map link |
 | `/readings` | Hb, BP, weight, sugar by hand, pasted report text, or a photo (needs `tesseract` on the server) | Trend chart and sourced flags (WHO Hb < 11; BP 140/90 and 160/110). Parsed values are shown for confirmation before saving |
 | `/meals` | Free text: "2 roti, 1 katori dal, curd" | Approximate nutrients vs a pregnancy day, and vegetarian/allergy-aware foods to close gaps |
+| `/foods` | Nothing (uses your week, diet and allergies) | What to eat this month from the Prasuti Tantra (traditional, quoted with authority and page) and the foods richest in a nutrient. Foods only: see [`food-guide.md`](./food-guide.md) |
 | `/summary` | None (built from the above) | One printable page for the doctor, with questions she may want to ask |
 | `/book` | A term, e.g. *stanya* | The Prasuti Tantra by chapter, authorities cited, bilingual glossary |
 | `/map` | The last question asked | How the topics in the answer connect |
 
 Saying "my Hb is 9.8" or "I ate 2 roti and dal" in plain chat records it too (requires consent; questions are never recorded).
+
+## Your safety profile
+In Settings, you can tell MATRIVA your health conditions, the medicines you take now, allergies, pregnancy history (twins, previous caesarean, preterm birth, miscarriage or stillbirth), age and blood group. All optional. MATRIVA uses them only to warn you better: see [`guardrails.md`](./guardrails.md). The medicines and conditions also appear on the summary for your doctor.
 
 ## Limits to know
 - Thresholds and screening rules are sourced, but marked `pending_clinical_review` in `backend/app/data/care_rules.yaml`. A clinician must review them before real use.

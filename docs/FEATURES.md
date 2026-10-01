@@ -123,11 +123,14 @@ Knowledge management · Evaluation dashboard
 - `/check`: structured red-flag screening with emergency / urgent / soon triage, 112, emergency contact
 - `/readings`: Hb, BP, weight, sugar; typed, pasted report or photo (OCR); sourced flags and trend
 - `/meals`: free-text meal log, USDA nutrients vs a pregnancy day, diet/allergy-aware suggestions
+- `/foods`: what to eat this month, from the book's month-wise regimen (traditional) and by nutrient (USDA values, NIH allowance); foods only ([`food-guide.md`](./food-guide.md))
 - `/summary`: printable one-page doctor summary
 - `/book` and `/map`: Prasuti Tantra browser and concept graph
 - Chat records readings and meals from plain statements (with consent)
 - English / हिन्दी / ગુજરાતી, voice in and out, mobile-first
 - All care data is consent-gated, exportable and purged on consent withdrawal or deletion
+- Guard rails: 1,231 sourced rules covering medicines, herbs, foods, exposures, warning signs, risky requests and the person's own conditions, plus a check on the bot's own answer; never advises on a medicine ([`guardrails.md`](./guardrails.md))
+- Safety profile in Settings: conditions, current medicines, allergies, pregnancy history, age, blood group
 
 ## Ownership (see `.github/CODEOWNERS`)
 | Area | Owner |

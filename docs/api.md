@@ -32,6 +32,8 @@ time-limited, issuer/audience checked, and never contain profile or health data.
 | `GET` | `/privacy/export` | Export the caller's data as JSON |
 | `DELETE` | `/privacy/account` | Delete the account and associated data |
 
+The profile also carries the safety profile used by the guard rails: `known_conditions`, `current_medications`, `allergies`, `risk_factors` (codes from `backend/app/data/guardrails/conditions.yaml`), `age_years` and `blood_group` (`A+`, `O-`...). `PUT /profile` replaces the whole profile, so send every field you want to keep.
+
 A chat message never silently updates the permanent profile. Session context is stored only
 on the conversation.
 
@@ -49,7 +51,7 @@ on the conversation.
 | `POST` | `/feedback` | Rate a message or recommendation |
 
 The chat response contains `answer`, `intent`, `safety_status`, `sources`, `citations`,
-`evidence`, and `recommendations`. If the safety subsystem, retrieval layer, or source set is
+`evidence`, `recommendations` and `suggestions`. `evidence.guardrails` lists the guard-rail rules that applied (id, kind, action, title, the phrase that matched, and sources with links). A caution is a line beginning `⚠️` at the start of `answer`. If the safety subsystem, retrieval layer, or source set is
 unavailable, the service returns a safe fallback or `503`; it never returns an unrestricted
 medical answer.
 
@@ -75,6 +77,7 @@ come from `backend/app/data/care_rules.yaml`, each with a source and
 | `DELETE` | `/care/meals/{id}` | Delete a meal |
 | `GET` | `/care/screening/questions` | Red-flag questions filtered by week |
 | `POST` | `/care/screening/assess` | Triage result: emergency / urgent / soon, with sources |
+| `GET` | `/care/food-guide` | The book's food regimen for this month and, with `?need=iron`, the foods richest in a nutrient; respects diet and allergies |
 | `GET` | `/care/summary` | One-page doctor summary |
 | `PUT` / `GET` / `DELETE` | `/care/emergency-contact` | Manage the emergency contact |
 

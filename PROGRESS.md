@@ -19,6 +19,38 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-01 — @neevmodh — What to eat (`/foods`), from the book
+
+- New `GET /care/food-guide` and a `/foods` card: the Prasuti Tantra month-wise dietary regimen (chapter 5, scanned
+  pages 135-142) for the month of pregnancy, each entry with its authority and scanned page and labelled traditional,
+  plus the foods richest in a chosen nutrient (USDA values per everyday serving, NIH allowance), the foods to avoid
+  (from the guard rails, with sources) and what the book lists as unsuitable, noting where modern guidance differs.
+- Foods only: herb-medicated preparations and enemas the book describes are kept in a collapsed "not food, not advice"
+  section. Vegetarian, vegan and allergy filters apply; liver is never suggested; B12 for a vegan goes to a doctor.
+- A test checks that every quoted entry appears in the OCR text of the book. Fixed a flaw in the meal suggestions
+  too: dry grains and seeds now use a realistic dry serving, so oats and amaranth no longer look far richer in iron.
+- Status: done. Notes: traditional content is not modern evidence and nothing here is clinically reviewed.
+
+### 2026-10-01 — @neevmodh — Guard rails: 1,231 sourced rules, personal warnings, output check
+
+- New `backend/app/safety/guardrails/` engine with rules as data (`backend/app/data/guardrails/*.yaml`):
+  918 medicines (one rule per drug, with Indian brand names and typo tolerance), 205 herbs, foods and
+  exposures, 44 rules tied to the person's own conditions, 28 warning signs, 15 standing reminders,
+  9 request rules, 12 output checks; about 9,700 trigger phrases in English, Hinglish, Hindi and Gujarati.
+- The chat never advises on a medicine (no yes, no dose, no brand), refuses home abortion and induction
+  and sex determination (PCPNDT), escalates emergencies with 112/102/Tele-MANAS/181, and puts cautions in
+  front of an ordinary answer. The same rules run on `/chat` and `/chat/stream`. A final check replaces any
+  answer that gives a dose, calls a medicine safe, diagnoses, or falsely reassures.
+- New profile inputs (migration `0005_safety_profile`): current medicines, risk factors, age, blood group;
+  used only by the rules, consent-gated, exported and purged with the profile, shown on the doctor summary.
+  Settings page gets a Safety profile section and no longer erases fields it does not show.
+- The chat shows each caution as a callout and, one click away, the rule that applied and its source.
+- Tests: backend 378 → 513 (including a check that no ordinary benchmark question is blocked); Playwright 9 → 12.
+- Status: done. Notes: the rules are **not clinically verified**. They were written from public
+  pregnancy-safety knowledge; each names the reference it is consistent with, but nobody has checked each
+  rule against that reference and no clinician or pharmacist has signed them off. Hindi and Gujarati text
+  still needs native-speaker review.
+
 ### 2026-10-01 — @neevmodh — Documentation refresh
 
 - Brought `docs/api.md` (care, wellness, resources, stream, book/graph routes), `architecture.md`

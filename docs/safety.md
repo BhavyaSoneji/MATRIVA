@@ -12,6 +12,10 @@ reviewed, and manageable by administrators.
 The pre-check understands English, Hindi, Hinglish and Gujarati red-flag phrases. The Hindi and
 Gujarati wording still needs native-speaker review.
 
+## Guard rails
+
+Before any retrieval, a rule engine of 1,231 rules checks the question for medicines (918), herbs, foods and exposures (205), warning signs, risky requests (a dose, which medicine to take, stopping a medicine, a home abortion, the baby's sex) and what the person has told us about their own conditions, medicines and allergies. It escalates emergencies, refuses medicine advice, and puts cautions in front of an ordinary answer. A second check on the answer itself replaces any answer that gives a dose, calls a medicine safe, diagnoses, or falsely reassures. Details, the full rule list and the limits are in [`guardrails.md`](./guardrails.md).
+
 ## Structured screening
 
 Separately from chat, `/care/screening` asks about 20 yes/no questions filtered by the week of
