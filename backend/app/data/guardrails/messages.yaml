@@ -1,0 +1,30 @@
+# Shared wording. Hindi and Gujarati are written for clarity and still need native-speaker review (issue #91).
+messages:
+  emergency:
+    en: "This is an emergency. Call 112 now (or 102 for an ambulance) or go to the nearest hospital with maternity care, where a medical professional can see you. Do not wait for a reply here."
+    hi: "यह आपात स्थिति है। अभी 112 पर कॉल करें (एम्बुलेंस के लिए 102) या प्रसूति सुविधा वाले नज़दीकी अस्पताल जाएँ, जहाँ चिकित्सा पेशेवर आपको देख सकें। यहाँ जवाब का इंतज़ार न करें।"
+    gu: "આ કટોકટી છે. હમણાં જ 112 પર કૉલ કરો (એમ્બ્યુલન્સ માટે 102) અથવા પ્રસૂતિ સુવિધા ધરાવતી નજીકની હૉસ્પિટલમાં જાઓ, જ્યાં તબીબી વ્યાવસાયિક તમને જોઈ શકે. અહીં જવાબની રાહ ન જુઓ."
+  same_day:
+    en: "Please call your doctor or go to your maternity unit today. If it gets worse or you feel unwell, call 112."
+    hi: "कृपया आज ही अपने डॉक्टर को फ़ोन करें या प्रसूति इकाई जाएँ। हालत बिगड़े या तबीयत ठीक न लगे तो 112 पर कॉल करें।"
+    gu: "કૃપા કરીને આજે જ તમારા ડૉક્ટરને ફોન કરો અથવા પ્રસૂતિ યુનિટમાં જાઓ. સ્થિતિ બગડે અથવા સારું ન લાગે તો 112 પર કૉલ કરો."
+  mental_health:
+    en: "You are not alone. Please talk to someone now: Tele-MANAS 14416 (free, 24x7, many languages). If you are in immediate danger, call 112."
+    hi: "आप अकेली नहीं हैं। कृपया अभी किसी से बात करें: Tele-MANAS 14416 (मुफ़्त, 24x7, कई भाषाओं में)। तुरंत ख़तरा हो तो 112 पर कॉल करें।"
+    gu: "તમે એકલા નથી. કૃપા કરીને હમણાં કોઈની સાથે વાત કરો: Tele-MANAS 14416 (મફત, 24x7, ઘણી ભાષાઓમાં). તાત્કાલિક જોખમ હોય તો 112 પર કૉલ કરો."
+  violence:
+    en: "If someone is hurting you or you feel unsafe at home, call the Women Helpline 181 or 112. Your safety and your baby's come first."
+    hi: "अगर कोई आपको चोट पहुँचा रहा है या घर पर आप सुरक्षित महसूस नहीं करतीं, तो महिला हेल्पलाइन 181 या 112 पर कॉल करें। आपकी और आपके बच्चे की सुरक्षा सबसे पहले है।"
+    gu: "જો કોઈ તમને ઇજા પહોંચાડે છે અથવા ઘરે તમે સુરક્ષિત અનુભવતા નથી, તો મહિલા હેલ્પલાઇન 181 અથવા 112 પર કૉલ કરો. તમારી અને તમારા બાળકની સુરક્ષા સૌથી પહેલા છે."
+  doctor_footer:
+    en: "I'm not a doctor and can't prescribe or advise on medicines. Please talk to your doctor, or the ANM/ASHA at your health centre. In an emergency call 112."
+    hi: "मैं डॉक्टर नहीं हूँ और दवाओं पर सलाह या पर्चा नहीं दे सकती। कृपया अपने डॉक्टर या स्वास्थ्य केंद्र की ANM/आशा से बात करें। आपात स्थिति में 112 पर कॉल करें।"
+    gu: "હું ડૉક્ટર નથી અને દવાઓ અંગે સલાહ કે પ્રિસ્ક્રિપ્શન આપી શકતી નથી. કૃપા કરીને તમારા ડૉક્ટર અથવા આરોગ્ય કેન્દ્રના ANM/આશા સાથે વાત કરો. કટોકટીમાં 112 પર કૉલ કરો."
+  output_blocked:
+    en: "I can't give that answer safely: it may contain medicine advice, a diagnosis or a promise I can't back up. Please ask your doctor. In an emergency call 112."
+    hi: "मैं यह जवाब सुरक्षित रूप से नहीं दे सकती: इसमें दवा की सलाह, निदान या ऐसा वादा हो सकता है जिसे मैं पूरा नहीं कर सकती। कृपया अपने डॉक्टर से पूछें। आपात स्थिति में 112 पर कॉल करें।"
+    gu: "હું આ જવાબ સુરક્ષિત રીતે આપી શકતી નથી: તેમાં દવાની સલાહ, નિદાન અથવા એવું વચન હોઈ શકે જે હું પૂરું કરી શકતી નથી. કૃપા કરીને તમારા ડૉક્ટરને પૂછો. કટોકટીમાં 112 પર કૉલ કરો."
+  info_urgent:
+    en: "If this is happening to you now, get medical help straight away; in an emergency call 112."
+    hi: "अगर यह अभी आपके साथ हो रहा है, तो तुरंत चिकित्सा मदद लें; आपात स्थिति में 112 पर कॉल करें।"
+    gu: "જો આ હમણાં તમારી સાથે થઈ રહ્યું હોય, તો તરત તબીબી મદદ લો; કટોકટીમાં 112 પર કૉલ કરો."

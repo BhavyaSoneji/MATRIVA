@@ -183,6 +183,8 @@ class SafetyDecision:
     matched_rule_ids: list[str] = field(default_factory=list)
     response: str | None = None
     reason: str = "No configured safety rule matched"
+    guardrails: tuple[dict, ...] = ()  # public view of the guard-rail rules that matched (id, kind, action, sources)
+    notices: tuple[str, ...] = ()  # cautions to put in front of an ordinary answer
 
 
 URGENT_TERMS = {

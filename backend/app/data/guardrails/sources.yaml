@@ -1,0 +1,43 @@
+# Where each rule's claim comes from. Links go to the issuing body's page (or its site root when a stable deep link
+# is not certain). Nothing here has been signed off by a clinician; see review_status in the README.
+sources:
+  nhs-medicines: {name: "NHS - Medicines in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/medicines/"}
+  nhs-foods: {name: "NHS - Foods to avoid in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/foods-to-avoid/"}
+  nhs-alcohol: {name: "NHS - Alcohol in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/alcohol-and-pregnancy/"}
+  nhs-smoking: {name: "NHS - Stop smoking in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/stop-smoking/"}
+  nhs-exercise: {name: "NHS - Exercise in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/exercise/"}
+  nhs-movements: {name: "NHS - Your baby's movements", url: "https://www.nhs.uk/pregnancy/keeping-well/your-babys-movements/"}
+  nhs-bleeding: {name: "NHS - Vaginal bleeding in pregnancy", url: "https://www.nhs.uk/pregnancy/related-conditions/common-symptoms/vaginal-bleeding/"}
+  nhs-preeclampsia: {name: "NHS - Pre-eclampsia", url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+  nhs-gdm: {name: "NHS - Gestational diabetes", url: "https://www.nhs.uk/conditions/gestational-diabetes/"}
+  nhs-cholestasis: {name: "NHS - Obstetric cholestasis", url: "https://www.nhs.uk/conditions/obstetric-cholestasis/"}
+  nhs-dvt: {name: "NHS - Deep vein thrombosis", url: "https://www.nhs.uk/conditions/deep-vein-thrombosis-dvt/"}
+  nhs-miscarriage: {name: "NHS - Miscarriage", url: "https://www.nhs.uk/conditions/miscarriage/"}
+  nhs-ectopic: {name: "NHS - Ectopic pregnancy", url: "https://www.nhs.uk/conditions/ectopic-pregnancy/"}
+  nhs-pregnancy: {name: "NHS - Pregnancy", url: "https://www.nhs.uk/pregnancy/"}
+  nhs-labour: {name: "NHS - Labour and birth", url: "https://www.nhs.uk/pregnancy/labour-and-birth/"}
+  nhs-travel: {name: "NHS - Travelling in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/travelling/"}
+  fda-nsaid: {name: "US FDA - Avoid NSAIDs at 20 weeks or later in pregnancy (2020)", url: "https://www.fda.gov/drugs/drug-safety-and-availability/fda-recommends-avoiding-use-nsaids-pregnancy-20-weeks-or-later-because-they-can-result-problems"}
+  fda-labeling: {name: "US FDA - Pregnancy and lactation drug labelling", url: "https://www.fda.gov/drugs/labeling-information-drug-products/pregnancy-and-lactation-labeling-drugs-final-rule"}
+  fda-fish: {name: "US FDA - Advice about eating fish", url: "https://www.fda.gov/food/consumers/advice-about-eating-fish"}
+  acog: {name: "ACOG - Patient and clinical guidance", url: "https://www.acog.org/"}
+  cdc-pregnancy: {name: "CDC - Pregnancy", url: "https://www.cdc.gov/pregnancy/"}
+  cdc-listeria: {name: "CDC - Listeria", url: "https://www.cdc.gov/listeria/"}
+  mothertobaby: {name: "MotherToBaby (OTIS) - Medication fact sheets", url: "https://mothertobaby.org/fact-sheets/"}
+  who-anc: {name: "WHO - Recommendations on antenatal care for a positive pregnancy experience (2016)", url: "https://www.who.int/publications/i/item/9789241549912"}
+  who-alcohol: {name: "WHO - Alcohol", url: "https://www.who.int/health-topics/alcohol"}
+  who-tobacco: {name: "WHO - Tobacco", url: "https://www.who.int/health-topics/tobacco"}
+  nice-hypertension: {name: "NICE NG133 - Hypertension in pregnancy", url: "https://www.nice.org.uk/guidance/ng133"}
+  rcog: {name: "RCOG - Patient information and green-top guidelines", url: "https://www.rcog.org.uk/"}
+  fogsi: {name: "FOGSI - Good clinical practice recommendations", url: "https://www.fogsi.org/"}
+  mohfw: {name: "MoHFW (India) - Antenatal care and safe motherhood guidance", url: "https://main.mohfw.gov.in/"}
+  nhm: {name: "National Health Mission - PMSMA, JSSK and maternal health", url: "https://nhm.gov.in/"}
+  icmr-nin: {name: "ICMR-NIN - Dietary guidelines for Indians", url: "https://www.nin.res.in/"}
+  ayush: {name: "Ministry of AYUSH", url: "https://ayush.gov.in/"}
+  mtp-act: {name: "Medical Termination of Pregnancy Act, 1971 (amended 2021)", url: "https://www.indiacode.nic.in/"}
+  pcpndt: {name: "Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994", url: "https://www.indiacode.nic.in/"}
+  tele-manas: {name: "Tele-MANAS (Govt. of India mental-health helpline 14416)", url: "https://telemanas.mohfw.gov.in/"}
+  helpline-181: {name: "Women Helpline 181 (Ministry of Women and Child Development)", url: "https://wcd.nic.in/"}
+  erss-112: {name: "Emergency Response Support System 112", url: "https://112.gov.in/"}
+  cdc-vaccines: {name: "CDC - Vaccines during pregnancy", url: "https://www.cdc.gov/vaccines/pregnancy/"}
+  nhs-vaccines: {name: "NHS - Vaccinations in pregnancy", url: "https://www.nhs.uk/pregnancy/keeping-well/vaccinations/"}

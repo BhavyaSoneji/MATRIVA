@@ -1,0 +1,46 @@
+# Canonical conditions and risk factors the guard rails reason about. A person's free-text entries are mapped to
+# these codes through the aliases (matched as whole words). Adding an alias widens the net; it never narrows it.
+conditions:
+  hypertension: {label: "high blood pressure", aliases: ["hypertension", "high blood pressure", "high bp", "bp problem", "gestational hypertension", "chronic hypertension", "pregnancy induced hypertension", "pih", "blood pressure"]}
+  preeclampsia: {label: "pre-eclampsia", aliases: ["preeclampsia", "pre eclampsia", "eclampsia", "toxemia", "toxaemia"]}
+  gestational_diabetes: {label: "gestational diabetes", aliases: ["gestational diabetes", "gdm", "sugar in pregnancy", "pregnancy diabetes"]}
+  diabetes: {label: "diabetes", aliases: ["diabetes", "diabetic", "type 1 diabetes", "type 2 diabetes", "sugar patient", "high sugar", "insulin"]}
+  thyroid: {label: "thyroid disease", aliases: ["thyroid", "hypothyroid", "hypothyroidism", "hyperthyroid", "hyperthyroidism", "hashimoto", "graves"]}
+  epilepsy: {label: "epilepsy", aliases: ["epilepsy", "epileptic", "seizure disorder", "fits disorder"]}
+  asthma: {label: "asthma", aliases: ["asthma", "wheezing"]}
+  anaemia: {label: "anaemia", aliases: ["anaemia", "anemia", "low hemoglobin", "low haemoglobin", "low hb", "iron deficiency"]}
+  heart_disease: {label: "heart disease", aliases: ["heart disease", "heart problem", "cardiac", "valve", "rheumatic heart", "cardiomyopathy", "arrhythmia"]}
+  kidney_disease: {label: "kidney disease", aliases: ["kidney disease", "kidney problem", "renal", "ckd", "nephritis", "kidney stone"]}
+  liver_disease: {label: "liver disease", aliases: ["liver disease", "hepatitis", "liver problem", "fatty liver", "cirrhosis"]}
+  placenta_previa: {label: "placenta praevia", aliases: ["placenta previa", "placenta praevia", "low lying placenta", "low placenta"]}
+  cervical_insufficiency: {label: "cervical insufficiency", aliases: ["cervical insufficiency", "incompetent cervix", "cerclage", "short cervix", "weak cervix"]}
+  twins: {label: "twins or more", aliases: ["twins", "twin pregnancy", "triplets", "multiple pregnancy"]}
+  prev_cesarean: {label: "previous caesarean", aliases: ["previous cesarean", "previous caesarean", "c section", "csection", "previous c section", "lscs"]}
+  prev_preterm: {label: "previous preterm birth", aliases: ["preterm birth", "premature birth", "previous preterm", "premature delivery"]}
+  prev_miscarriage: {label: "previous miscarriage", aliases: ["miscarriage", "recurrent miscarriage", "abortion history", "previous miscarriage", "threatened miscarriage", "threatened abortion"]}
+  hiv: {label: "HIV", aliases: ["hiv", "aids"]}
+  hepatitis_b: {label: "hepatitis B", aliases: ["hepatitis b", "hbsag", "hep b"]}
+  hepatitis_c: {label: "hepatitis C", aliases: ["hepatitis c", "hep c"]}
+  tuberculosis: {label: "tuberculosis", aliases: ["tuberculosis", "tb", "pulmonary tb"]}
+  pcos: {label: "PCOS", aliases: ["pcos", "pcod", "polycystic"]}
+  depression: {label: "depression or anxiety", aliases: ["depression", "anxiety", "panic attacks", "bipolar", "mental illness", "postpartum depression"]}
+  sickle_cell: {label: "sickle cell disease or trait", aliases: ["sickle cell", "sickle"]}
+  thalassemia: {label: "thalassaemia", aliases: ["thalassemia", "thalassaemia", "thalassemia trait", "thalassemia minor"]}
+  obesity: {label: "obesity", aliases: ["obesity", "obese", "overweight", "high bmi"]}
+  clotting: {label: "a clotting disorder", aliases: ["clotting disorder", "blood clot", "thrombophilia", "antiphospholipid", "dvt", "deep vein thrombosis", "factor v leiden"]}
+  lupus: {label: "lupus or autoimmune disease", aliases: ["lupus", "sle", "autoimmune", "rheumatoid", "arthritis"]}
+  gerd: {label: "acid reflux", aliases: ["gerd", "acid reflux", "acidity", "heartburn"]}
+  migraine: {label: "migraine", aliases: ["migraine"]}
+  uti: {label: "urinary infection", aliases: ["uti", "urinary infection", "urine infection"]}
+risk_factors:
+  twins: {label: "Expecting twins or more"}
+  previous_cesarean: {label: "Previous caesarean section"}
+  previous_preterm_birth: {label: "Previous preterm birth"}
+  previous_miscarriage: {label: "Previous miscarriage"}
+  previous_stillbirth: {label: "Previous stillbirth"}
+  rh_negative: {label: "Rh-negative blood group"}
+  smoker: {label: "Smokes or chews tobacco"}
+  drinks_alcohol: {label: "Drinks alcohol"}
+  ivf: {label: "Pregnancy through IVF or fertility treatment"}
+  age_under_18: {label: "Under 18 (set from age)"}
+  age_35_plus: {label: "35 or older (set from age)"}

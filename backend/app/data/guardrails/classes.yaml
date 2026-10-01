@@ -1,0 +1,72 @@
+# Message templates by class. {name} is the medicine or substance, {why} the reason on the rule.
+classes:
+  contraindicated:
+    action: block
+    default_why: "it can harm a developing baby"
+    message: "{name} is known to harm a developing baby and is not meant to be used in pregnancy ({why}). I can't advise on it. If you have taken it, or someone prescribed it to you, please call your doctor today, and do not stop any other prescribed medicine on your own."
+    localized:
+      hi: "{name} विकसित हो रहे बच्चे को नुकसान पहुँचाने के लिए जानी जाती है और गर्भावस्था में इस्तेमाल के लिए नहीं है। मैं इस पर सलाह नहीं दे सकती। अगर आपने यह ली है या किसी ने लिखी है, तो आज ही अपने डॉक्टर को बताएँ, और कोई और निर्धारित दवा अपने आप बंद न करें।"
+      gu: "{name} વિકસતા બાળકને નુકસાન પહોંચાડવા માટે જાણીતી છે અને ગર્ભાવસ્થામાં વાપરવા માટે નથી. હું તેના પર સલાહ આપી શકતી નથી. જો તમે તે લીધી હોય અથવા કોઈએ લખી આપી હોય, તો આજે જ તમારા ડૉક્ટરને જણાવો, અને બીજી કોઈ સૂચવેલી દવા જાતે બંધ ન કરો."
+  avoid:
+    action: block
+    default_why: "doctors usually advise against it in pregnancy"
+    message: "Doctors usually advise avoiding {name} in pregnancy ({why}). I can't advise on medicines: only your doctor can decide, based on your health and how many weeks pregnant you are. Please don't take it, or stop it, on your own."
+    localized:
+      hi: "डॉक्टर आमतौर पर गर्भावस्था में {name} से बचने की सलाह देते हैं। मैं दवाओं पर सलाह नहीं दे सकती: यह फ़ैसला केवल आपका डॉक्टर आपकी सेहत और गर्भ के हफ़्तों के आधार पर कर सकता है। कृपया इसे अपने आप न लें और न बंद करें।"
+      gu: "ડૉક્ટર સામાન્ય રીતે ગર્ભાવસ્થામાં {name} ટાળવાની સલાહ આપે છે. હું દવાઓ પર સલાહ આપી શકતી નથી: આ નિર્ણય ફક્ત તમારા ડૉક્ટર તમારા સ્વાસ્થ્ય અને ગર્ભના અઠવાડિયાના આધારે લઈ શકે. કૃપા કરીને તેને જાતે ન લો કે બંધ ન કરો."
+  doctor_only:
+    action: block
+    default_why: "it needs a doctor's decision in pregnancy"
+    message: "{name} is a prescription medicine. I can't tell you whether to start, stop or change it in pregnancy; only the doctor treating you can ({why}). Please don't change it on your own."
+    localized:
+      hi: "{name} डॉक्टर के पर्चे वाली दवा है। गर्भावस्था में इसे शुरू करना, बंद करना या बदलना है या नहीं, यह मैं नहीं बता सकती; यह केवल आपका इलाज करने वाला डॉक्टर तय कर सकता है। कृपया इसे अपने आप न बदलें।"
+      gu: "{name} ડૉક્ટરના પ્રિસ્ક્રિપ્શનવાળી દવા છે. ગર્ભાવસ્થામાં તે શરૂ કરવી, બંધ કરવી કે બદલવી તે હું કહી શકતી નથી; તે ફક્ત તમારો સારવાર કરતા ડૉક્ટર નક્કી કરી શકે. કૃપા કરીને તેને જાતે ન બદલો."
+  otc_ask:
+    action: block
+    default_why: "even over-the-counter medicines need checking in pregnancy"
+    message: "I can't advise on {name}, even though it can be bought without a prescription. Please ask your doctor or pharmacist before taking any medicine in pregnancy, and tell them how many weeks pregnant you are. ({why})"
+    localized:
+      hi: "मैं {name} पर सलाह नहीं दे सकती, भले ही यह बिना पर्चे के मिलती हो। गर्भावस्था में कोई भी दवा लेने से पहले अपने डॉक्टर या फ़ार्मासिस्ट से पूछें और उन्हें बताएँ कि आप कितने हफ़्ते की गर्भवती हैं।"
+      gu: "હું {name} પર સલાહ આપી શકતી નથી, ભલે તે પ્રિસ્ક્રિપ્શન વગર મળતી હોય. ગર્ભાવસ્થામાં કોઈ પણ દવા લેતા પહેલાં તમારા ડૉક્ટર કે ફાર્માસિસ્ટને પૂછો અને કેટલા અઠવાડિયાની ગર્ભવતી છો તે જણાવો."
+  supplement:
+    action: caution
+    default_why: "extra does not mean better"
+    message: "About {name}: take it only as your doctor or ANM has advised, and do not double up to make up for a missed dose ({why})."
+    localized:
+      hi: "{name} के बारे में: इसे केवल उतना ही लें जितना आपके डॉक्टर या ANM ने बताया है, और छूटी हुई खुराक की भरपाई के लिए दोगुनी न लें।"
+      gu: "{name} વિશે: તે ફક્ત તમારા ડૉક્ટર કે ANM એ કહ્યા મુજબ જ લો, અને ચૂકી ગયેલા ડોઝની ભરપાઈ માટે બમણું ન લો."
+  herbal:
+    action: block
+    default_why: "herbal and Ayurvedic products are medicines too, and many have not been shown safe in pregnancy"
+    message: "I can't recommend {name} in pregnancy. Herbal and Ayurvedic products are medicines too ({why}). Please ask your doctor, and an Ayurvedic physician who knows you are pregnant, before using it."
+    localized:
+      hi: "मैं गर्भावस्था में {name} की सलाह नहीं दे सकती। जड़ी-बूटी और आयुर्वेदिक उत्पाद भी दवाएँ हैं। इन्हें लेने से पहले अपने डॉक्टर से और ऐसे आयुर्वेदिक वैद्य से पूछें जो जानते हों कि आप गर्भवती हैं।"
+      gu: "હું ગર્ભાવસ્થામાં {name} ની ભલામણ કરી શકતી નથી. જડીબુટ્ટી અને આયુર્વેદિક ઉત્પાદનો પણ દવાઓ છે. વાપરતા પહેલાં તમારા ડૉક્ટરને અને તમે ગર્ભવતી છો તે જાણતા આયુર્વેદિક વૈદ્યને પૂછો."
+  avoid_substance:
+    action: caution
+    default_why: "it is on the usual avoid list for pregnancy"
+    message: "{name}: {why}. Please talk to your doctor if you have already had it."
+    localized:
+      hi: "{name}: गर्भावस्था में इससे आमतौर पर बचने को कहा जाता है। अगर आपने यह पहले ही ले लिया है तो अपने डॉक्टर से बात करें।"
+      gu: "{name}: ગર્ભાવસ્થામાં સામાન્ય રીતે તેનાથી બચવા કહેવામાં આવે છે. જો તમે તે લઈ લીધું હોય તો તમારા ડૉક્ટર સાથે વાત કરો."
+  limit_substance:
+    action: caution
+    default_why: "keep it within the usual limit"
+    message: "{name}: {why}. Ask your doctor what is right for you."
+    localized:
+      hi: "{name}: सीमा में रखें। आपके लिए क्या सही है, यह अपने डॉक्टर से पूछें।"
+      gu: "{name}: મર્યાદામાં રાખો. તમારા માટે શું યોગ્ય છે તે તમારા ડૉક્ટરને પૂછો."
+  forbidden_substance:
+    action: caution
+    default_why: "no amount is known to be safe in pregnancy"
+    message: "{name}: {why}. If you use it, please tell your doctor; they can help you stop safely and without judgement."
+    localized:
+      hi: "{name}: गर्भावस्था में इसकी कोई मात्रा सुरक्षित नहीं मानी जाती। अगर आप इसका सेवन करती हैं तो अपने डॉक्टर को बताएँ; वे बिना किसी आलोचना के सुरक्षित तरीक़े से छोड़ने में मदद करेंगे।"
+      gu: "{name}: ગર્ભાવસ્થામાં તેની કોઈ માત્રા સુરક્ષિત ગણાતી નથી. જો તમે તેનું સેવન કરો છો તો તમારા ડૉક્ટરને જણાવો; તેઓ કોઈ ટીકા વગર સુરક્ષિત રીતે છોડવામાં મદદ કરશે."
+  vaccine:
+    action: caution
+    default_why: "vaccines in pregnancy are timed and chosen by your doctor"
+    message: "About {name}: vaccines in pregnancy are decided by your doctor or ANM. Some (tetanus-diphtheria, inactivated flu, COVID-19, whooping cough, and RSV at the right weeks) are recommended, while live vaccines are avoided. {why}."
+    localized:
+      hi: "{name} के बारे में: गर्भावस्था में टीके आपका डॉक्टर या ANM तय करता है। कुछ (टेटनस-डिफ्थीरिया, निष्क्रिय फ़्लू, कोविड-19, काली खाँसी) सही समय पर सुझाए जाते हैं, जबकि जीवित टीकों से बचा जाता है।"
+      gu: "{name} વિશે: ગર્ભાવસ્થામાં રસી તમારા ડૉક્ટર કે ANM નક્કી કરે છે. કેટલીક (ટિટેનસ-ડિફ્થેરિયા, નિષ્ક્રિય ફ્લૂ, કોવિડ-19, કાળી ઉધરસ) યોગ્ય સમયે સૂચવાય છે, જ્યારે જીવંત રસી ટાળવામાં આવે છે."

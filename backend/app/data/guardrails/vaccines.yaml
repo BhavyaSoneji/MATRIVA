@@ -1,0 +1,44 @@
+# Vaccines. Live vaccines are avoided in pregnancy; recommended ones are timed by your doctor or ANM. No vaccine is ever
+# started or skipped on the chat's say-so.
+groups:
+  - {"cls": "avoid", "why": "live vaccines are not given during pregnancy; your doctor will tell you what to do about timing", "src": ["cdc-vaccines", "nhs-vaccines"], "items": [
+      "MMR vaccine|mmr|measles mumps rubella",
+      "measles vaccine|measles shot",
+      "rubella vaccine|german measles vaccine",
+      "varicella vaccine|chickenpox vaccine|varivax|varicella shot",
+      "BCG vaccine|bcg|bcg injection",
+      "yellow fever vaccine|yellow fever shot",
+      "live nasal flu vaccine|nasal flu vaccine|fluenz|flumist|nasal spray flu vaccine",
+      "oral typhoid vaccine|vivotif|typhoid capsule vaccine",
+      "oral cholera vaccine|vaxchora|shanchol|euvichol|cholera drops",
+      "rotavirus vaccine|rotavac|rotasiil|rotateq|rotarix",
+      "zoster live vaccine|zostavax|live shingles vaccine",
+      "oral polio vaccine|opv|polio drops",
+      "japanese encephalitis live vaccine|imojev|je vaccine live",
+      "dengue vaccine|dengvaxia|qdenga|tak-003"
+    ]}
+  - {"cls": "vaccine", "why": "this vaccine is recommended in pregnancy at specific weeks, and your doctor or ANM will tell you when", "src": ["cdc-vaccines", "nhs-vaccines", "mohfw"], "items": [
+      "tetanus vaccine|tt injection|tt vaccine|tetanus toxoid|tetanus shot|tt shot|tt1|tt2|tt booster",
+      "Td vaccine|td injection|td shot|tetanus diphtheria|td booster|td1|td2",
+      "Tdap vaccine|tdap|boostrix|adacel|whooping cough vaccine|pertussis vaccine|tdap shot|tdap injection",
+      "inactivated flu vaccine|flu shot|flu vaccine|influenza vaccine|flu jab|seasonal flu vaccine|fluarix|vaxigrip|influvac|flu injection",
+      "COVID-19 vaccine|covid vaccine|covishield|covaxin|corona vaccine|covid shot|covid booster|corona injection|covid jab|booster dose|covid injection",
+      "RSV vaccine|abrysvo|arexvy|rsv shot|respiratory syncytial virus vaccine",
+      "hepatitis B vaccine|hep b vaccine|hepatitis b injection|engerix|hepatitis b shot|heplisav|recombivax|hepatitis b booster",
+      "hepatitis A vaccine|hep a vaccine|havrix|hepatitis a shot|vaqta|avaxim|hepatitis a injection",
+      "rabies vaccine|anti rabies injection|arv injection|anti-rabies|rabipur|verorab|rabies shot|rabies injection|post exposure rabies|rabies immunoglobulin|rig injection",
+      "typhoid vaccine|typhoid injection|typbar|typhim vi|typhoid conjugate vaccine|vi polysaccharide|typhoid shot|tcv",
+      "pneumococcal vaccine|pneumovax|prevnar|pneumonia vaccine|pcv13|ppsv23|pneumococcal shot|pneumosil|pcv",
+      "meningococcal vaccine|menactra|menveo|meningitis vaccine|menquadfi|meningococcal shot|nimenrix|bexsero|trumenba",
+      "inactivated polio vaccine|ipv|polio injection|salk vaccine",
+      "HPV vaccine|gardasil|cervarix|cervical cancer vaccine|hpv shot|hpv injection|cervavac",
+      "japanese encephalitis vaccine|je vaccine|jenvac|inactivated je vaccine",
+      "tick-borne encephalitis vaccine|tbe vaccine|ticovac",
+      "anthrax vaccine",
+      "zoster recombinant vaccine|shingrix|shingles vaccine",
+      "haemophilus influenzae vaccine|hib vaccine|hib injection",
+      "varicella zoster immunoglobulin|vzig|chickenpox immunoglobulin|zig",
+      "hepatitis B immunoglobulin|hbig|hep b immunoglobulin|hepabig",
+      "tetanus immunoglobulin|tig|tetanus immune globulin|tetagam",
+      "immunoglobulin injection|ivig|intravenous immunoglobulin|immune globulin|gamma globulin|immunoglobulin shot"
+    ]}

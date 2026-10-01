@@ -19,6 +19,7 @@ from app.models import (
     Message,
     MessageRole,
     PregnancyProfile,
+    RiskLevel,
     SafetyStatus,
     User,
 )
@@ -27,6 +28,7 @@ from app.rag.pipeline import answer_question, answer_question_stream
 from app.rag.translate import to_english_query
 from app.rag.retrieval import RetrievedChunk
 from app.repositories.knowledge import source_payload
+from app.safety.guardrails import build_guard_context, check_output, evaluate as evaluate_guardrails, evaluate_profile_watch
 from app.safety.classifier import (
     SafetyDecision,
     SafetySubsystemError,
@@ -168,6 +170,47 @@ def _add_message(
     return message
 
 
+_RISK_ORDER = {"safe_general": 0, "low_concern": 1, "medical_review": 2, "high_risk": 3, "urgent_escalation": 4}
+
+
+def _apply_guardrails(db: Session, payload: MessageRequest, user: User | None, decision: SafetyDecision) -> SafetyDecision:
+    """Merge the guard-rail rule engine (medicines, substances, risky requests, symptoms, the person's own
+    conditions) into the base decision. The more severe outcome always wins; nothing here can lower it."""
+    ctx = build_guard_context(db, user, payload.language)
+    result = evaluate_guardrails(payload.message, ctx, payload.language)
+    notices = list(result.notices)
+    if not payload.conversation_id and result.action != "escalate":
+        notices += [n for n in evaluate_profile_watch(ctx, payload.language) if n not in notices]
+    if not result.triggered and not notices:
+        return decision
+
+    risk = decision.risk
+    status = decision.status
+    response = decision.response
+    reason = decision.reason
+    matched_ids = list(decision.matched_rule_ids)
+    target = {"escalate": RiskLevel.URGENT_ESCALATION, "block": RiskLevel.HIGH_RISK, "caution": RiskLevel.LOW_CONCERN}.get(result.action or "")
+    if target is not None and _RISK_ORDER[target.value] > _RISK_ORDER[risk.value]:
+        risk = target
+        status = SafetyStatus(target.value)
+        reason = "Matched guard-rail rule: " + result.matches[0].title
+    if result.action in {"escalate", "block"} and result.response and risk in {RiskLevel.URGENT_ESCALATION, RiskLevel.HIGH_RISK}:
+        # the guard rail's own message is more specific than the generic one, unless the base rule is already urgent
+        if not (decision.risk == RiskLevel.URGENT_ESCALATION and result.action != "escalate"):
+            response = result.response
+    matched_ids += [f"guard:{m.rule_id}" for m in result.matches]
+    return SafetyDecision(
+        status=status, risk=risk, matched_rule_ids=list(dict.fromkeys(matched_ids)), response=response, reason=reason,
+        guardrails=tuple(result.public()), notices=tuple(notices[:3]),
+    )
+
+
+def _with_notices(answer: str, decision: SafetyDecision) -> str:
+    if not decision.notices:
+        return answer
+    return "\n".join(f"⚠️ {notice}" for notice in decision.notices) + "\n\n" + answer
+
+
 def _run_safety_pre_check(db: Session, payload: MessageRequest, user: User | None) -> tuple[str, SafetyDecision]:
     """Shared by `process_chat` and `stream_chat`: intent classification plus
     the Section 19/20 safety pre-check (`classify_query`), which MUST run --
@@ -181,6 +224,7 @@ def _run_safety_pre_check(db: Session, payload: MessageRequest, user: User | Non
     try:
         rules = active_safety_rules(db)
         decision = classify_query(payload.message, rules)
+        decision = _apply_guardrails(db, payload, user, decision)
     except Exception as exc:
         raise SafetySubsystemError("safety pre-check unavailable") from exc
     if decision.risk.value != "safe_general":
@@ -209,6 +253,7 @@ def _finalize_generation_result(
     decision: SafetyDecision,
     *,
     request_id: str,
+    language: str | None = None,
 ) -> _FinalizedAnswer:
     """Shared by `process_chat` and `stream_chat`: turns a `GenerationResult`
     (whatever produced it -- blocking `answer_question` or a fully-buffered
@@ -224,10 +269,22 @@ def _finalize_generation_result(
     """
     if not generation.text:
         return _FinalizedAnswer(
-            answer=insufficient_evidence(),
+            answer=_with_notices(insufficient_evidence(), decision),
             safety_status=SafetyStatus.INSUFFICIENT_INFORMATION,
             citations=[],
-            corrected=False,
+            corrected=bool(decision.notices),
+        )
+
+    # Guard-rail output check: no doses, no "safe to take", no diagnosis, no home-abortion or induction steps,
+    # no false reassurance. A failing answer is replaced whole; it is never edited.
+    verdict = check_output(generation.text, language)
+    if not verdict.ok:
+        log_event("chat.output_guard_blocked", request_id=request_id, rules=",".join(verdict.rule_ids))
+        return _FinalizedAnswer(
+            answer=verdict.safe_answer or insufficient_evidence(),
+            safety_status=SafetyStatus.MEDICAL_REVIEW,
+            citations=[],
+            corrected=True,
         )
 
     web_citations = generation.web_citations
@@ -267,7 +324,8 @@ def _finalize_generation_result(
             for web in web_citations
         ]
         return _FinalizedAnswer(
-            answer=generation.text, safety_status=decision.status, citations=citations, corrected=False
+            answer=_with_notices(generation.text, decision), safety_status=decision.status, citations=citations,
+            corrected=bool(decision.notices),
         )
 
     answer = post_check.safe_answer or insufficient_evidence()
@@ -306,7 +364,7 @@ def process_chat(
         trace = generation.trace
         if generation.text:
             generation_latency_ms = retrieval_latency_ms
-        finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id)
+        finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id, language=payload.language)
         answer = finalized.answer
         safety_status = finalized.safety_status
         citations = finalized.citations
@@ -342,6 +400,7 @@ def process_chat(
         "retrieval_latency_ms": retrieval_latency_ms,
         "generation_latency_ms": generation_latency_ms,
         "safety_reason": decision.reason,
+        **({"guardrails": list(decision.guardrails)} if decision.guardrails else {}),
         "citation_validation": "passed" if citations else "not_applicable",
         "web_search_used": any(c.source_type == "external_web" for c in citations),
         "request_id": request_id,
@@ -486,7 +545,7 @@ def stream_chat(
         trace = generation.trace
         if generation.text:
             generation_latency_ms = retrieval_latency_ms
-        finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id)
+        finalized = _finalize_generation_result(generation, chunks, decision, request_id=request_id, language=payload.language)
         answer = finalized.answer
         safety_status = finalized.safety_status
         citations = finalized.citations
@@ -548,6 +607,7 @@ def stream_chat(
         "retrieval_latency_ms": retrieval_latency_ms,
         "generation_latency_ms": generation_latency_ms,
         "safety_reason": decision.reason,
+        **({"guardrails": list(decision.guardrails)} if decision.guardrails else {}),
         "citation_validation": "passed" if citations else "not_applicable",
         "web_search_used": any(item.source_type == "external_web" for item in citations),
         "request_id": request_id,
