@@ -120,6 +120,8 @@ def _prepare_turn(db: Session, payload: MessageRequest, user: User | None, decis
         if user is not None and decision.risk.value in {"safe_general", "low_concern"}
         else None
     )
+    if query != payload.message:
+        user_context.original_question = payload.message
     return user_context, history, query, action
 
 

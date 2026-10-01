@@ -121,6 +121,13 @@ class ContextPacket:
             )
         sections.append(f"SAFETY RESULT\n{self.safety_result}")
         sections.append(f"EVIDENCE METADATA\n{evidence_lines}")
+        language = self.user_context.get("reply_language")
+        if language:
+            # Last thing the model reads, so it outweighs the English evidence above it.
+            sections.append(
+                f"REPLY LANGUAGE\nWrite your whole answer in {language}. Only the required section labels "
+                "(e.g. MODERN / TRADITIONAL / EVIDENCE STATUS) and source names stay in English."
+            )
         return "\n\n".join(sections)
 
 
@@ -151,6 +158,7 @@ def build_context_packet(
         "context_terms": user_context.context_terms,
         "about_the_user": "; ".join(user_context.profile_notes),
         "reply_language": user_context.reply_language,
+        "question_as_the_user_wrote_it": user_context.original_question,
     }
 
     question_tokens = _token_count(user_question)

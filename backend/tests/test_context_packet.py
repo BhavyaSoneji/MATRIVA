@@ -108,3 +108,12 @@ def test_empty_retrieval_set_still_produces_valid_packet() -> None:
     packet = build_context_packet("question", [], safety_result={})
     assert packet.retrieved_sources == []
     assert "no sources retrieved" in packet.to_prompt_text()
+
+
+def test_reply_language_is_stated_last_in_the_prompt() -> None:
+    from app.rag.reranking import UserContext
+
+    packet = build_context_packet("q", [], safety_result={}, user_context=UserContext(reply_language="Hindi"))
+    text = packet.to_prompt_text()
+    assert text.rstrip().splitlines()[-2:][0] == "REPLY LANGUAGE" and "in Hindi" in text
+    assert "REPLY LANGUAGE" not in build_context_packet("q", [], safety_result={}).to_prompt_text()

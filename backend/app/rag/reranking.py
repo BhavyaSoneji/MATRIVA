@@ -58,6 +58,8 @@ class UserContext:
     # Human-readable personalisation lines for the model (week, diet, allergies...). Never names/contact details.
     profile_notes: list[str] = field(default_factory=list)
     reply_language: str | None = None  # e.g. "Hindi"; None = English
+    # The user's words when the search query was translated/expanded (so the model sees what was really asked).
+    original_question: str | None = None
 
 
 def _stage_relevance(chunk: KnowledgeChunk, context: UserContext) -> float:
