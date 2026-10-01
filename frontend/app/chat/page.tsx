@@ -3,12 +3,19 @@
 import * as React from "react";
 import { RequireAuth } from "@/components/require-auth";
 import { api, streamChat } from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 import type {
   ChatHistoryResponse,
   Citation,
+  PregnancyResponse,
+  ResourceLibraryResponse,
+  ResourceResponse,
   SourceResponse,
   RecommendationResponse,
 } from "@/lib/types";
+import { ChatWidget, type WidgetSpec } from "@/components/chat-widgets";
+import { ResourceGrid } from "@/components/resource-cards";
+import { WeekRing } from "@/components/week-ring";
 import { ChatAnswer } from "@/components/chat-answer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
@@ -24,6 +31,15 @@ import {
   Globe,
   ChevronDown,
   Plus,
+  Apple,
+  Sprout,
+  Dumbbell,
+  CalendarHeart,
+  CalendarDays,
+  Sparkles,
+  Library,
+  ClipboardPen,
+  BookCheck,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -40,13 +56,38 @@ interface ChatMessage {
   streaming?: boolean;
   stopped?: boolean;
   failed?: boolean;
+  widget?: WidgetSpec;
+  resources?: ResourceResponse[];
 }
+
+/** Everything that used to be its own page is now a chat action. Each is
+ * either a question (answered from the reviewed knowledge base, with related
+ * videos/articles attached) or an inline card. Slash commands mirror them. */
+interface QuickAction {
+  id: string;
+  label: string;
+  command: string;
+  icon: React.ComponentType<{ className?: string }>;
+  hint: string;
+  ask?: { prompt: string; topic: string };
+  widget?: WidgetSpec;
+}
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { id: "week", label: "My week", command: "/week", icon: CalendarDays, hint: "Progress & milestones", widget: { type: "week" } },
+  { id: "nutrition", label: "Nutrition", command: "/nutrition", icon: Apple, hint: "What to eat now", ask: { prompt: "What should I eat at my stage of pregnancy, and what should I avoid?", topic: "nutrition" } },
+  { id: "ayurveda", label: "Ayurveda", command: "/ayurveda", icon: Sprout, hint: "Traditional guidance", ask: { prompt: "What does Ayurveda (Garbhini Paricharya) advise for my stage of pregnancy?", topic: "ayurveda" } },
+  { id: "lifestyle", label: "Lifestyle", command: "/lifestyle", icon: Dumbbell, hint: "Exercise, sleep, habits", ask: { prompt: "Which exercise, sleep and lifestyle habits suit my stage of pregnancy?", topic: "lifestyle" } },
+  { id: "visit", label: "Next visit", command: "/visits", icon: CalendarHeart, hint: "Antenatal schedule", widget: { type: "visit" } },
+  { id: "foryou", label: "For you", command: "/foryou", icon: Sparkles, hint: "Personal suggestions", widget: { type: "foryou" } },
+  { id: "log", label: "Log today", command: "/log", icon: ClipboardPen, hint: "Water, sleep, activity", widget: { type: "log" } },
+  { id: "library", label: "Library", command: "/library", icon: Library, hint: "Videos & articles", widget: { type: "library" } },
+  { id: "evidence", label: "Evidence", command: "/evidence", icon: BookCheck, hint: "Guidelines & research", widget: { type: "library", types: ["guideline", "research"] } },
+];
 
 const SUGGESTED_QUESTIONS = [
   "What foods should I avoid in my first trimester?",
   "Is it safe to do yoga during pregnancy?",
-  "What does Ayurveda say about diet during pregnancy?",
-  "When is my next prenatal checkup?",
   "What are signs I should call my doctor right away?",
 ];
 
@@ -169,6 +210,8 @@ function RelatedRecommendations({ items }: { items: RecommendationResponse[] }) 
 }
 
 function ChatContent() {
+  const { user } = useAuth();
+  const [pregnancy, setPregnancy] = React.useState<PregnancyResponse | null>(null);
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [input, setInput] = React.useState("");
   const [conversationId, setConversationId] = React.useState<string | undefined>(undefined);
@@ -180,6 +223,13 @@ function ChatContent() {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const abortRef = React.useRef<AbortController | null>(null);
+
+  React.useEffect(() => {
+    api
+      .get<PregnancyResponse>("/pregnancy")
+      .then(setPregnancy)
+      .catch(() => setPregnancy(null)); // no pregnancy details yet -- onboarding covers it
+  }, []);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -244,7 +294,34 @@ function ChatContent() {
     );
   };
 
-  const sendMessage = async (text: string, opts?: { skipUserBubble?: boolean }) => {
+  const attachResources = async (messageId: string, query: string, topic?: string) => {
+    const fetchFor = async (q: string | null) => {
+      const params = new URLSearchParams({ limit: "3" });
+      if (q) params.set("q", q);
+      if (topic) params.set("topic", topic);
+      if (pregnancy) params.set("stage", String(pregnancy.trimester));
+      return (await api.get<ResourceLibraryResponse>(`/resources?${params}`)).resources;
+    };
+    try {
+      let found = await fetchFor(query);
+      if (found.length === 0 && topic) found = await fetchFor(null);
+      if (found.length > 0) patchMessage(messageId, { resources: found });
+    } catch {
+      // related links are a bonus; never block or break the answer
+    }
+  };
+
+  const addWidget = (spec: WidgetSpec, command: string) => {
+    const now = new Date().toISOString();
+    setMessages((prev) => [
+      ...prev,
+      { id: `u-${crypto.randomUUID()}`, role: "user", text: command, createdAt: now },
+      { id: `w-${crypto.randomUUID()}`, role: "assistant", text: "", widget: spec, createdAt: now },
+    ]);
+    setPinnedToBottom(true);
+  };
+
+  const sendMessage = async (text: string, opts?: { skipUserBubble?: boolean; topic?: string }) => {
     const trimmed = text.trim();
     if (!trimmed || sending || trimmed.length > MAX_MESSAGE_CHARS) return;
     setError(null);
@@ -271,6 +348,7 @@ function ChatContent() {
     const controller = new AbortController();
     abortRef.current = controller;
 
+    let safety = "";
     await streamChat(
       { message: trimmed, conversation_id: conversationId },
       {
@@ -278,6 +356,7 @@ function ChatContent() {
           patchMessage(assistantId, (m) => ({ text: m.text + delta }));
         },
         onFinal: (data) => {
+          safety = data.safety_status;
           patchMessage(assistantId, {
             text: data.answer,
             safetyStatus: data.safety_status,
@@ -294,6 +373,8 @@ function ChatContent() {
             recommendations: data.recommendations,
             streaming: false,
           });
+          // Don't distract from an urgent-care answer with links.
+          if (!URGENT_STATUSES.has(safety)) void attachResources(data.message_id, trimmed, opts?.topic);
         },
         onError: (message) => {
           patchMessage(assistantId, { text: message, streaming: false, failed: true });
@@ -304,6 +385,32 @@ function ChatContent() {
 
     setSending(false);
     abortRef.current = null;
+  };
+
+  const runAction = (action: QuickAction) => {
+    if (sending) return;
+    setInput("");
+    if (action.widget) addWidget(action.widget, action.command);
+    else if (action.ask) void sendMessage(action.ask.prompt, { topic: action.ask.topic });
+  };
+
+  const submit = (raw: string) => {
+    const text = raw.trim();
+    if (!text.startsWith("/")) return void sendMessage(text);
+    const action = QUICK_ACTIONS.find((a) => a.command === text.toLowerCase());
+    if (action) return runAction(action);
+    setInput("");
+    const help = QUICK_ACTIONS.map((a) => `${a.command} — ${a.hint}`).join("\n");
+    setMessages((prev) => [
+      ...prev,
+      { id: `u-${crypto.randomUUID()}`, role: "user", text, createdAt: new Date().toISOString() },
+      {
+        id: `h-${crypto.randomUUID()}`,
+        role: "assistant",
+        text: `I don't know that command. Try one of these, or just ask a question:\n\n${help}`,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
   };
 
   const stopGenerating = () => {
@@ -350,11 +457,58 @@ function ChatContent() {
   const canRegenerate = !sending && messages.some((m) => m.role === "assistant");
 
   return (
-    <main className="mx-auto flex h-[calc(100vh-4rem)] max-w-[880px] flex-col px-6">
+    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1320px]">
+      <aside className="hidden w-[280px] shrink-0 flex-col gap-6 overflow-y-auto border-r border-border py-8 pl-6 pr-6 lg:flex">
+        <div>
+          <p className="eyebrow-sm text-muted-foreground">
+            {new Date().toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long" })}
+          </p>
+          <p className="display mt-2 text-[1.6rem] leading-[1.05]">
+            Good day{user?.full_name ? `, ${user.full_name.split(" ")[0]}` : ""}.
+          </p>
+        </div>
+        {pregnancy && (
+          <button
+            type="button"
+            onClick={() => runAction(QUICK_ACTIONS[0])}
+            className="lift flex items-center gap-4 border border-border bg-card p-4 text-left"
+          >
+            <WeekRing week={pregnancy.current_week} size={84} stroke={2.5} />
+            <span>
+              <span className="eyebrow-sm block text-accent">Trimester {pregnancy.trimester}</span>
+              <span className="mt-1 block text-[12px] capitalize text-muted-foreground">
+                {pregnancy.stage.replace(/_/g, " ")}
+              </span>
+            </span>
+          </button>
+        )}
+        <nav aria-label="Companion actions" className="flex flex-col">
+          <p className="eyebrow-sm mb-2 text-muted-foreground">Ask or open</p>
+          {QUICK_ACTIONS.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              disabled={sending}
+              onClick={() => runAction(a)}
+              className="group flex items-center gap-3 border-b border-border py-3 text-left transition-colors hover:text-accent disabled:opacity-50"
+            >
+              <a.icon className="h-4 w-4 shrink-0 text-accent" />
+              <span className="flex-1">
+                <span className="block text-[14px] font-medium">{a.label}</span>
+                <span className="block text-[11px] text-muted-foreground">{a.hint}</span>
+              </span>
+              <span className="eyebrow-sm hidden text-muted-foreground/70 xl:inline">{a.command}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
+    <main className="flex min-w-0 flex-1 flex-col px-6">
       <div className="flex shrink-0 items-baseline justify-between border-b border-border py-6">
         <div>
           <h1 className="display text-2xl leading-none">The companion</h1>
-          <p className="eyebrow-sm mt-2 text-muted-foreground">Answers cite the guideline they came from.</p>
+          <p className="eyebrow-sm mt-2 text-muted-foreground">
+            Ask anything, or type / for commands. Answers cite where they came from.
+          </p>
         </div>
         <div className="flex items-center gap-5">
           <span className="eyebrow-sm text-muted-foreground">{messages.length} messages</span>
@@ -382,8 +536,12 @@ function ChatContent() {
 
           {!historyLoading && messages.length === 0 && (
             <div className="py-10 text-center">
-              <p className="text-sm text-muted-foreground">
-                Ask a question about nutrition, lifestyle, or your pregnancy stage to get started.
+              <p className="display text-[1.6rem] leading-[1.15]">
+                What would you like to know{user?.full_name ? `, ${user.full_name.split(" ")[0]}` : ""}?
+              </p>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Everything lives here — nutrition, Ayurveda, your week, logging, videos and articles.
+                Pick an action, type <span className="font-mono text-foreground">/</span>, or just ask.
               </p>
               <p className="eyebrow-sm mt-3 text-muted-foreground/70">
                 Every answer traces back to a reviewed source, or says plainly when it can&apos;t.
@@ -419,6 +577,8 @@ function ChatContent() {
                           </p>
                         </div>
                       )}
+
+                      {m.widget && <ChatWidget spec={m.widget} pregnancy={pregnancy} />}
 
                       {m.text ? (
                         <ChatAnswer text={m.text} sources={m.sources ?? []} />
@@ -471,6 +631,13 @@ function ChatContent() {
                       )}
 
                       {m.recommendations && <RelatedRecommendations items={m.recommendations} />}
+
+                      {m.resources && m.resources.length > 0 && (
+                        <div className="mt-2 flex flex-col gap-3 border-t border-border pt-4">
+                          <p className="eyebrow-sm text-muted-foreground">Watch &amp; read</p>
+                          <ResourceGrid items={m.resources} compact />
+                        </div>
+                      )}
 
                       {m.evidence && Object.keys(m.evidence).length > 0 && (
                         <EvidencePanel evidence={m.evidence} citations={m.citations ?? []} />
@@ -532,6 +699,21 @@ function ChatContent() {
           </Alert>
         )}
 
+        <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1 lg:hidden">
+          {QUICK_ACTIONS.map((a) => (
+            <button
+              key={a.id}
+              type="button"
+              disabled={sending}
+              onClick={() => runAction(a)}
+              className="flex shrink-0 items-center gap-1.5 border border-border px-3 py-2 text-[11.5px] text-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+            >
+              <a.icon className="h-3.5 w-3.5 text-accent" />
+              {a.label}
+            </button>
+          ))}
+        </div>
+
         <div className="mb-4 flex flex-wrap items-center gap-2.5">
           {SUGGESTED_QUESTIONS.map((q) => (
             <button
@@ -560,20 +742,20 @@ function ChatContent() {
           className="flex items-end gap-3 border border-border bg-card"
           onSubmit={(e) => {
             e.preventDefault();
-            sendMessage(input);
+            submit(input);
           }}
         >
           <textarea
             ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask anything — answers come with their sources"
+            placeholder="Ask anything, or type / for commands"
             rows={1}
             className="max-h-[200px] min-h-[62px] flex-1 resize-none border-0 bg-transparent px-4 py-[19px] text-base text-foreground outline-none placeholder:text-muted-foreground/70"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
-                sendMessage(input);
+                submit(input);
               }
             }}
           />
@@ -609,6 +791,7 @@ function ChatContent() {
         </div>
       </div>
     </main>
+    </div>
   );
 }
 
