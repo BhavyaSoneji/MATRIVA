@@ -18,6 +18,7 @@ from app.models import (
     FoodItem,
     Guideline,
     IndexStatus,
+    KnowledgeChunk,
     KnowledgeDocument,
     KnowledgeSource,
     ReviewStatus,
@@ -27,6 +28,9 @@ from app.models import (
 from app.repositories.knowledge import source_payload
 from app.schemas.api import (
     AyurvedaSourceRequest,
+    BulkApproveRequest,
+    BulkApproveResponse,
+    DocumentPreviewResponse,
     DocumentMetadataRequest,
     DocumentResponse,
     ExerciseGuidanceRequest,
@@ -133,13 +137,12 @@ def update_document(document_id: str, payload: DocumentMetadataRequest, admin: A
     return _document_response(document)
 
 
-@router.post("/documents/{document_id}/approve", response_model=DocumentResponse)
-def approve_document(document_id: str, admin: AdminUser, db: DBSession) -> DocumentResponse:
-    document = db.get(KnowledgeDocument, document_id)
-    if document is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
-    if document.index_status != IndexStatus.INDEXED.value:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Document must be successfully indexed before approval")
+def _approve_document(db: DBSession, document: KnowledgeDocument, admin: AdminUser) -> None:
+    """Approve one document and everything that was held back pending its source.
+
+    Ingestion deliberately leaves linked FoodItem rows inactive and Guideline rows
+    "pending" until the source is reviewed, so approval is the moment they go live.
+    """
     now = datetime.now(timezone.utc)
     document.review_status = ReviewStatus.APPROVED.value
     document.active = True
@@ -159,9 +162,63 @@ def approve_document(document_id: str, admin: AdminUser, db: DBSession) -> Docum
         source.evidence_metadata.review_status = ReviewStatus.APPROVED.value
         source.evidence_metadata.reviewer = admin.email
         source.evidence_metadata.reviewed_at = now
+    if source.guideline is not None and source.guideline.status == "pending":
+        source.guideline.status = "active"
+    for food in db.execute(select(FoodItem).where(FoodItem.active.is_(False))).scalars():
+        if source.id in (food.source_ids or []):
+            food.active = True
     record_audit(db, actor_user_id=admin.id, action="document.approve", resource_type="knowledge_document", resource_id=document.id)
+
+
+@router.post("/documents/{document_id}/approve", response_model=DocumentResponse)
+def approve_document(document_id: str, admin: AdminUser, db: DBSession) -> DocumentResponse:
+    document = db.get(KnowledgeDocument, document_id)
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    if document.index_status != IndexStatus.INDEXED.value:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Document must be successfully indexed before approval")
+    _approve_document(db, document, admin)
     db.commit()
     return _document_response(document)
+
+
+@router.post("/documents/bulk-approve", response_model=BulkApproveResponse)
+def bulk_approve_documents(payload: BulkApproveRequest, admin: AdminUser, db: DBSession) -> BulkApproveResponse:
+    """Approve many documents in one transaction. Documents that are missing or not yet
+    indexed are skipped and reported, never silently approved."""
+    approved: list[str] = []
+    skipped: dict[str, str] = {}
+    for document_id in dict.fromkeys(payload.ids):
+        document = db.get(KnowledgeDocument, document_id)
+        if document is None:
+            skipped[document_id] = "not found"
+        elif document.index_status != IndexStatus.INDEXED.value:
+            skipped[document_id] = "not indexed"
+        else:
+            _approve_document(db, document, admin)
+            approved.append(document_id)
+    db.commit()
+    return BulkApproveResponse(approved=approved, skipped=skipped)
+
+
+@router.get("/documents/{document_id}/preview", response_model=DocumentPreviewResponse)
+def preview_document(document_id: str, admin: AdminUser, db: DBSession) -> DocumentPreviewResponse:
+    """What a reviewer needs to judge a document: the stored text and where it came from."""
+    document = db.get(KnowledgeDocument, document_id)
+    if document is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Document not found")
+    chunks = db.execute(
+        select(KnowledgeChunk).where(KnowledgeChunk.document_id == document.id).order_by(KnowledgeChunk.chunk_index).limit(6)
+    ).scalars().all()
+    total = db.query(KnowledgeChunk).filter(KnowledgeChunk.document_id == document.id).count()
+    return DocumentPreviewResponse(
+        document_id=document.id,
+        excerpt="\n\n".join(chunk.content for chunk in chunks),
+        chunk_count=total,
+        truncated=total > len(chunks),
+        source_url=document.source.url,
+        authority=document.source.authority,
+    )
 
 
 @router.post("/documents/{document_id}/reject", response_model=DocumentResponse)
