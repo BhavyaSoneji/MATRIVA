@@ -1,6 +1,35 @@
-# Safety layer
+# Safety
 
-Safety is independent of the LLM and runs before and after generation.
+Safety is independent of any language model and runs before and after an answer is made. It is written as plain rules and data, so it behaves the same way every time and can be read, tested and reviewed. If any part of it fails, MATRIVA fails closed: it refuses instead of guessing.
+
+## The layers
+
+| # | Layer | Runs | What it does | Page |
+|---|---|---|---|---|
+| 1 | Emergency pre-check | before anything | Red-flag terms and admin rules short-circuit to an emergency message | [Pre-check](#pre-check) |
+| 2 | Guard rails | before retrieval | 1,231 sourced rules: escalate emergencies, refuse medicine advice, add cautions; personal to the user's conditions | [`guardrails.md`](./guardrails.md) |
+| 3 | Prompt-injection defence | while retrieving | Retrieved text is data, never instructions | [Post-check](#post-check) |
+| 4 | Retrieval gate | during retrieval | Only approved, active documents; too little evidence means no answer | [`rag.md`](./rag.md) |
+| 5 | Output check | after composing | Replaces any answer that gives a dose, calls a medicine safe, diagnoses, or falsely reassures | [`guardrails.md`](./guardrails.md#what-the-bot-says-is-checked-too) |
+| 6 | Post-check | after composing | Validates citations and escalation language | [Post-check](#post-check) |
+| 7 | Structured screening | outside chat | 20 sourced yes/no questions and reading thresholds, applied by rules | [Structured screening](#structured-screening) |
+
+```mermaid
+flowchart LR
+    Q([Question]) --> L1{{1 · Pre-check}}
+    L1 -- emergency --> E[Emergency message]
+    L1 --> L2{{2 · Guard rails}}
+    L2 -- escalate / block --> E2[Fixed message · no retrieval]
+    L2 --> L4[4 · Retrieval gate]
+    L4 -- too little --> N[No reviewed source]
+    L4 --> L5{{5 · Output check}}
+    L5 --> L6{{6 · Post-check}}
+    L6 --> A([Answer])
+    style E fill:#E5484D,color:#fff
+    style E2 fill:#E5484D,color:#fff
+```
+
+Two rules hold across all of them: **a layer can only make an answer safer, never less safe**, and **the user is always given somewhere to go**: 112, a doctor, an ANM or ASHA, or a helpline.
 
 ## Pre-check
 
