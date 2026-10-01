@@ -30,10 +30,17 @@ retrieval-augmented generation, an independent safety layer, and transparent sou
   end-to-end against the actual APIs, including the full `answer_query()` pipeline producing a
   cited, grounded answer and correctly short-circuiting to "insufficient evidence" when the
   knowledge base has nothing relevant.
-- The full product frontend (Next.js) is built: landing, auth, onboarding, dashboard, AI chat with
-  citations and evidence-level badges, nutrition/lifestyle/ayurveda/stage-wise guidance pages,
-  recommendations, a sources explorer, settings/privacy, and admin dashboards for document and
-  evaluation management — all wired to the real backend API.
+- The frontend (Next.js) is a single chat workspace: after sign-in everything happens in the
+  companion — nutrition, Ayurveda and lifestyle questions, your week, next visit, personalised
+  suggestions, daily wellness logging, and a library of verified videos, articles, guidelines and
+  research papers. Quick actions and slash commands (`/week`, `/nutrition`, `/ayurveda`,
+  `/lifestyle`, `/visits`, `/foryou`, `/log`, `/library`, `/evidence`) open inline cards instead of
+  separate pages. Only landing, auth, onboarding, settings/privacy and admin remain as routes.
+- **Resource library:** `backend/app/data/library.yaml` holds ~85 live-verified links (YouTube
+  videos, NHS/WHO/ACOG/Government of India pages, PubMed papers). Regenerate and re-verify with
+  `python knowledge/resources/build_library.py`. It is a pointer collection, separate from the
+  reviewed knowledge base; new paraphrased guidance in `knowledge/seed/guidelines.yaml` is ingested
+  as *pending* and needs admin approval before it can ground chat answers.
 - **238 automated tests pass** across `backend/` (175), `ingestion/` (27), and `evaluation/` (36);
   the frontend builds cleanly with zero lint/type errors across all 17 routes.
 - The full local stack (PostgreSQL/pgvector, Redis, FastAPI, Next.js) runs via Docker Compose, and
