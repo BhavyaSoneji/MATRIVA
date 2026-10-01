@@ -81,6 +81,8 @@ from app.rag.embeddings import embed_text
 
 BOOK_PATH = _REPO_ROOT / "knowledge" / "ayurveda" / "Prasuti-Tantra-OCR.txt"
 SEED_YAML_PATH = _REPO_ROOT / "knowledge" / "seed" / "seed.yaml"
+# Paraphrased public-health guidance (WHO / NHS / Government of India); same schema, same pending-only policy.
+GUIDELINES_YAML_PATH = _REPO_ROOT / "knowledge" / "seed" / "guidelines.yaml"
 
 # Maps the RAG-core schema's finer-grained pending reason onto the SQL
 # layer's single ReviewStatus.PENDING -- both still block retrieve_chunks_scored
@@ -97,6 +99,9 @@ _SOURCE_TYPE_MAP = {
     "medical_guideline": "professional_society",
     "ayurvedic_classical_source": "traditional",
     "nutrition_reference": "government",
+    "international_guideline": "international",
+    "government_guideline": "government",
+    "government_scheme": "government",
 }
 
 _EMBED_RETRIES = 2
@@ -296,7 +301,9 @@ def _ingest_seed_document(db: Session, entry: dict, *, api_key: str | None, inge
         name=name,
         title=entry["title"],
         source_type=_SOURCE_TYPE_MAP.get(entry["source_type"], "internal"),
-        jurisdiction=entry.get("region") or "India",
+        authority=entry.get("authority"),
+        url=entry.get("url"),
+        jurisdiction=entry.get("jurisdiction") or entry.get("region") or "India",
         topic=entry.get("topic"),
         version=entry.get("version"),
         review_status=ReviewStatus.PENDING.value,
@@ -398,7 +405,8 @@ def _ingest_seed_document(db: Session, entry: dict, *, api_key: str | None, inge
 
 def ingest_seed_yaml(db: Session, *, api_key: str | None, dry_run: bool) -> None:
     entries = yaml.safe_load(SEED_YAML_PATH.read_text(encoding="utf-8"))
-    print(f"[seed] {len(entries)} documents in {SEED_YAML_PATH}")
+    entries += yaml.safe_load(GUIDELINES_YAML_PATH.read_text(encoding="utf-8"))
+    print(f"[seed] {len(entries)} documents in {SEED_YAML_PATH.name} + {GUIDELINES_YAML_PATH.name}")
     if dry_run:
         print("[seed] --dry-run: not writing to the database")
         return
