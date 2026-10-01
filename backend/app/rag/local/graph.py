@@ -61,6 +61,7 @@ class KnowledgeGraph:
     postings: dict[str, set[int]] = field(default_factory=dict)
     edges: dict[tuple[str, str], tuple[float, int]] = field(default_factory=dict)  # (a,b) -> (npmi, passages)
     _phrase_index: dict[tuple[str, ...], list[str]] = field(default_factory=dict)
+    _adjacency: dict[str, list[tuple[str, float]]] = field(default_factory=dict)
 
     # -------------------------------------------------------------- build
     @classmethod
@@ -114,6 +115,23 @@ class KnowledgeGraph:
             i += max(matched, 1)
         return found
 
+    def detect_spans(self, toks: list[str]) -> dict[str, set[str]]:
+        """{concept id: the question tokens that named it}, e.g. "kicks" names reduced_movement. Lets a paraphrase
+        count as covered when a passage mentions the concept in different words ("baby's movements")."""
+        out: dict[str, set[str]] = {}
+        i = 0
+        while i < len(toks):
+            matched = 0
+            for length in range(min(_MAX_PHRASE, len(toks) - i), 0, -1):
+                ids = self._phrase_index.get(tuple(toks[i : i + length]))
+                if ids:
+                    for cid in ids:
+                        out.setdefault(cid, set()).update(toks[i : i + length])
+                    matched = length
+                    break
+            i += max(matched, 1)
+        return out
+
     def detect_text(self, text: str) -> list[str]:
         return self.detect(tokens(text))
 
@@ -147,6 +165,41 @@ class KnowledgeGraph:
         for cid in cids:
             out.pop(cid, None)
         return out
+
+    def activation(self, seeds: dict[str, float], alpha: float = 0.5, iterations: int = 20) -> dict[str, float]:
+        """Personalised PageRank from `seeds` over the concept graph (graph-RAG style multi-hop reasoning).
+
+        A question about "iron" activates iron, spreads some activation to anaemia and folate (concepts the passages
+        keep mentioning with it), a little further to their neighbours, and so on. `alpha` is the share of activation
+        that keeps flowing outwards each step; the rest returns to the seeds, so activation stays anchored on what
+        the user actually asked about. Returns {concept: activation}, summing to 1.
+        """
+        seeds = {c: w for c, w in seeds.items() if c in self.concepts and w > 0}
+        if not seeds:
+            return {}
+        if not self._adjacency:
+            nbrs: dict[str, list[tuple[str, float]]] = defaultdict(list)
+            for (a, b), (w, _) in self.edges.items():
+                nbrs[a].append((b, w))
+                nbrs[b].append((a, w))
+            self._adjacency = {c: [(n, w / sum(x for _, x in lst)) for n, w in lst] for c, lst in nbrs.items()}
+        total = sum(seeds.values())
+        restart = {c: w / total for c, w in seeds.items()}
+        rank = dict(restart)
+        for _ in range(iterations):
+            nxt: dict[str, float] = defaultdict(float)
+            for c, mass in rank.items():
+                out = self._adjacency.get(c)
+                if not out:
+                    nxt[c] += alpha * mass  # a dead end keeps its mass
+                    continue
+                for n, w in out:
+                    nxt[n] += alpha * mass * w
+            for c, r in restart.items():
+                nxt[c] += (1 - alpha) * r
+            norm = sum(nxt.values()) or 1.0
+            rank = {c: v / norm for c, v in nxt.items()}
+        return rank
 
     def subgraph(self, cids: list[str], neighbours_each: int = 5, max_nodes: int = 18) -> dict[str, Any]:
         """Nodes and edges around `cids` for the knowledge-map card."""
