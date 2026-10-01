@@ -19,7 +19,7 @@ export default function NotFound() {
           Whatever you were looking for has moved, or never existed. Let&apos;s get you back to your week.
         </p>
         <div className="mt-10">
-          <Link href="/dashboard">
+          <Link href="/chat">
             <Button size="lg">Back to your dashboard</Button>
           </Link>
         </div>
