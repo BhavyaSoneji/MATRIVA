@@ -146,7 +146,19 @@ What we got wrong first, which is the useful part:
 - **Hindi and Gujarati broke a regex.** The usual "strip punctuation" pattern deletes Devanagari and Gujarati vowel signs, which Python does not count as letters. A test question in Hindi found it.
 - **The honest limit.** The rules were written from public knowledge and cite the reference they are consistent with. Nobody has checked each one against its source, and no clinician or pharmacist has signed them off. Reviewing them is the next job, and [`clinical-review.md`](./clinical-review.md) is written for the reviewer.
 
-## 11. What we would do next
+## 11. The food guide: quoting a damaged book honestly
+
+The *Prasuti Tantra* has a month-by-month dietary regimen, with what Caraka, Susruta, Vagbhata, Bhela and Harita each advise. It is exactly the kind of source the project exists to use, and exactly the kind that can mislead: it is traditional, translated, and read through an imperfect scan.
+
+Decisions that mattered:
+
+- **Quote, cite, label.** Each entry is the book's own English wording, the authority, and the scanned page, shown as *traditional (Ayurveda)*. A test checks every quoted entry against the OCR text, so nothing can be invented. Four entries had damaged scans; they are restated and marked as restated.
+- **Separate food from medicine.** Much of the regimen is milk or ghee prepared with named herbs, and, in the last months, enemas. Those are treatments. They sit in a collapsed "not food, not advice" section. The food list holds only food.
+- **Where tradition and modern guidance differ, say so.** One author lists pulses, garlic and onion as unsuitable. The card shows that, and next to it that ICMR-NIN recommends pulses and the NHS does not list any of them as foods to avoid.
+- **Do not let a bad serving flatter a food.** The nutrient lists reused a "150 g per serving" default, which made dry oats and amaranth look far richer in iron than a real portion. Dry grains and seeds now use a dry serving. This also fixed the older meal suggestions.
+- **Do not hand a vegan a B12 list that does not exist.** No plant food reliably supplies it. The card says so and sends the person to a doctor.
+
+## 12. What we would do next
 
 1. **Clinical review** of `care_rules.yaml` and native-speaker review of the Hindi and Gujarati safety phrases. Nothing else matters more before real use.
 2. **A pilot** with one clinic: 20–30 mothers for 8 weeks, measuring check-in streaks, visits kept and flags raised.
@@ -154,7 +166,7 @@ What we got wrong first, which is the useful part:
 4. **More sources**, reviewed by a person: the gate is only as good as what's behind it.
 5. **Close the paraphrase gap** with a small local embedding model, kept optional so the engine still runs anywhere.
 
-## 12. Takeaways
+## 13. Takeaways
 
 - A refusal is a feature. The gate that says *"I can't answer that from a reviewed source"* is what makes every other answer trustworthy.
 - Build the offline path first. It makes the system testable, cheap and independent of any vendor.
