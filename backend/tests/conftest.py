@@ -7,6 +7,9 @@ os.environ["JWT_SECRET"] = "test-secret-012345678901234567890123456789"
 os.environ["ENVIRONMENT"] = "testing"
 os.environ["DEMO_MODE"] = "true"
 os.environ["AUTO_CREATE_TABLES"] = "true"
+# The legacy native orchestration tests remain hermetic regression coverage;
+# LangChain-specific tests opt in explicitly.
+os.environ["RAG_ORCHESTRATOR"] = "native"
 # Hermetic: never reach a real LLM, embedding or search provider, even if backend/.env has live keys.
 for _key in ("LLM_API_KEY", "EMBEDDING_API_KEY", "TAVILY_API_KEY"):
     os.environ[_key] = ""

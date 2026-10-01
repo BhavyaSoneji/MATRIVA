@@ -18,16 +18,19 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from dataclasses import dataclass, field
+from typing import Any
 
+from langchain_core.runnables import RunnableBranch, RunnableLambda, RunnablePassthrough
 from sqlalchemy.orm import Session as DatabaseSession
 
-from app.core.config import get_settings
+from app.core.config import Settings, get_settings
 from app.evidence.citation_validation import (
     CitationValidationResult,
     validate_citations_against_packet,
 )
 from app.llm.generator import GenerationResult, generate_grounded_answer
 from app.llm.groq_client import Groq, generate_from_packet, stream_from_packet
+from app.llm.langchain_provider import build_generation_runnable, stream_generation
 from app.rag.context_packet import ContextPacket, WebSourceEntry, build_context_packet
 from app.rag.grounding import INSUFFICIENT_EVIDENCE_RESPONSE, has_sufficient_evidence
 from app.rag.multi_domain import (
@@ -244,6 +247,80 @@ def _finalize_generation(
     )
 
 
+def _langchain_answer_query(
+    query: str,
+    *,
+    candidate_chunks: list[KnowledgeChunk],
+    candidate_scores: dict[str, float] | None,
+    candidate_scoring_mode: str | None,
+    profile: UserContext | None,
+    client: Groq | None,
+    k: int,
+    settings: Settings,
+) -> PipelineResult:
+    """Compose the complete blocking RAG path as a LangChain runnable chain.
+
+    The independent safety, grounding, citation and post-check functions are
+    unchanged. LangChain owns orchestration and provider invocation, so a
+    safety short-circuit never reaches retrieval/generation and every completed
+    answer still passes the same fail-closed finalization path.
+    """
+
+    generation = build_generation_runnable(
+        settings=settings,
+        client=client,
+        legacy_generator=generate_from_packet,
+    )
+
+    def prepare(_: None) -> dict[str, GenerationPlan]:
+        plan = _prepare_generation(
+            query,
+            candidate_chunks=candidate_chunks,
+            candidate_scores=candidate_scores,
+            candidate_scoring_mode=candidate_scoring_mode,
+            profile=profile,
+            k=k,
+        )
+        return {"plan": plan}
+
+    def has_early_result(state: dict[str, GenerationPlan]) -> bool:
+        return state["plan"].early_result is not None
+
+    def early_result(state: dict[str, GenerationPlan]) -> PipelineResult:
+        result = state["plan"].early_result
+        assert result is not None
+        return result
+
+    def context_packet(state: dict[str, GenerationPlan]) -> ContextPacket:
+        packet = state["plan"].context_packet
+        assert packet is not None
+        return packet
+
+    def finalize(state: dict[str, Any]) -> PipelineResult:
+        plan = state["plan"]
+        packet = state["context_packet"]
+        safety = plan.safety_result
+        assert packet is not None and safety is not None
+        return _finalize_generation(
+            query,
+            str(state["raw_answer"]),
+            packet,
+            safety,
+            used_web_search=bool(packet.web_sources),
+        )
+
+    prepare_step = RunnableLambda(prepare)
+    assign_packet = RunnablePassthrough.assign(context_packet=context_packet)
+    generate_step = RunnablePassthrough.assign(
+        raw_answer=(RunnableLambda(context_packet) | generation)
+    )
+    branch = RunnableBranch(
+        (has_early_result, RunnableLambda(early_result)),
+        (assign_packet | generate_step | RunnableLambda(finalize)),
+    )
+    return (prepare_step | branch).invoke(None)
+
+
 def answer_query(
     query: str,
     *,
@@ -254,9 +331,27 @@ def answer_query(
     client: Groq | None = None,
     k: int = DEFAULT_K,
 ) -> PipelineResult:
-    """Run the full pipeline for one query. `client` is injectable so this
-    is testable without a live Groq key (same pattern as #9's
-    generate_from_packet)."""
+    """Run the full pipeline for one query.
+
+    Production orchestration uses LangChain runnables. ``RAG_ORCHESTRATOR=native``
+    keeps the original explicit Python sequence as a compatibility/rollback
+    seam. An injected Groq-compatible client remains supported in both modes
+    for deterministic tests without a live provider key.
+    """
+
+    settings = get_settings()
+    if getattr(settings, "rag_orchestrator", "native") == "langchain":
+        return _langchain_answer_query(
+            query,
+            candidate_chunks=candidate_chunks,
+            candidate_scores=candidate_scores,
+            candidate_scoring_mode=candidate_scoring_mode,
+            profile=profile,
+            client=client,
+            k=k,
+            settings=settings,
+        )
+
     plan = _prepare_generation(
         query,
         candidate_chunks=candidate_chunks,
@@ -313,6 +408,8 @@ def answer_query_stream(
     behavior a post-check failure produces. Callers MUST replace whatever
     was rendered from prior deltas with the final event's text, never merge.
     """
+    settings = get_settings()
+    use_langchain = getattr(settings, "rag_orchestrator", "native") == "langchain"
     plan = _prepare_generation(
         query,
         candidate_chunks=candidate_chunks,
@@ -329,7 +426,16 @@ def answer_query_stream(
 
     buffer: list[str] = []
     try:
-        for delta in stream_from_packet(plan.context_packet, client=client):
+        if use_langchain:
+            deltas = stream_generation(
+                plan.context_packet,
+                settings=settings,
+                client=client,
+                legacy_streamer=stream_from_packet,
+            )
+        else:
+            deltas = stream_from_packet(plan.context_packet, client=client)
+        for delta in deltas:
             buffer.append(delta)
             yield StreamEvent(kind="delta", text=delta)
     except Exception:  # noqa: BLE001

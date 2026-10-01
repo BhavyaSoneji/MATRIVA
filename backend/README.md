@@ -24,7 +24,7 @@ No API key is needed: `RAG_ENGINE=local` is the default. Settings are listed in 
 | `app/safety/` | Pre-check, post-check, prompt-injection defence |
 | `app/safety/guardrails/` | The rule engine: `registry.py` (load and validate), `engine.py` (match), `context.py` (what we know about the person), `output.py` (check the answer) |
 | `app/rag/local/` | The offline retrieval engine |
-| `app/rag/`, `app/llm/` | The optional Groq and Gemini pipeline |
+| `app/rag/`, `app/llm/` | LangChain orchestration plus the optional Groq and Gemini providers |
 | `app/data/` | Data that is reviewed as data: `guardrails/*.yaml`, `care_rules.yaml`, `food_guide.yaml`, `ontology.yaml`, `book_index.json`, `foods_nutrients.json`, `library.yaml` |
 | `app/models/`, `app/schemas/` | SQLAlchemy entities and Pydantic contracts |
 | `alembic/versions/` | Migrations `0001` to `0005` |

@@ -15,6 +15,25 @@ If the external path fails for any reason it falls back to the grounded local an
 an unrestricted one. The offline engine is documented in depth (signals, ablation, held-out
 results) in [`local-rag.md`](./local-rag.md); this page is the overview and the contract.
 
+## LangChain orchestration
+
+With `RAG_ENGINE=external`, the query-to-response path is composed as a LangChain runnable
+chain by default (`RAG_ORCHESTRATOR=langchain`):
+
+1. `RunnableLambda` runs the existing safety pre-check, retrieval, grounding gate,
+   reranking and context-packet preparation.
+2. `RunnableBranch` short-circuits urgent or insufficient-evidence requests before a
+   provider client is constructed.
+3. `ChatGroq` receives the same reviewed context packet, injection-defense prompt and
+   multi-domain rules used by the native client.
+4. A final runnable performs citation validation, segmentation checks and the fail-closed
+   safety post-check before a response can be returned.
+
+Streaming uses the same preparation and finalization stages and streams through LangChain's
+model streaming API. `RAG_ORCHESTRATOR=native` remains an explicit rollback seam; it does
+not change the safety policy or the local grounded fallback. Gemini embeddings use
+`GoogleGenerativeAIEmbeddings` from `langchain-google-genai` on the LangChain path.
+
 ## The request path
 
 ```mermaid
