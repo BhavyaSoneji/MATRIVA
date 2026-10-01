@@ -327,8 +327,11 @@ A modular monolith **on purpose**: RAG, safety, API, ingestion and evaluation ar
 | Ingestion | **43 passing** |
 | Evaluation harnesses | **36 passing** |
 | Frontend end-to-end (Playwright, mocked API) | **12 passing** |
+| Guard-rail checks inside the backend suite | every rule has a source, every emergency rule has Hindi and Gujarati, and no ordinary benchmark question is blocked |
 | Lint · type-check · production build | clean |
 | `npm audit` (production) | **0 vulnerabilities** |
+
+CI runs the backend (ruff, secret scan, mypy, pytest), ingestion, evaluation and frontend (audit, lint, type-check, build, Playwright) jobs on every pull request. Retrieval is measured on held-out question sets, not only the ones it was tuned on: see [`docs/local-rag.md`](./docs/local-rag.md) and [`docs/testing.md`](./docs/testing.md).
 
 ---
 
