@@ -37,17 +37,33 @@ Code: `backend/app/rag/local/` (`text`, `index`, `graph`, `corpus`, `retriever`,
   `GET /knowledge/graph?q=iron`.
 * The index and graph rebuild automatically when documents are approved, rejected or reindexed.
 
-## The book (Prasuti Tantra, Dr. Premvati Tiwari)
+## The book (Prasuti Tantra, Prof. Premvati Tiwari)
 
-The scan is bilingual: Sanskrit/Hindi that OCR mangles, and English translation paragraphs that it reads well.
-`ingestion/pipelines/ocr_english.py` keeps only genuine English prose, cleans OCR debris, scores every paragraph,
-and groups the result into 34 reviewable sections (≈598 chunks, ≈94k words) that remember their scanned-page
-numbers. They load as **pending**; approve them section by section in *Admin → Documents* after checking against
-the PDF. Text is cleaned, never rewritten.
+The scan is bilingual: Sanskrit/Hindi that OCR mangles, and English translation paragraphs that it reads well. The book
+is represented at three levels, all derived deterministically from the OCR (no model, no network):
+
+1. **Structure** (`ingestion/pipelines/book_structure.py`). The 11 chapters are found from their
+   `अध्याय / CHAPTER / (TITLE)` headings in the body. Section rows come from the book's bilingual contents; because
+   each scan is a two-page spread and the page numbers drift, every row is **verified by reading the body text near its
+   predicted page**, and rows that cannot be found are dropped rather than guessed (93 verified of 109 parsed).
+2. **Passages** (`ocr_english.py`). Only genuine English prose is kept (≈567 chunks, ≈94k words), cleaned and scored.
+   Each chunk carries chapter, section, scanned page, readability, and the Hindi/Sanskrit original beside it as unverified
+   provenance (shown under "Show the passage"; never searched or quoted).
+3. **Knowledge representation** (`backend/app/data/book_index.json`, built by `backend/scripts/build_book_index.py`):
+   chapters with titles in both languages, sections, main concepts (from the ontology), distinctive terms
+   (TF-IDF across chapters — *dauhrda* surfaces for the pregnancy chapter), classical authorities cited per chapter
+   (Vagbhata, Susruta, Caraka, Kasyapa …), and a Hindi ↔ English glossary from the contents. The glossary also lets
+   Hindi questions be translated offline. Browse it in the chat with **/book**, or `GET /knowledge/book`.
+
+Retrieval uses the structure: section and chapter titles are searched, so "monthwise dietary regimen" finds
+*Ch. 5 › Monthwise dietary regimen, scanned p. 139*. Where that page's English OCR is too damaged to quote (two-column
+pages sometimes merge), the answer says so and points at the page instead of quoting garbage.
+
+Ingest one chapter per document (11 documents to review in *Admin → Documents*, all pending until approved):
 
 ```
-python backend/scripts/ingest_real_knowledge.py --book-only   # sections (default)
-python backend/scripts/ingest_real_knowledge.py --seed-only   # guidelines, foods, seed documents
+python backend/scripts/ingest_real_knowledge.py --book-only --replace   # chapters
+python backend/scripts/build_book_index.py                              # regenerate the representation
 ```
 
 ## Evaluation
@@ -59,7 +75,7 @@ book) and asks `evaluation/local_rag/questions.yaml` (39 in-scope, 13 out-of-sco
 |---|---|
 | right document in top 1 / 3 / 5 | 95% / 100% / 100% |
 | mean reciprocal rank | 0.97 |
-| in-scope questions answered | 92% |
+| in-scope questions answered | 90% |
 | out-of-scope questions refused | 92% (12 of 13) |
 
 `backend/tests/test_local_rag_eval.py` fails CI if these drop. The one out-of-scope miss is "newborn vaccines",
@@ -70,7 +86,7 @@ question set, so treat the numbers as an upper bound for unseen questions.
 
 Approved content in the default knowledge base: 20+ WHO / NHS / Government of India guidance entries (including six
 from ICMR-NIN's *Dietary Guidelines for Indians*, the main source for Indian diet advice), 67 USDA nutrient profiles
-for foods common in Indian diets, the FOGSI visit schedule, and the Prasuti Tantra English passages. Each is
+for foods common in Indian diets, the FOGSI visit schedule, and the Prasuti Tantra English passages (11 chapters). Each is
 paraphrased with its source URL; the wording has not been reviewed line by line by a clinician.
 
 ## Limits (honest)
@@ -79,6 +95,6 @@ paraphrased with its source URL; the wording has not been reviewed line by line 
   never inventing a fact.
 * **English knowledge base.** Hindi/Gujarati questions are translated by a small glossary, so unusual phrasings
   are missed. Answers are in English.
-* **OCR noise.** Two-column pages and index pages occasionally slip through the quality filter, which is why every
-  section needs human review.
+* **OCR noise.** Two-column pages sometimes merge into unreadable English. The structure still locates the right
+  section and the answer points to the page, but cannot quote it. Hindi/Sanskrit text is kept only as provenance.
 * Nothing is shown until it is approved: with nothing approved, the chat honestly says it has no evidence.
