@@ -229,3 +229,34 @@ export interface LifestyleItem {
   safety_status: string;
   source_ids: string[];
 }
+
+export interface ResourceResponse {
+  id: string;
+  type: "video" | "article" | "guideline" | "research";
+  topic: string;
+  stages: string[];
+  language: string;
+  title: string;
+  publisher: string;
+  url: string;
+  thumbnail: string | null;
+  about: string;
+}
+
+export interface ResourceLibraryResponse {
+  verified_on: string | null;
+  topics: Record<string, string>;
+  resources: ResourceResponse[];
+}
+
+export interface WellnessLog {
+  date: string;
+  water_intake_ml: number | null;
+  sleep_hours: number | null;
+  activity_minutes: number | null;
+  updated_at: string;
+}
+
+export interface WellnessSummary {
+  days: WellnessLog[];
+}
