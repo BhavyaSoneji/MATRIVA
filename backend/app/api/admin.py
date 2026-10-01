@@ -15,9 +15,12 @@ from app.models import (
     AyurvedicSource,
     EvidenceMetadata,
     ExerciseGuidance,
+    Feedback,
     FoodItem,
     Guideline,
     IndexStatus,
+    Message,
+    MessageRole,
     KnowledgeChunk,
     KnowledgeDocument,
     KnowledgeSource,
@@ -34,6 +37,7 @@ from app.schemas.api import (
     DocumentMetadataRequest,
     DocumentResponse,
     ExerciseGuidanceRequest,
+    FeedbackReviewItem,
     FoodItemRequest,
     GuidelineRequest,
     GuidelineResponse,
@@ -529,3 +533,54 @@ def update_guideline(guideline_id: str, payload: GuidelineRequest, admin: AdminU
         status=_guideline_status(item),
         source=SourceResponse.model_validate(source_payload(source)),
     )
+
+
+@router.get("/feedback", response_model=list[FeedbackReviewItem])
+def review_feedback(
+    admin: AdminUser,
+    db: DBSession,
+    max_rating: int = 2,
+    limit: int = 100,
+) -> list[FeedbackReviewItem]:
+    """Low-rated answers with the question that prompted them: the to-do list for filling gaps.
+
+    `had_evidence=False` means the answer cited no reviewed source -- those are the clearest
+    signals that the knowledge base is missing something users actually ask.
+    """
+    limit = max(1, min(limit, 300))
+    rows = db.execute(
+        select(Feedback)
+        .where(Feedback.message_id.is_not(None), Feedback.rating <= max_rating)
+        .order_by(Feedback.created_at.desc())
+        .limit(limit)
+    ).scalars().all()
+    items: list[FeedbackReviewItem] = []
+    for fb in rows:
+        answer = db.get(Message, fb.message_id)
+        if answer is None:
+            continue
+        question = db.execute(
+            select(Message.content)
+            .where(
+                Message.conversation_id == answer.conversation_id,
+                Message.role == MessageRole.USER.value,
+                Message.created_at <= answer.created_at,
+            )
+            .order_by(Message.created_at.desc())
+            .limit(1)
+        ).scalar_one_or_none()
+        source_count = len(answer.sources or [])
+        items.append(
+            FeedbackReviewItem(
+                feedback_id=fb.id,
+                rating=fb.rating,
+                comment=fb.comment,
+                created_at=fb.created_at,
+                question=question,
+                answer=answer.content,
+                safety_status=answer.safety_status,
+                source_count=source_count,
+                had_evidence=source_count > 0,
+            )
+        )
+    return items
