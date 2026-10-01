@@ -14,6 +14,7 @@ What is left. Most of it needs people, not code. Issue numbers refer to the GitH
 | Decide whether profile deletion should also delete chat history | Today only account deletion does ([`privacy.md`](./privacy.md#a-gap-to-know-about)) | A product decision, then a small change | |
 | Confirm the Round 1 submission status | The Sep 25 date has passed | A team member | #68, #76 |
 | Branch protection on `main` | Direct pushes are possible | A repository admin | #21 |
+| Rate limits on the care, profile, privacy and resources routes | Only auth, chat and the knowledge routes are limited today | A small change in `main.py` | |
 
 ## Product
 
