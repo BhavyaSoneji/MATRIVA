@@ -202,6 +202,36 @@ def normalize_query(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+# Hindi (Devanagari + roman "Hinglish") and Gujarati equivalents of the urgent/review terms above, so a
+# user who writes in their own language is escalated exactly like an English speaker. Like the English
+# lists these are illustrative and PENDING clinical + native-speaker review; they deliberately err
+# toward escalating. Substring match on NFKC-normalised text, so no word-boundary regex is involved.
+_MULTILINGUAL_URGENT = {
+    # Hindi
+    "तेज ब्लीडिंग", "बहुत ब्लीडिंग", "बहुत खून", "खून बह रहा", "खून आ रहा",
+    "तेज सिरदर्द", "तेज सिर दर्द", "बहुत तेज सिरदर्द", "धुंधला दिख", "आंखों के आगे अंधेरा",
+    "बच्चा हिल नहीं रहा", "बच्चा नहीं हिल रहा", "बच्चे की हलचल कम", "हलचल बंद", "बच्चा हिलना बंद",
+    "पेट में तेज दर्द", "पेट में बहुत दर्द", "तेज पेट दर्द", "पानी की थैली फट", "पानी निकल रहा",
+    "सांस लेने में तकलीफ", "सांस नहीं ले पा", "सीने में दर्द", "दौरा पड़", "दौरे पड़", "बेहोश",
+    "आत्महत्या", "जान देने का मन",
+    # Hinglish
+    "bahut khoon", "khoon aa raha", "khoon beh raha", "tez sir dard", "tez sar dard",
+    "baby hil nahi raha", "bachcha hil nahi raha", "bacha hil nahi raha", "halchal band", "halchal kam",
+    "pet mein tez dard", "pet me tez dard", "pet mein bahut dard", "saans lene mein takleef",
+    "saans nahi le pa", "seene mein dard", "behosh", "daura pad", "paani ki thaili phat",
+    # Gujarati
+    "ખૂબ લોહી", "લોહી વહે", "લોહી નીકળ", "તીવ્ર માથાનો દુખાવો", "ધૂંધળું દેખાય", "બાળક હલતું નથી",
+    "બાળકની હલનચલન ઓછી", "પેટમાં તીવ્ર દુખાવો", "શ્વાસ લેવામાં તકલીફ", "છાતીમાં દુખાવો", "આંચકી", "બેભાન",
+    "આત્મહત્યા",
+}
+_MULTILINGUAL_REVIEW = {
+    "ब्लीडिंग", "खून", "दवा", "दवाई", "बुखार", "दर्द", "khoon", "dawai", "dawa", "bukhar", "dard",
+    "લોહી", "દવા", "તાવ", "દુખાવો",
+}
+URGENT_TERMS |= {normalize_query(term) for term in _MULTILINGUAL_URGENT}
+MEDICAL_REVIEW_TERMS |= {normalize_query(term) for term in _MULTILINGUAL_REVIEW}
+
+
 def _risk_from_rule(value: str) -> RiskLevel:
     try:
         return RiskLevel(value)
