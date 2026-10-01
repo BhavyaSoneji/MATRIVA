@@ -16,6 +16,7 @@ Nothing here calls a model or the network.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -28,12 +29,14 @@ CANDIDATES = 50
 MMR_LAMBDA = 0.72
 MAX_PER_SOURCE = 3
 MAX_PER_DOCUMENT = 2
+MAX_NUTRIENT_TABLES = 2  # per-food nutrient tables: useful, but they must not crowd out guidance
 
 EVIDENCE_WEIGHT = {
     "supported": 1.0, "mixed_evidence": 0.8, "limited_evidence": 0.6, "preliminary": 0.55,
     "traditional": 0.55, "uncertain": 0.4, "not_established": 0.3,
 }
 _ANIMAL_CONCEPTS = frozenset({"meat", "fish", "liver"})
+_FOOD_TYPES = frozenset({"food"})
 # Asking "what does Ayurveda say..." is a request for traditional sources; prefer them (softly).
 TRADITIONAL_CUES = frozenset({"ayurveda", "charaka", "susruta", "sushruta", "vagbhata", "kashyapa", "samhita", "classical"})
 
@@ -85,6 +88,14 @@ class Retrieval:
     pool: int = 0  # how many passages passed the filters
     sentence_coverage: float = 0.0
     union_coverage: float = 0.0
+    quantity_intent: bool = False  # "how much / how many / dose": prefer sentences that state a number
+
+
+_QUANTITY_RE = re.compile(r"\bhow (?:much|many|often|long)\b|\bdose\b|\bdosage\b|\bamount\b|\bquantit|\bportions?\b|\bper day\b|\bhow big\b", re.IGNORECASE)
+
+
+def wants_quantity(query: str) -> bool:
+    return bool(_QUANTITY_RE.search(query))
 
 
 def _rank(scores: dict[int, float]) -> dict[int, int]:
@@ -190,6 +201,10 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
         )
         if profile.stage and passage_stage not in (None, "all", profile.stage):
             score *= 0.93  # written for another stage: still reachable, just less preferred
+        if p.meta.get("topic") == "nutrient_profile" and not any(
+            graph.concepts[c].type == "food" for c in q_concepts
+        ):
+            score *= 0.7  # "how much iron do I need?" is about intake guidance, not about one food's label
         if qset & TRADITIONAL_CUES and not (p.meta.get("domain") == "ayurveda" or p.meta.get("source_type") == "traditional"):
             score *= 0.65
         if profile.diet in {"vegetarian", "vegan"} and (graph.passage_concepts[i] & _ANIMAL_CONCEPTS) and not (
@@ -211,11 +226,14 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
     chosen: list[Hit] = []
     per_source: dict[str, int] = {}
     per_doc: dict[str, int] = {}
+    tables = 0
     remaining = list(pool)
     while remaining and len(chosen) < k:
         best, best_val = None, -math.inf
         for h in remaining:
             if per_source.get(h.meta["source_id"], 0) >= MAX_PER_SOURCE or per_doc.get(h.meta["document_id"], 0) >= MAX_PER_DOCUMENT:
+                continue
+            if h.meta.get("topic") == "nutrient_profile" and tables >= MAX_NUTRIENT_TABLES:
                 continue
             sim = max((_jaccard(index.passages[h.idx].token_set, index.passages[c.idx].token_set) for c in chosen), default=0.0)
             val = MMR_LAMBDA * h.score - (1 - MMR_LAMBDA) * sim
@@ -227,6 +245,7 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
         remaining.remove(best)
         per_source[best.meta["source_id"]] = per_source.get(best.meta["source_id"], 0) + 1
         per_doc[best.meta["document_id"]] = per_doc.get(best.meta["document_id"], 0) + 1
+        tables += best.meta.get("topic") == "nutrient_profile"
 
     # ---- judge
     if not chosen:
@@ -256,4 +275,4 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
             f"passages together {union_cov:.0%}, best passage {top.coverage:.0%}); not enough to answer reliably"
         )
     )
-    return Retrieval(chosen, q_tokens, concepts, expanded, confidence, sufficient, reason, len(allowed), round(best_sentence, 3), round(union_cov, 3))
+    return Retrieval(chosen, q_tokens, concepts, expanded, confidence, sufficient, reason, len(allowed), round(best_sentence, 3), round(union_cov, 3), wants_quantity(query))

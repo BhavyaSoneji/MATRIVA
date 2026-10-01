@@ -91,6 +91,7 @@ def load_passages(db: Session) -> list[Passage]:
                     "authority": source.authority,
                     "url": source.url,
                     "domain": document.domain,
+                    "topic": source.topic,
                     "stage": document.pregnancy_stage,
                     "region": document.region,
                     "evidence_level": source.evidence_level,
