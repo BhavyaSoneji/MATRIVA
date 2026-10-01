@@ -134,6 +134,10 @@ class HealthProfile(Base):
     dietary_restrictions: Mapped[list[str]] = mapped_column(JSON, default=list)
     activity_restrictions: Mapped[list[str]] = mapped_column(JSON, default=list)
     allergies: Mapped[list[str]] = mapped_column(JSON, default=list)
+    current_medications: Mapped[list[str]] = mapped_column(JSON, default=list)
+    risk_factors: Mapped[list[str]] = mapped_column(JSON, default=list)
+    age_years: Mapped[int | None] = mapped_column(Integer)
+    blood_group: Mapped[str | None] = mapped_column(String(8))
     notes: Mapped[str | None] = mapped_column(Text)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False)
 

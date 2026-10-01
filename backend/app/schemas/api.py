@@ -90,6 +90,10 @@ class ProfileUpdateRequest(APIModel):
     dietary_restrictions: list[str] = Field(default_factory=list, max_length=50)
     activity_restrictions: list[str] = Field(default_factory=list, max_length=50)
     allergies: list[str] = Field(default_factory=list, max_length=50)
+    current_medications: list[str] = Field(default_factory=list, max_length=50)
+    risk_factors: list[str] = Field(default_factory=list, max_length=20)
+    age_years: int | None = Field(default=None, ge=10, le=60)
+    blood_group: str | None = Field(default=None, max_length=16)
     health_notes: str | None = Field(default=None, max_length=2000)
     activity_level: str | None = Field(default=None, max_length=40)
     occupation: str | None = Field(default=None, max_length=120)
@@ -110,6 +114,8 @@ class ProfileUpdateRequest(APIModel):
         "dietary_restrictions",
         "activity_restrictions",
         "allergies",
+        "current_medications",
+        "risk_factors",
         "lifestyle_preferences",
         "food_preferences",
     )
@@ -119,6 +125,16 @@ class ProfileUpdateRequest(APIModel):
         if any(len(item) > 160 for item in cleaned):
             raise ValueError("list entries must be 160 characters or fewer")
         return list(dict.fromkeys(cleaned))
+
+    @field_validator("blood_group")
+    @classmethod
+    def validate_blood_group(cls, value: str | None) -> str | None:
+        if value is None or not value.strip():
+            return None
+        text = value.strip().upper().replace(" ", "").replace("POSITIVE", "+").replace("NEGATIVE", "-").replace("POS", "+").replace("NEG", "-")
+        if text not in {"A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"}:
+            raise ValueError("blood group must be one of A+, A-, B+, B-, AB+, AB-, O+, O-")
+        return text
 
 
 class ProfileResponse(APIModel):

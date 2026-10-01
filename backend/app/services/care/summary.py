@@ -63,6 +63,9 @@ def build(db: Session, user: User, today: date) -> dict[str, Any]:
         },
         "health": {
             "known_conditions": health.known_conditions if health else [], "allergies": health.allergies if health else [],
+            "current_medications": (health.current_medications or []) if health else [],
+            "risk_factors": (health.risk_factors or []) if health else [],
+            "blood_group": health.blood_group if health else None, "age_years": health.age_years if health else None,
             "doctor_restrictions": health.doctor_restrictions if health else [], "diet": diet.diet_type if diet else None,
         },
         "readings": {"latest": latest, "trend": trend, "weight_gain": readings_module.weight_gain(rows, d)},

@@ -43,4 +43,4 @@ def test_alembic_upgrade_head_on_fresh_database(tmp_path: Path) -> None:
     finally:
         engine.dispose()
 
-    assert version == "0004_care_features"
+    assert version == "0005_safety_profile"

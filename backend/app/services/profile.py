@@ -66,6 +66,10 @@ def update_profile(db: Session, user: User, payload: ProfileUpdateRequest) -> di
     health.dietary_restrictions = payload.dietary_restrictions
     health.activity_restrictions = payload.activity_restrictions
     health.allergies = payload.allergies
+    health.current_medications = payload.current_medications
+    health.risk_factors = payload.risk_factors
+    health.age_years = payload.age_years
+    health.blood_group = payload.blood_group
     health.notes = payload.health_notes
     db.add(health)
 
@@ -112,6 +116,10 @@ def profile_payload(db: Session, user: User) -> dict[str, object]:
             "dietary_restrictions": health.dietary_restrictions,
             "activity_restrictions": health.activity_restrictions,
             "allergies": health.allergies,
+            "current_medications": health.current_medications or [],
+            "risk_factors": health.risk_factors or [],
+            "age_years": health.age_years,
+            "blood_group": health.blood_group,
             "notes": health.notes,
         } if health else None,
         "lifestyle": {
