@@ -22,6 +22,7 @@ from app.models import (
     SafetyStatus,
     User,
 )
+from app.rag.followup import resolve_followup
 from app.rag.pipeline import answer_question, answer_question_stream
 from app.rag.retrieval import RetrievedChunk
 from app.repositories.knowledge import source_payload
@@ -40,8 +41,11 @@ from app.schemas.api import (
     SourceResponse,
 )
 from app.services.audit import active_safety_rules, record_safety_event
+from app.services.chat_actions import apply_wellness_statement
+from app.services.personalization import build_user_context
 from app.services.recommendation import generate_recommendations
 from app.services.stage import calculate_stage
+from app.services.suggestions import suggest_followups
 
 INTENT_KEYWORDS = {
     "EMERGENCY": {"emergency", "bleeding", "severe headache", "fetal movement", "breathing", "pain"},
@@ -80,6 +84,42 @@ def _profile_context(db: Session, user: User | None) -> tuple[str | None, str | 
     dietary = db.execute(select(DietaryProfile).where(DietaryProfile.user_id == user.id)).scalar_one_or_none()
     stage = calculate_stage(pregnancy.current_week).stage if pregnancy else None
     return stage, dietary.region if dietary else None
+
+
+def _recent_user_messages(db: Session, payload: MessageRequest, user: User | None) -> list[str]:
+    """The user's last few questions in this conversation (newest first), for follow-up resolution.
+
+    Only the signed-in owner's own conversation is read; anything else yields no history and
+    `_conversation` later rejects it properly.
+    """
+    if not payload.conversation_id or user is None:
+        return []
+    rows = db.execute(
+        select(Message.content)
+        .join(Conversation, Conversation.id == Message.conversation_id)
+        .where(
+            Message.conversation_id == payload.conversation_id,
+            Conversation.user_id == user.id,
+            Message.role == MessageRole.USER.value,
+        )
+        .order_by(Message.created_at.desc())
+        .limit(3)
+    ).scalars().all()
+    return list(rows)
+
+
+def _prepare_turn(db: Session, payload: MessageRequest, user: User | None, decision: SafetyDecision):
+    """Per-turn context shared by the blocking and streaming paths: personalised user context,
+    the (possibly follow-up-resolved) retrieval query, and any wellness statement to log."""
+    user_context = build_user_context(db, user, payload.language)
+    history = _recent_user_messages(db, payload, user)
+    query = resolve_followup(payload.message, history)
+    action = (
+        apply_wellness_statement(db, user, payload.message)
+        if user is not None and decision.risk.value in {"safe_general", "low_concern"}
+        else None
+    )
+    return user_context, history, query, action
 
 
 def _conversation(db: Session, user: User | None, payload: MessageRequest) -> Conversation:
@@ -239,7 +279,8 @@ def process_chat(
     request_id: str,
 ) -> ChatResponse:
     intent, decision = _run_safety_pre_check(db, payload, user)
-    stage, region = _profile_context(db, user)
+    user_context, history, query, action = _prepare_turn(db, payload, user, decision)
+    stage, region = user_context.pregnancy_stage, user_context.region
     sources: list[SourceResponse] = []
     citations: list[Citation] = []
     recommendations = []
@@ -248,9 +289,12 @@ def process_chat(
     if decision.risk.value in {"urgent_escalation", "high_risk"}:
         answer = decision.response or "Please contact a qualified maternity-care professional for an urgent review."
         safety_status = decision.status
+    elif action is not None:
+        answer = action.summary
+        safety_status = decision.status
     else:
         retrieval_started = time.perf_counter()
-        generation, chunks = answer_question(db, payload.message, stage=stage, region=region)
+        generation, chunks = answer_question(db, query, stage=stage, region=region, profile=user_context)
         retrieval_latency_ms = round((time.perf_counter() - retrieval_started) * 1000, 2)
         sources = _unique_sources(chunks)
         if generation.text:
@@ -303,6 +347,11 @@ def process_chat(
         retrieval_count=len(sources),
         source_count=len(sources),
     )
+    suggestions = (
+        []
+        if decision.risk.value in {"urgent_escalation", "high_risk"}
+        else suggest_followups(intent, stage, asked=[payload.message, *history])
+    )
     response = ChatResponse(
         conversation_id=conversation.id,
         message_id=assistant_message.id,
@@ -313,6 +362,7 @@ def process_chat(
         citations=citations,
         evidence=evidence,
         recommendations=[item for item in recommendations],
+        suggestions=suggestions,
     )
     # Keep the user message ID available for feedback without exposing it in logs.
     response.evidence["user_message_id"] = user_message.id
@@ -382,7 +432,8 @@ def stream_chat(
     part of a single JSON response.
     """
     intent, decision = _run_safety_pre_check(db, payload, user)
-    stage, region = _profile_context(db, user)
+    user_context, history, query, action = _prepare_turn(db, payload, user, decision)
+    stage, region = user_context.pregnancy_stage, user_context.region
     sources: list[SourceResponse] = []
     citations: list[Citation] = []
     recommendations: list[Any] = []
@@ -399,12 +450,21 @@ def stream_chat(
             "final",
             {"answer": answer, "safety_status": safety_status.value, "citations": [], "corrected": False},
         )
+    elif action is not None:
+        # A wellness statement ("I drank 3 glasses of water") was logged -- confirm it, no retrieval needed.
+        answer = action.summary
+        safety_status = decision.status
+        yield format_sse_event("delta", {"text": answer})
+        yield format_sse_event(
+            "final",
+            {"answer": answer, "safety_status": safety_status.value, "citations": [], "corrected": False},
+        )
     else:
         retrieval_started = time.perf_counter()
         chunks: list[RetrievedChunk] = []
         final_generation: GenerationResult | None = None
         streamed_parts: list[str] = []
-        for stream_event in answer_question_stream(db, payload.message, stage=stage, region=region):
+        for stream_event in answer_question_stream(db, query, stage=stage, region=region, profile=user_context):
             if stream_event.kind == "delta":
                 streamed_parts.append(stream_event.text)
                 yield format_sse_event("delta", {"text": stream_event.text})
@@ -491,9 +551,15 @@ def stream_chat(
         retrieval_count=len(sources),
         source_count=len(sources),
     )
+    suggestions = (
+        []
+        if decision.risk.value in {"urgent_escalation", "high_risk"}
+        else suggest_followups(intent, stage, asked=[payload.message, *history])
+    )
     yield format_sse_event(
         "done",
         {
+            "suggestions": suggestions,
             "conversation_id": conversation.id,
             "message_id": assistant_message.id,
             "sources": [item.model_dump(mode="json") for item in sources],
