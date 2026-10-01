@@ -31,3 +31,14 @@ def test_retrieval_quality_and_refusals_on_the_real_corpus() -> None:
 def test_modern_questions_do_not_depend_on_the_book() -> None:
     m = _load().evaluate(include_book=False)["metrics"]
     assert m["hit_at_3"] >= 0.95 and m["refusal_precision"] >= 0.85
+
+
+def test_held_out_sets_do_not_regress() -> None:
+    """Floors for the paraphrase sets (numbers in docs/local-rag.md); they catch a change that overfits the tuned set."""
+    mod = _load()
+    here = RUN.parent
+    engine = mod.Engine(mod.build_passages(True))
+    floors = {"heldout.yaml": (0.90, 0.80), "heldout2.yaml": (0.80, 0.80), "heldout3.yaml": (0.80, 0.70)}
+    for name, (hit3, refusal) in floors.items():
+        m = mod.evaluate(questions=here / name, engine=engine)["metrics"]
+        assert m["hit_at_3"] >= hit3 and m["refusal_precision"] >= refusal, (name, m)
