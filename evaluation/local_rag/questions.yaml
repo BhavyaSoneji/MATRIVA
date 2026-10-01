@@ -7,13 +7,13 @@
 # Out-of-scope questions must come back INSUFFICIENT (the engine has to refuse, not stretch a loose match).
 
 in_scope:
-  - {q: "How much iron and folic acid should pregnant women take every day?", expect_docs: [guide-who-iron-folate-001]}
+  - {q: "How much iron and folic acid should pregnant women take every day?", expect_docs: [guide-who-iron-folate-001, guide-nin-iron-001]}
   - {q: "How much caffeine is safe during pregnancy?", expect_docs: [guide-who-caffeine-001]}
   - {q: "Which foods should I avoid while pregnant?", expect_docs: [guide-nhs-food-safety-001]}
-  - {q: "Can I eat liver when I am pregnant?", expect_docs: [guide-nhs-food-safety-001, food-usda-173001]}
+  - {q: "Can I eat liver when I am pregnant?", expect_docs: [guide-nhs-food-safety-001, food-usda-171061]}
   - {q: "How much exercise should I do each week during pregnancy?", expect_docs: [guide-who-activity-001, guide-nhs-exercise-001]}
   - {q: "What are the warning signs of pre-eclampsia?", expect_docs: [guide-nhs-preeclampsia-001]}
-  - {q: "My baby is moving less than usual, what should I do?", expect_docs: [guide-nhs-movements-001]}
+  - {q: "My baby is moving less than usual, what should I do?", expect_docs: [guide-nhs-movements-001, guide-nhs-labour-signs-001]}
   - {q: "What can I do about morning sickness and vomiting?", expect_docs: [guide-nhs-morning-sickness-001]}
   - {q: "How do I ease back pain in pregnancy?", expect_docs: [guide-nhs-back-pain-001]}
   - {q: "Which vaccines are recommended during pregnancy?", expect_docs: [guide-nhs-vaccines-001]}
@@ -27,9 +27,14 @@ in_scope:
   - {q: "What haemoglobin level counts as anaemia in pregnancy?", expect_docs: [guide-who-anaemia-001]}
   - {q: "Does calcium supplementation reduce pre-eclampsia risk?", expect_docs: [guide-who-calcium-001]}
   - {q: "When are antenatal care visits scheduled?", expect_docs: [seed-anc-fogsi-001]}
-  - {q: "How much folic acid and vitamin D should I take?", expect_docs: [guide-nhs-vitamins-001]}
+  - {q: "How much folic acid and vitamin D should I take?", expect_docs: [guide-nhs-vitamins-001, guide-nin-folic-001]}
+  - {q: "What should I eat during pregnancy?", expect_docs: [guide-nin-balanced-plate-001, guide-nin-extra-food-001, guide-nhs-healthy-diet-001]}
+  - {q: "How much extra protein and how many calories do I need in the second trimester?", expect_docs: [guide-nin-extra-food-001]}
+  - {q: "Does tea reduce iron absorption and how can I improve it?", expect_docs: [guide-nin-iron-001]}
+  - {q: "Can I drink tea or coffee while pregnant?", expect_docs: [guide-who-caffeine-001, guide-nin-dos-donts-001]}
+  - {q: "How many glasses of water should I drink?", expect_docs: [guide-nin-balanced-plate-001]}
   - {q: "How much iron is in lentils?", expect_docs: [food-usda-172421]}
-  - {q: "How much calcium is in ragi?", expect_docs: [seed-ifct-ragi-001]}
+  - {q: "How much calcium is in ragi?", expect_docs: [seed-ifct-ragi-001, food-usda-168871]}
   - {q: "How much protein is in moong dal?", expect_docs: [seed-ifct-moong-dal-001, food-usda-174257]}
   - {q: "Is guava a good source of vitamin C?", expect_docs: [food-usda-173044]}
   - {q: "Is spinach rich in iron and folate?", expect_docs: [food-usda-168463, seed-ifct-palak-001]}

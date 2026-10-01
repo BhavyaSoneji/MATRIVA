@@ -52,7 +52,7 @@ def build_passages(include_book: bool = True) -> list[Passage]:
                 tokens=tokens(f"{e['content']} {e['title']} {e.get('topic', '')}"),
                 meta={
                     "title": e["title"], "document_id": e["document_id"], "source_id": e.get("source_id", e["document_id"]),
-                    "domain": e["domain"].lower(), "stage": None if stage in (None, "all") else stage,
+                    "topic": e.get("topic"), "domain": e["domain"].lower(), "stage": None if stage in (None, "all") else stage,
                     "region": e.get("region"), "evidence_level": e["evidence_level"].lower(),
                     "source_type": "traditional" if e["domain"] == "AYURVEDA" else "government", "locator": None,
                 },
