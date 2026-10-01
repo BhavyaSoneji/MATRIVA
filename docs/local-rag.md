@@ -8,17 +8,25 @@ pipeline is still in the code behind `RAG_ENGINE=external`, but nothing calls it
 question
   │  safety pre-check (in the user's own language)           ← unchanged, runs first
   │  follow-up resolution ("what about ragi?" + previous turn)
-  │  Hindi / Gujarati / Hinglish → English search query (offline glossary)
+  │  Hindi / Gujarati / Hinglish → English search query (hand glossary + the book's own bilingual terms)
   ▼
-analyse      stemmed tokens · corpus synonyms · concepts found · related concepts (knowledge graph)
-retrieve     BM25 (words) │ TF-IDF over character n-grams (OCR / spelling tolerant) │ concept match
-fuse         reciprocal rank fusion
-rerank       coverage · term proximity · concept coverage · title match · evidence strength ·
-             text quality · stage fit · diet fit · "asked about Ayurveda" preference
+understand   intent (definition · quantity · safety · how-to · list · comparison) · classical authorities named
+             · compound questions split when their halves are never discussed together
+analyse      stemmed tokens · corpus synonyms · concepts found (with the words that named them) · related concepts
+retrieve     seven signals, each its own ranking:
+               BM25 (words)  │  character n-grams (OCR / spelling tolerant)  │  concept match
+               latent semantic space (same meaning, different words)  │  structure (chapter & section titles)
+               graph activation (personalised PageRank over the concept graph: multi-hop)
+               pseudo-relevance feedback (vocabulary the best passages use)
+fuse         weighted reciprocal rank fusion
+rerank       coverage · term proximity · concept coverage · title match · semantic similarity · section match ·
+             evidence strength · text quality · stage fit · diet fit · "asked about Ayurveda" and
+             "asked about Caraka" preferences · a prior against scanned text on everyday questions
 diversify    MMR + at most 3 passages per source, 2 per document
-judge        sufficiency gate: best-sentence, union and top-passage coverage (idf-weighted) → answer or refuse
-compose      pick real sentences, drop near-duplicates, split modern vs traditional, number citations,
-             add stage / allergy / diet notes
+judge        idf-weighted sufficiency gate (best sentence · passages together · best passage; a concept counts as
+             covered when the passage mentions it in other words) → answer or refuse
+compose      pick real sentences (definitions for "what is", numbers for "how much", the named authority), drop
+             near-duplicates, split modern vs traditional, number citations, add stage / allergy / diet notes
   ▼
 answer (every sentence is quoted from an approved passage)  +  retrieval trace  +  follow-up suggestions
   │  safety post-check                                       ← unchanged
@@ -66,21 +74,66 @@ python backend/scripts/ingest_real_knowledge.py --book-only --replace   # chapte
 python backend/scripts/build_book_index.py                              # regenerate the representation
 ```
 
+## Advanced signals
+
+| signal | what it adds | code |
+|---|---|---|
+| Latent semantic space | passages about the same thing in different words; learned from the approved corpus with a truncated SVD (numpy, hashed features) | `semantic.py` |
+| Structure | a passage inherits its section / chapter / document title, so a section is found even when its own OCR is unreadable | `index.structure_scores` |
+| Graph activation | personalised PageRank over the concept graph reaches concepts the question did not name (multi-hop) | `graph.activation` |
+| Pseudo-relevance feedback | terms frequent in the best passages but rare in the corpus are added to the search at low weight | `feedback.py` |
+| Authority awareness | "what does Caraka say" prefers passages and sentences that cite him | `authorities.py` |
+| Query understanding | intent, authorities, compound-question splitting | `understanding.py` |
+
+Every signal sits behind `Config`, so each can be switched off.
+
 ## Evaluation
 
-`python evaluation/local_rag/run.py` builds the index from the repo's data files (guidelines, USDA foods, the
-book) and asks `evaluation/local_rag/questions.yaml` (39 in-scope, 13 out-of-scope questions):
+Four question sets in `evaluation/local_rag/`, because one set that you also tune on proves little:
 
-| metric | value |
-|---|---|
-| right document in top 1 / 3 / 5 | 95% / 100% / 100% |
-| mean reciprocal rank | 0.97 |
-| in-scope questions answered | 90% |
-| out-of-scope questions refused | 92% (12 of 13) |
+* `questions.yaml` – the development set the engine was tuned on.
+* `heldout.yaml`, `heldout2.yaml` – everyday paraphrases written after tuning; used to diagnose failures, so they
+  guided some fixes (stemming of plurals, an over-broad "pregnant woman" concept, a prior against OCR text on
+  everyday questions). They are development data now, not clean tests.
+* `heldout3.yaml` – the clean test: written after all of that and never tuned on.
 
-`backend/tests/test_local_rag_eval.py` fails CI if these drop. The one out-of-scope miss is "newborn vaccines",
-which is genuinely near the pregnancy-vaccines passage. The thresholds in `retriever.py` were calibrated on this
-question set, so treat the numbers as an upper bound for unseen questions.
+| set | in-scope | right doc first | in top 3 | MRR | answered | out-of-scope refused |
+|---|---|---|---|---|---|---|
+| tuned (`questions.yaml`) | 39 | 95% | 100% | 0.97 | 97% | 92% (12/13) |
+| held-out 1 | 20 | 90% | 95% | 0.94 | 85% | 88% (7/8) |
+| held-out 2 | 16 | 69% | 88% | 0.78 | 75% | 100% (6/6) |
+| **held-out 3 (clean)** | 14 | **71%** | **86%** | **0.79** | **71%** | **83% (5/6)** |
+
+So on questions it has never seen, the right document is first about 7 times in 10 and in the top three about 6 in 7.
+That is the number to believe; the tuned set flatters it.
+
+### Ablation (what each signal is worth)
+
+`python evaluation/local_rag/ablation.py`, over the three development sets (75 in-scope, 27 out-of-scope questions):
+
+| configuration | right doc first | top 3 | MRR | answered | refused |
+|---|---|---|---|---|---|
+| full pipeline | 88.0% | 96.0% | 0.923 | 89.3% | 92.6% |
+| lexical only (BM25 + n-grams) | 85.3% | 96.0% | 0.905 | 90.6% | 92.6% |
+| without semantic space | 84.0% | 96.0% | 0.903 | 88.0% | 92.6% |
+| without structure | 86.7% | 96.0% | 0.917 | 89.3% | 92.6% |
+| without graph activation | 86.7% | 96.0% | 0.917 | 89.3% | 92.6% |
+| without feedback | 88.0% | 96.0% | 0.923 | 89.3% | 92.6% |
+| without concepts | 85.3% | 96.0% | 0.910 | 88.0% | 92.6% |
+| without n-grams | 85.3% | 96.0% | 0.904 | 86.6% | 96.3% |
+
+Read this honestly: the lexical baseline is already strong, and the advanced signals add only a few points of
+rank quality (the semantic space is worth the most, about 4 points of "right document first"). With 75 questions, one
+question is 1.3 points, so differences under ~3 points are noise. Feedback, authority and compound-question handling
+show no effect here because few of these questions exercise them; they are covered by unit tests instead
+(`tests/test_local_rag_advanced.py`).
+
+### Known failures
+
+* An out-of-scope question can slip through when it shares a rare word with the book ("what is a good diet for my
+  dog" matched a passage that mentions a dog). The sufficiency gate is lexical; it cannot know a dog is not a pregnancy topic.
+* Paraphrases with no shared vocabulary and no matching concept still fail ("what should I do if my baby kicks less").
+* `backend/tests/test_local_rag_eval.py` fails CI if the development sets regress.
 
 ## Sources behind the answers
 
