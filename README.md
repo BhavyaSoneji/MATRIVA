@@ -281,20 +281,23 @@ The full data map and what is and is not stored: [`docs/privacy.md`](./docs/priv
 flowchart TB
     subgraph FE["🖥️ Frontend · Next.js 16 · React 19"]
       CH[Single chat workspace]
-      W[Widgets: plan · check-in · readings · meals · summary · book · map]
+      W[Cards: plan · check-in · readings · meals · foods · summary · book · map]
+      ST[Settings · safety profile]
     end
     subgraph BE["⚙️ Backend · FastAPI (modular monolith)"]
       API[API · JWT · rate limits]
       RAG[RAG engine<br/>local default · optional Groq + Gemini]
-      SAF[Safety engine]
-      CARE[Care services<br/>dating · plan · tracking · readings · meals · summary · privacy]
+      SAF[Safety: pre-check · post-check]
+      GR[Guard rails<br/>1,231 rules · output check]
+      CARE[Care services<br/>dating · plan · tracking · readings · meals · food guide · summary · privacy]
     end
     DB[(SQLite dev · PostgreSQL + pgvector prod)]
     KB[(Reviewed knowledge base<br/>+ book index + ontology)]
     CH --> API
     W --> API
-    API --> RAG --> KB
-    API --> SAF
+    ST --> API
+    API --> SAF --> GR
+    GR --> RAG --> KB
     API --> CARE --> DB
     RAG --> DB
 ```
