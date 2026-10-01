@@ -274,3 +274,15 @@ export interface BulkApproveResult {
   approved: string[];
   skipped: Record<string, string>;
 }
+
+export interface FeedbackReviewItem {
+  feedback_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+  question: string | null;
+  answer: string | null;
+  safety_status: string | null;
+  source_count: number;
+  had_evidence: boolean;
+}

@@ -9,6 +9,7 @@ const links = [{ href: "/chat", label: "Companion" }];
 
 const adminLinks = [
   { href: "/admin/documents", label: "Documents" },
+  { href: "/admin/feedback", label: "Feedback" },
   { href: "/admin/evaluation", label: "Evaluation" },
 ];
 
