@@ -36,6 +36,9 @@ retrieval-augmented generation, an independent safety layer, and transparent sou
   research papers. Quick actions and slash commands (`/week`, `/nutrition`, `/ayurveda`,
   `/lifestyle`, `/visits`, `/foryou`, `/log`, `/library`, `/evidence`) open inline cards instead of
   separate pages. Only landing, auth, onboarding, settings/privacy and admin remain as routes.
+- **Offline RAG engine (default):** answers come from a local pipeline — hybrid BM25 + character-n-gram retrieval, a
+  corpus-derived knowledge graph, an evidence-sufficiency gate and extractive, cited composition. It needs no Groq or
+  Gemini key. See [`docs/local-rag.md`](./docs/local-rag.md).
 - **Resource library:** `backend/app/data/library.yaml` holds ~85 live-verified links (YouTube
   videos, NHS/WHO/ACOG/Government of India pages, PubMed papers). Regenerate and re-verify with
   `python knowledge/resources/build_library.py`. It is a pointer collection, separate from the
