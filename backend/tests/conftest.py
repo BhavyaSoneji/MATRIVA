@@ -21,9 +21,12 @@ from app.main import app
 
 @pytest.fixture(autouse=True)
 def clean_database():
+    from app.rag.local.corpus import reset_cache
+
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     rate_limiter.clear()
+    reset_cache()
     yield
     Base.metadata.drop_all(bind=engine)
 

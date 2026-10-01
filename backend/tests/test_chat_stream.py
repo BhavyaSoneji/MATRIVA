@@ -20,7 +20,7 @@ QUERY = "What is the best telescope for viewing Saturn's rings?"
 
 
 def _fake_settings(llm_api_key: str = "", tavily_api_key: str = ""):
-    return SimpleNamespace(llm_api_key=llm_api_key, tavily_api_key=tavily_api_key)
+    return SimpleNamespace(llm_api_key=llm_api_key, tavily_api_key=tavily_api_key, rag_engine="external")
 
 
 def parse_sse(body: str) -> list[dict]:
