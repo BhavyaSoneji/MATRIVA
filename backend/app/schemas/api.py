@@ -478,6 +478,24 @@ class WellnessSummaryResponse(APIModel):
     days: list[WellnessLogResponse]
 
 
+class BulkApproveRequest(APIModel):
+    ids: list[str] = Field(min_length=1, max_length=200)
+
+
+class BulkApproveResponse(APIModel):
+    approved: list[str]
+    skipped: dict[str, str]
+
+
+class DocumentPreviewResponse(APIModel):
+    document_id: str
+    excerpt: str
+    chunk_count: int
+    truncated: bool
+    source_url: str | None
+    authority: str | None
+
+
 class ResourceResponse(APIModel):
     id: str
     type: str
