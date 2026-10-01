@@ -14,7 +14,7 @@ Nothing in MATRIVA has been signed off by a clinician, a pharmacist or a native 
 | Output checks | `output.yaml` | 12 rules | Obstetrician, and a clinician who reads the replacement wording |
 | Book regimen and avoid list | `backend/app/data/food_guide.yaml` | 37 entries | Ayurvedic physician and a dietitian |
 | Seeded guidance paraphrases | `knowledge/seed/guidelines.yaml` | 26 entries | Obstetrician, against each `url` |
-| **Hindi and Gujarati wording** | `messages.yaml`, `classes.yaml`, `requests.yaml`, `symptoms.yaml` (the `localized` and the Hindi and Gujarati terms) | all refusals, emergencies, and about 10,000 trigger phrases | Native speaker of each language, ideally a nurse or doctor |
+| **Hindi and Gujarati wording** | `messages.yaml`, `classes.yaml`, `requests.yaml`, `symptoms.yaml` (the `localized` and the Hindi and Gujarati terms) | every refusal and emergency message, and the Hindi and Gujarati trigger phrases among the roughly 9,700 in all | Native speaker of each language, ideally a nurse or doctor |
 
 ## How the rules are built (so you know what you are reading)
 
