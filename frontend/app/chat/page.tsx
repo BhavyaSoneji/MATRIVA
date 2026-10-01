@@ -561,6 +561,7 @@ function ChatContent() {
                 key={l.id}
                 type="button"
                 title={l.name}
+                aria-label={l.name}
                 aria-pressed={lang === l.id}
                 onClick={() => changeLang(l.id)}
                 className={`h-9 min-w-9 px-2.5 text-[12px] font-semibold transition-colors ${
@@ -645,7 +646,11 @@ function ChatContent() {
                           <TriangleAlert className="h-4 w-4 shrink-0 text-blush-500" aria-hidden="true" />
                           <p className="text-sm text-foreground/85">
                             This response indicates a concern that may need urgent care. Contact your
-                            healthcare provider immediately.
+                            healthcare provider immediately. In India, call{" "}
+                            <a href="tel:112" className="font-semibold underline">
+                              112
+                            </a>{" "}
+                            for emergencies (108 / 102 for an ambulance).
                           </p>
                         </div>
                       )}
