@@ -13,6 +13,16 @@ function Bar({ value, label }: { value: number; label: string }) {
   );
 }
 
+const SIGNAL_LABEL: Record<string, string> = {
+  bm25: "word match",
+  ngram: "spelling-tolerant match",
+  concept: "concepts",
+  semantic: "semantic space",
+  structure: "chapter & section titles",
+  graph: "concept graph",
+  feedback: "query expansion",
+};
+
 const CONFIDENCE_LABEL = (c: number) => (c >= 0.65 ? "Strong" : c >= 0.45 ? "Moderate" : "Partial");
 
 /** Shows how the offline RAG engine found an answer: what it understood, what it searched, what it scored. */
@@ -49,6 +59,31 @@ export function RetrievalTracePanel({ trace }: { trace: RetrievalTrace }) {
         </div>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <p className="eyebrow-sm">Question type</p>
+          <p className="mt-1 text-foreground capitalize">{(trace.intent ?? "general").replace("_", " ")}</p>
+          {trace.authorities_asked && trace.authorities_asked.length > 0 && (
+            <p className="mt-1.5">Looking for what {trace.authorities_asked.join(" and ")} said</p>
+          )}
+          {trace.sub_queries && trace.sub_queries.length > 1 && (
+            <p className="mt-1.5">Answered in parts: {trace.sub_queries.join(" · ")}</p>
+          )}
+        </div>
+        <div>
+          <p className="eyebrow-sm">Searched with</p>
+          <p className="mt-1 text-foreground">
+            {(trace.signals ?? []).map((sg) => SIGNAL_LABEL[sg] ?? sg).join(" · ") || "—"}
+          </p>
+          {trace.expanded_with && trace.expanded_with.length > 0 && (
+            <p className="mt-1.5">Also tried: {trace.expanded_with.join(", ")}</p>
+          )}
+          {trace.reached_through_graph && trace.reached_through_graph.length > 0 && (
+            <p className="mt-1.5">Reached through the graph: {trace.reached_through_graph.join(", ")}</p>
+          )}
+        </div>
+      </div>
+
       {trace.passages.length > 0 && (
         <ol className="flex flex-col gap-3">
           {trace.passages.slice(0, 5).map((p, i) => (
@@ -62,7 +97,11 @@ export function RetrievalTracePanel({ trace }: { trace: RetrievalTrace }) {
                 <Bar value={p.bm25 / 0.6} label="Word match" />
                 <Bar value={p.ngram} label="Spelling-tolerant" />
                 <Bar value={p.coverage} label="Question covered" />
+                {(p.semantic ?? 0) > 0 && <Bar value={p.semantic ?? 0} label="Same meaning" />}
+                {(p.structure ?? 0) > 0 && <Bar value={p.structure ?? 0} label="Section title" />}
+                {(p.graph ?? 0) > 0 && <Bar value={Math.min(1, (p.graph ?? 0) * 3)} label="Concept graph" />}
               </div>
+              {p.authorities && p.authorities.length > 0 && <p>Cites: {p.authorities.join(", ")}</p>}
               {p.matched_concepts.length > 0 && <p>Concepts: {p.matched_concepts.join(", ")}</p>}
             </li>
           ))}

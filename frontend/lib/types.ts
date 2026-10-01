@@ -295,6 +295,10 @@ export interface TracePassage {
   score: number;
   bm25: number;
   ngram: number;
+  semantic?: number;
+  structure?: number;
+  graph?: number;
+  authorities?: string[];
   coverage: number;
   matched_terms: string[];
   matched_concepts: string[];
@@ -312,6 +316,12 @@ export interface RetrievalTrace {
   confidence: number;
   concepts: string[];
   related_concepts?: string[];
+  intent?: string;
+  authorities_asked?: string[];
+  sub_queries?: string[];
+  expanded_with?: string[];
+  reached_through_graph?: string[];
+  signals?: string[];
   query_terms: string[];
   passages_searched: number;
   reason?: string;
