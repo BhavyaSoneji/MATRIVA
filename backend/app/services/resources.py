@@ -14,11 +14,15 @@ from typing import Any
 
 import yaml
 
-from app.rag.retrieval import tokenize
+from app.rag.local.text import tokens
 
 # Same idea as retrieval.MIN_KEYWORD_RELEVANCE: one incidental shared word ("doctor") out of five
 # meaningful query words must not attach an unrelated video to an answer.
 _MIN_QUERY_OVERLAP = 0.3
+
+
+def tokenize(text: str) -> set[str]:
+    return set(tokens(text))
 
 _LIBRARY_PATH = Path(__file__).resolve().parents[1] / "data" / "library.yaml"
 
