@@ -158,3 +158,19 @@ portable embedding column without changing API contracts.
 LLM and embedding providers are optional adapters. Missing or failing providers trigger a
 source-grounded local fallback or a safe service-unavailable response. The API never treats
 provider availability as clinical approval.
+
+## When something fails
+
+| What fails | What happens |
+|---|---|
+| The safety classifier | `503` and a safe message; never an unrestricted answer |
+| A guard-rail rule file is invalid | The backend refuses to load it, so the problem shows at start-up and in the tests, not in front of a patient |
+| Retrieval finds too little | The fixed "no reviewed source" answer, with `insufficient_information` |
+| The output check rejects an answer | The answer is replaced whole with a safe message |
+| The external LLM or embedding provider fails | The grounded local answer; never a guess |
+| Redis is down | A local in-process rate limiter and a logged warning |
+| The database is down | `/health` reports it; requests fail rather than guess |
+
+## Cost of the safety layer
+
+Measured on a laptop: matching a question against all 1,231 rules takes about 0.1 ms, and the output check about 0.6 ms. The registry loads once, in about 0.2 s, at first use. The safety layer is not a noticeable part of a response's latency.
