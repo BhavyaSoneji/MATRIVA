@@ -51,6 +51,21 @@ uvicorn app.main:app --reload
   `python scripts/build_book_index.py`, then approve documents in *Admin → Documents*.
 - The frontend ships its own Docker image; see [`frontend/README.md`](../frontend/README.md).
 
+## What the image does not contain
+
+The backend image holds `app/`, `alembic/` and the entrypoint. It does **not** contain:
+
+- **`knowledge/`, `ingestion/` and `backend/scripts/`.** The scripts that load the book and the guidance, and the book itself, are not in the container. Load the knowledge from a checkout of the repository with `DATABASE_URL` pointing at the database:
+
+  ```bash
+  cd backend
+  DATABASE_URL=postgresql+psycopg://... python scripts/ingest_real_knowledge.py
+  DATABASE_URL=... python scripts/build_book_index.py
+  ```
+
+  Everything loads as **pending**. Sign in as an admin, open Admin, Documents, and approve what a reviewer has cleared. Until then the chat honestly says it has no reviewed source. The guard rails, care rules, food guide, ontology and the book's structure (`app/data/`) *are* in the image, so they work without this step.
+- **Tesseract.** Importing a lab report from a photo (`/care/readings/ocr`) needs the `tesseract` binary, which the slim image does not have. Pasting the report text works without it. Add `apt-get install tesseract-ocr` to the Dockerfile if you need photos.
+
 ## Production checklist
 
 - Use `docker-compose.prod.yml` or an orchestrator with secret management.
