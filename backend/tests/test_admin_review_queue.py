@@ -72,8 +72,9 @@ def test_approving_ingested_documents_activates_held_back_rows(client: TestClien
 
 
 def test_approved_seed_content_is_discoverable_by_natural_questions(client: TestClient, admin_headers: dict[str, str], monkeypatch) -> None:
-    """The content is only worth shipping if real questions find the right document."""
-    from app.rag.retrieval import retrieve_chunks_scored
+    """The content is only worth shipping if real questions find the right document (offline engine)."""
+    from app.rag.local.corpus import get_engine
+    from app.rag.local.retriever import search
 
     monkeypatch.setattr(ingest_module, "embed_text", lambda text, api_key=None: None)
     with SessionLocal() as db:
@@ -90,9 +91,9 @@ def test_approved_seed_content_is_discoverable_by_natural_questions(client: Test
         "How much caffeine is okay?": "Caffeine",
     }
     with SessionLocal() as db:
+        engine = get_engine(db)
         for question, expected in expectations.items():
-            hits, _mode = retrieve_chunks_scored(db, question, limit=5)
-            titles = [h.document.title for h in hits]
+            titles = [h.meta["title"] for h in search(engine, question, k=5).hits]
             assert any(expected.lower() in t.lower() for t in titles), (question, titles)
 
 
