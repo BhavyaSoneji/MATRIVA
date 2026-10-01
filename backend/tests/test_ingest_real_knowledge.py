@@ -28,8 +28,13 @@ from app.models import (
 )
 
 
-# seed.yaml (8: FOGSI ANC, 2 Garbhini Paricharya, 5 IFCT foods) + guidelines.yaml
-EXPECTED_SEED_DOCS = 8 + len(yaml.safe_load(ingest_module.GUIDELINES_YAML_PATH.read_text(encoding="utf-8")))
+def _count(path) -> int:
+    return len(yaml.safe_load(path.read_text(encoding="utf-8")))
+
+
+# seed.yaml (8: FOGSI ANC, 2 Garbhini Paricharya, 5 IFCT foods) + guidelines.yaml + foods.yaml
+EXPECTED_SEED_DOCS = 8 + _count(ingest_module.GUIDELINES_YAML_PATH) + _count(ingest_module.FOODS_YAML_PATH)
+EXPECTED_FOOD_ITEMS = 5 + _count(ingest_module.FOODS_YAML_PATH)
 
 
 @pytest.fixture(autouse=True)
@@ -62,7 +67,7 @@ def test_seed_yaml_creates_structured_side_records(client) -> None:
         assert db.query(AyurvedicSource).count() == 2
 
         food_items = db.query(FoodItem).all()
-        assert len(food_items) == 5
+        assert len(food_items) == EXPECTED_FOOD_ITEMS
         # FoodItem has no review-status gate of its own (see /knowledge/food) --
         # must stay inactive until the source is approved, or nutrition data
         # would bypass the pending-review policy entirely.
@@ -145,3 +150,20 @@ def test_guideline_entries_are_pending_with_source_urls_and_safe_topics(client) 
         who = db.query(KnowledgeSource).filter(KnowledgeSource.name == "guide-who-iron-folate-001").one()
         assert who.url and who.authority == "World Health Organization"
         assert who.review_status == "pending"
+
+
+def test_usda_food_entries_are_pending_cited_and_numeric(client) -> None:
+    entries = yaml.safe_load(ingest_module.FOODS_YAML_PATH.read_text(encoding="utf-8"))
+    assert len(entries) >= 60
+    ids = [e["document_id"] for e in entries]
+    assert len(ids) == len(set(ids))
+    for entry in entries:
+        assert entry["review_status"] == "PENDING_SOURCE_VERIFICATION"
+        assert entry["domain"] == "NUTRITION"
+        assert entry["url"].startswith("https://fdc.nal.usda.gov/")
+        assert "anc" not in entry["topic"]
+        # the exact USDA record and real per-100 g numbers are in the text
+        assert "per 100 g" in entry["content"] and "SR Legacy record" in entry["content"]
+        assert "protein" in entry["content"] and "iron" in entry["content"]
+    liver = next(e for e in entries if "liver" in e["title"].lower())
+    assert "avoiding liver" in liver["content"] and "avoid_in_pregnancy" in liver["safety_tags"]
