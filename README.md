@@ -427,20 +427,27 @@ Playwright starts its own server on port 3000 (`npm run build && npm run start`)
 
 ```
 matriva/
-├── frontend/                 Next.js app — landing, auth, onboarding, ONE chat workspace, settings, admin
-│   ├── app/chat/             the companion (slash commands, widgets, voice)
-│   └── components/care/      plan · check-in · readings · meals · summary · safety check
+├── frontend/                 Next.js app: landing, auth, onboarding, ONE chat workspace, settings, admin
+│   ├── app/chat/             the companion (slash commands, cards, voice)
+│   ├── app/settings/         profile, safety profile, consent, export, delete
+│   ├── components/care/      plan · check-in · readings · meals · foods · summary · safety check · safety profile
+│   └── tests/e2e/            Playwright specs (API mocked)
 ├── backend/
 │   ├── app/api/              auth, profile, chat, care, knowledge, admin, privacy, feedback …
 │   ├── app/rag/local/        offline engine: index, semantic, graph, retriever, composer, book
-│   ├── app/services/care/    dating, plan, screening, tracking, readings, meals, summary, privacy
-│   ├── app/safety/           classifier, post-check, prompt-injection defence, guardrails/ (1,231-rule engine)
-│   ├── app/data/             ontology.yaml, care_rules.yaml, guardrails/ (rule files), foods_nutrients.json, book_index.json, library.yaml
+│   ├── app/safety/           classifier, post-check, prompt-injection defence
+│   ├── app/safety/guardrails/  the 1,231-rule engine: registry, matcher, output check
+│   ├── app/services/care/    dating, plan, screening, tracking, readings, meals, food guide, summary, privacy
+│   ├── app/data/             ontology.yaml, care_rules.yaml, food_guide.yaml, foods_nutrients.json, book_index.json, library.yaml
+│   ├── app/data/guardrails/  the rule files (medicines, herbs, foods, symptoms, requests, conditions, output)
+│   ├── alembic/versions/     migrations 0001 to 0005
 │   └── tests/                513 tests
 ├── ingestion/                OCR, chunking, book-structure recovery
 ├── evaluation/               retrieval / generation / safety / hallucination harnesses + held-out sets
-├── knowledge/                seed guidelines, foods, Ayurveda source, resource library builder
-└── docs/                     architecture, API, RAG, safety, care features, tech blog
+├── knowledge/                seed guidelines, foods, the Ayurveda source, resource library builder
+├── database/seed/            synthetic demo users and sources (local use only)
+├── docs/                     architecture, API, RAG, safety, guard rails, privacy, testing, and more
+└── .github/                  CI, code owners, pull request template
 ```
 
 ---
