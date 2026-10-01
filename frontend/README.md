@@ -24,6 +24,20 @@ Useful scripts: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run t
 
 > This project uses a recent Next.js with breaking changes; see `AGENTS.md` before writing code.
 
+## Add a card to the chat
+
+Features are slash commands that open a card inside the conversation, not pages.
+
+1. Write the component in `components/care/` (or `components/`). Wrap it in `Frame` and use `Chip` for choices.
+2. Add its type to `WidgetSpec` in `components/chat-widgets.tsx` (care cards use `CareAction` in `components/care/plan-widget.tsx`) and a `case` in the `ChatWidget` switch.
+3. Add an entry to `QUICK_ACTIONS` in `app/chat/page.tsx`: `id`, `label`, `command` (the slash command), `icon`, `hint`, and `widget`.
+4. Add the response types to `lib/care-types.ts`, and call the API with `api.get` from `lib/api.ts`.
+5. Add a Playwright spec that mocks the endpoint (see `tests/e2e/care.spec.ts`).
+
+## Tests
+
+`npx playwright test` runs the specs in `tests/e2e/` against a production build, with the API mocked by `page.route`. They test the interface and its contract with the backend, not the backend. Playwright starts `npm run build && npm run start` on port 3000 and **reuses any server already listening there**: stop a stale dev server first, or you will test old code.
+
 ## Environment variables
 
 - `NEXT_PUBLIC_API_URL` — base URL of the MATRIVA backend API (default `http://localhost:8000`; the README's local `uvicorn` example runs on `8010`, so set it in `.env.local`).
