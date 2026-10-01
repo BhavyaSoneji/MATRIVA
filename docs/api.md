@@ -5,6 +5,20 @@ in development and `/redoc` at `/redoc`.
 
 Base URL: `http://localhost:8000` (Docker Compose default; the README's local `uvicorn` example uses `8010`).
 
+## Conventions
+
+| | |
+|---|---|
+| **Format** | JSON requests and responses, UTF-8. Hindi and Gujarati text is sent as is |
+| **Auth** | `Authorization: Bearer <token>` from `/auth/register` or `/auth/login`. The token lasts 30 minutes by default |
+| **Errors** | `{"detail": "..."}` for a message, or `{"detail": [{"loc": [...], "msg": "...", "type": "..."}]}` for validation errors (`422`) |
+| **Request id** | Every response carries `X-Request-ID`. Send your own (up to 64 characters) to correlate with the logs |
+| **Rate limits** | `429` with a `Retry-After` header on auth, chat and the knowledge routes ([`configuration.md`](./configuration.md)) |
+| **Caching** | Responses are `Cache-Control: no-store` |
+| **CORS** | Only origins in `CORS_ORIGINS`; methods GET, POST, PUT, DELETE, OPTIONS |
+| **Health** | `GET /health` returns `{"status": "ok", "database": "ok", "redis": "not_configured", "version": "0.1.0"}` |
+| **Interactive docs** | `/docs` (Swagger UI) and `/redoc` in development |
+
 ## Authentication
 
 Protected endpoints use `Authorization: Bearer <access-token>`.
