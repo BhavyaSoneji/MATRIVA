@@ -1,0 +1,1973 @@
+{
+ "title": "Ayurvediya Prasutitantra evam Striroga, Part I: Prasutitantra",
+ "author": "Prof. Premvati Tiwari",
+ "publisher": "Chaukhambha Orientalia, Varanasi",
+ "source": "knowledge/ayurveda/Prasuti-Tantra-OCR.txt (Tesseract OCR; not clinically reviewed)",
+ "generated_at": "2026-10-01",
+ "scan_note": "Each scanned image is a two-page spread, so printed page p is on scanned page 27 + (p-1)//2 (corrected locally by reading the text).",
+ "chapters": [
+  {
+   "number": 1,
+   "title_en": "Anatomy Of Female Reproductive System",
+   "title_hi": "स्त्री-शरीर-रचना ह",
+   "scan_start": 27,
+   "scan_end": 41,
+   "english_chunks": 17,
+   "english_words": 2774,
+   "sections": [
+    {
+     "title_en": "Treatment",
+     "title_hi": "गर्भिणी के उदावर्त की चिकित्सा",
+     "printed_page": 14,
+     "scan_page": 35
+    }
+   ],
+   "concepts": [
+    {
+     "id": "artava",
+     "label": "Artava (menstrual blood / ovum)",
+     "count": 7
+    },
+    {
+     "id": "shukra",
+     "label": "Shukra (semen)",
+     "count": 5
+    },
+    {
+     "id": "sex",
+     "label": "Intercourse",
+     "count": 3
+    },
+    {
+     "id": "labour",
+     "label": "Labour & delivery",
+     "count": 2
+    },
+    {
+     "id": "dhatu",
+     "label": "Dhatus (tissues)",
+     "count": 2
+    },
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 2
+    },
+    {
+     "id": "ojas",
+     "label": "Ojas",
+     "count": 2
+    },
+    {
+     "id": "fish",
+     "label": "Fish",
+     "count": 1
+    }
+   ],
+   "authorities": {
+    "Dalhana": 8,
+    "Susruta": 4,
+    "Vagbhata": 3,
+    "Caraka": 2,
+    "Kasyapa": 1,
+    "Cakrapani": 1,
+    "Indu": 1,
+    "Arunadatta": 1
+   },
+   "key_terms": [
+    "layer",
+    "marma",
+    "introitus",
+    "behind",
+    "pesis",
+    "ligament",
+    "clitoris",
+    "injury",
+    "isthmus",
+    "fundus",
+    "urethra",
+    "pubocervic"
+   ]
+  },
+  {
+   "number": 2,
+   "title_en": "Physiology Of Menstrual Cycle",
+   "title_hi": "ऋतुचक्र एवं उसका शारीर-क्रिया विवेचन",
+   "scan_start": 42,
+   "scan_end": 64,
+   "english_chunks": 33,
+   "english_words": 5062,
+   "sections": [
+    {
+     "title_en": "Specific epochs",
+     "title_hi": "स्त्री-शरीर की विशिष्ट अवस्थायें",
+     "printed_page": 36,
+     "scan_page": 44
+    },
+    {
+     "title_en": "Different words used to denote menstrual blood and",
+     "title_hi": "द्योतक विभिन्न शब्द",
+     "printed_page": 40,
+     "scan_page": 46
+    },
+    {
+     "title_en": "Treatment of abortion",
+     "title_hi": "गर्भस्नाव चिकित्सा",
+     "printed_page": 33,
+     "scan_page": 49
+    },
+    {
+     "title_en": "Female Sukra",
+     "title_hi": "स्त्री-शरीर-रचना",
+     "printed_page": 49,
+     "scan_page": 51
+    }
+   ],
+   "concepts": [
+    {
+     "id": "artava",
+     "label": "Artava (menstrual blood / ovum)",
+     "count": 18
+    },
+    {
+     "id": "shukra",
+     "label": "Shukra (semen)",
+     "count": 15
+    },
+    {
+     "id": "dhatu",
+     "label": "Dhatus (tissues)",
+     "count": 10
+    },
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 9
+    },
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 9
+    },
+    {
+     "id": "sex",
+     "label": "Intercourse",
+     "count": 9
+    },
+    {
+     "id": "rasa",
+     "label": "Rasa (taste / plasma)",
+     "count": 5
+    },
+    {
+     "id": "massage",
+     "label": "Massage & oil",
+     "count": 5
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 13,
+    "Susruta": 9,
+    "Harita": 8,
+    "Caraka": 7,
+    "Kasyapa": 7,
+    "Dalhana": 7,
+    "Cakrapani": 6,
+    "Bhavamisra": 3,
+    "Arunadatta": 3,
+    "Bhela": 1,
+    "Indu": 1
+   },
+   "key_terms": [
+    "nasya",
+    "phase",
+    "discharge",
+    "seventy",
+    "menopause",
+    "divid",
+    "pituitary",
+    "fifty",
+    "childhood",
+    "femal",
+    "drtava",
+    "denote"
+   ]
+  },
+  {
+   "number": 3,
+   "title_en": "Method Of Impregnation",
+   "title_hi": "गर्भाधान-विधि",
+   "scan_start": 65,
+   "scan_end": 77,
+   "english_chunks": 17,
+   "english_words": 2772,
+   "sections": [
+    {
+     "title_en": "Factors essential for conception",
+     "title_hi": "गर्भोत्यत्ति के लिए आवश्यक घटक",
+     "printed_page": 86,
+     "scan_page": 69
+    },
+    {
+     "title_en": "The cause of birth of male or female on even or odd days respectively",
+     "title_hi": "कारण",
+     "printed_page": 89,
+     "scan_page": 70
+    },
+    {
+     "title_en": "Effect of impregnation on different eR aN ce-days of rtukala",
+     "title_hi": "परिणाम",
+     "printed_page": 90,
+     "scan_page": 71
+    },
+    {
+     "title_en": "Specific acts for achieving conception",
+     "title_hi": "गर्भप्राप्ति के लिए कर्त्तव्य",
+     "printed_page": 91,
+     "scan_page": 71
+    },
+    {
+     "title_en": "Appendix |-Measures",
+     "title_hi": "परिशिष्ट ९ - मान",
+     "printed_page": 98,
+     "scan_page": 77
+    }
+   ],
+   "concepts": [
+    {
+     "id": "sex",
+     "label": "Intercourse",
+     "count": 9
+    },
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 6
+    },
+    {
+     "id": "artava",
+     "label": "Artava (menstrual blood / ovum)",
+     "count": 6
+    },
+    {
+     "id": "water",
+     "label": "Water & fluids",
+     "count": 5
+    },
+    {
+     "id": "shukra",
+     "label": "Shukra (semen)",
+     "count": 5
+    },
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 5
+    },
+    {
+     "id": "ghee",
+     "label": "Ghee",
+     "count": 4
+    },
+    {
+     "id": "pitta",
+     "label": "Pitta",
+     "count": 4
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 9,
+    "Susruta": 7,
+    "Caraka": 3,
+    "Kasyapa": 3,
+    "Arunadatta": 3
+   },
+   "key_terms": [
+    "marriage",
+    "couple",
+    "priest",
+    "altar",
+    "country",
+    "observ",
+    "behaviour",
+    "twentyfive",
+    "rtukala",
+    "desirous"
+   ]
+  },
+  {
+   "number": 4,
+   "title_en": "Embryology",
+   "title_hi": "गर्भ-विज्ञानीय अध्याय",
+   "scan_start": 78,
+   "scan_end": 123,
+   "english_chunks": 74,
+   "english_words": 11786,
+   "sections": [
+    {
+     "title_en": "The sequence of descent of mana, tm and paficamahabhiitas inembryo",
+     "title_hi": "क्रम",
+     "printed_page": 111,
+     "scan_page": 81
+    },
+    {
+     "title_en": "Sources of paficamahbhiitas in fetus",
+     "title_hi": "गर्भ में पञ्ञमहाभूतों के विभिन्न स्रोत",
+     "printed_page": 112,
+     "scan_page": 82
+    },
+    {
+     "title_en": "Bhautika components of fetus",
+     "title_hi": "गर्भ के पाह्भौतिक अड्भावयव",
+     "printed_page": 114,
+     "scan_page": 83
+    },
+    {
+     "title_en": "The importance of all mother etc. six factors in the formation of embryo and various body parts derived from these",
+     "title_hi": "उनसे उत्पन्न",
+     "printed_page": 127,
+     "scan_page": 89
+    },
+    {
+     "title_en": "The cause of dominance of mana",
+     "title_hi": "कारण",
+     "printed_page": 139,
+     "scan_page": 95
+    },
+    {
+     "title_en": "First born body part of the fetus",
+     "title_hi": "गर्भ का सर्वप्रथम उत्पन्न होने बाला अड़",
+     "printed_page": 158,
+     "scan_page": 105
+    },
+    {
+     "title_en": "Constituents of different body parts of the fetus",
+     "title_hi": "",
+     "printed_page": 161,
+     "scan_page": 106
+    },
+    {
+     "title_en": "Factors for sex formation",
+     "title_hi": "कारण",
+     "printed_page": 169,
+     "scan_page": 112
+    },
+    {
+     "title_en": "Multiple Pregnancy",
+     "title_hi": "",
+     "printed_page": 172,
+     "scan_page": 112
+    },
+    {
+     "title_en": "Reasons for absence of fetal excretas",
+     "title_hi": "गर्भ में मल इत्यादि के अभाव का कारण",
+     "printed_page": 186,
+     "scan_page": 119
+    },
+    {
+     "title_en": "intrauterine situation of fetus",
+     "title_hi": "गर्भाशयान्तर गर्भस्थिति",
+     "printed_page": 188,
+     "scan_page": 120
+    },
+    {
+     "title_en": "Pumsawanakarma",
+     "title_hi": "पुंसवनकर्म",
+     "printed_page": 190,
+     "scan_page": 122
+    }
+   ],
+   "concepts": [
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 51
+    },
+    {
+     "id": "shukra",
+     "label": "Shukra (semen)",
+     "count": 29
+    },
+    {
+     "id": "artava",
+     "label": "Artava (menstrual blood / ovum)",
+     "count": 27
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 27
+    },
+    {
+     "id": "labour",
+     "label": "Labour & delivery",
+     "count": 20
+    },
+    {
+     "id": "rasa",
+     "label": "Rasa (taste / plasma)",
+     "count": 18
+    },
+    {
+     "id": "sex",
+     "label": "Intercourse",
+     "count": 14
+    },
+    {
+     "id": "dhatu",
+     "label": "Dhatus (tissues)",
+     "count": 11
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 48,
+    "Caraka": 31,
+    "Susruta": 24,
+    "Harita": 24,
+    "Kasyapa": 19,
+    "Bhela": 13,
+    "Arunadatta": 10,
+    "Indu": 9,
+    "Dalhana": 8,
+    "Bhavamisra": 4,
+    "Cakrapani": 3,
+    "Sarngadhara": 2,
+    "Videha (Nimi)": 1
+   },
+   "key_terms": [
+    "embryo",
+    "satwa",
+    "depend",
+    "specy",
+    "conspicuous",
+    "component",
+    "upasneha",
+    "patern",
+    "osmosis",
+    "minor",
+    "kalala",
+    "divid"
+   ]
+  },
+  {
+   "number": 5,
+   "title_en": "Signs / Symptoms Of Pregnancy And Antenatal Care",
+   "title_hi": "गर्भिणी-चिह्न एवं गर्भिणी-परिचर्या",
+   "scan_start": 124,
+   "scan_end": 145,
+   "english_chunks": 36,
+   "english_words": 5579,
+   "sections": [
+    {
+     "title_en": "Signs/symptoms of sadyograhitagarbha or immediaiely conceived woman",
+     "title_hi": "सद्योगृहीत गर्भा के लक्षण",
+     "printed_page": 197,
+     "scan_page": 125
+    },
+    {
+     "title_en": "Signs/symptoms of vyakta-garbhd or after Conspicuousness of body parts of embryo",
+     "title_hi": "व्यक्तगर्भा के लक्षण",
+     "printed_page": 198,
+     "scan_page": 125
+    },
+    {
+     "title_en": "Signs/ Symptoms during different gestational Periods",
+     "title_hi": "गर्भिणी के मासानुमासिक लक्षण",
+     "printed_page": 209,
+     "scan_page": 126
+    },
+    {
+     "title_en": "Cause of breast changes during pregnancy",
+     "title_hi": "कारण",
+     "printed_page": 205,
+     "scan_page": 128
+    },
+    {
+     "title_en": "Dauhrda",
+     "title_hi": "दौहद",
+     "printed_page": 206,
+     "scan_page": 129
+    },
+    {
+     "title_en": "Antenatal care",
+     "title_hi": "गर्भिणी-परिचर्या",
+     "printed_page": 213,
+     "scan_page": 132
+    },
+    {
+     "title_en": "Monthwise dietary regimen for | Pregnant woman and its effect",
+     "title_hi": "लाभ",
+     "printed_page": 218,
+     "scan_page": 135
+    },
+    {
+     "title_en": "Dietetics and mode of life to be avoided by pregnant woman or garbhopaghatakara bhavas or factors likely to harm the fetus",
+     "title_hi": "भाव",
+     "printed_page": 228,
+     "scan_page": 140
+    }
+   ],
+   "concepts": [
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 25
+    },
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 17
+    },
+    {
+     "id": "garbhini",
+     "label": "Garbhini (pregnant woman)",
+     "count": 14
+    },
+    {
+     "id": "month_regimen",
+     "label": "Month-by-month (masa)",
+     "count": 13
+    },
+    {
+     "id": "meat",
+     "label": "Meat",
+     "count": 12
+    },
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 11
+    },
+    {
+     "id": "rasa",
+     "label": "Rasa (taste / plasma)",
+     "count": 9
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 8
+    }
+   ],
+   "authorities": {
+    "Caraka": 28,
+    "Susruta": 27,
+    "Vagbhata": 27,
+    "Harita": 12,
+    "Bhavamisra": 7,
+    "Bhela": 5,
+    "Kasyapa": 4,
+    "Cakrapani": 4,
+    "Indu": 4,
+    "Dalhana": 1,
+    "Arunadatta": 1,
+    "Yogaratnakara": 1
+   },
+   "key_terms": [
+    "butter",
+    "longing",
+    "squat",
+    "contraindication",
+    "weight",
+    "dauhrda",
+    "conspicuous",
+    "welfare",
+    "vehicle",
+    "sweeten",
+    "nostril",
+    "ninth"
+   ]
+  },
+  {
+   "number": 6,
+   "title_en": "Disorders During Pregnancy And Their Management",
+   "title_hi": "गर्भिणी-व्याधियाँ एवं उनकी चिकित्सा",
+   "scan_start": 146,
+   "scan_end": 185,
+   "english_chunks": 61,
+   "english_words": 9468,
+   "sections": [
+    {
+     "title_en": "Fever of.pregnant woman",
+     "title_hi": "गर्भिणी ज्वर",
+     "printed_page": 254,
+     "scan_page": 153
+    },
+    {
+     "title_en": "Garbhini-atisdra or dia- pe",
+     "title_hi": "गर्भिणी-अतिसार",
+     "printed_page": 268,
+     "scan_page": 160
+    },
+    {
+     "title_en": "Toxaemia of pregnancy",
+     "title_hi": "गर्भजन्य विषमयता",
+     "printed_page": 290,
+     "scan_page": 171
+    },
+    {
+     "title_en": "Garbhasthapaka drugs or",
+     "title_hi": "गर्भस्थापक औषधियाँ",
+     "printed_page": 293,
+     "scan_page": 172
+    },
+    {
+     "title_en": "Appropriate condition and 1",
+     "title_hi": "स्थिति एवं काल",
+     "printed_page": 294,
+     "scan_page": 173
+    },
+    {
+     "title_en": "Classification",
+     "title_hi": "जातहारिणी के भेद",
+     "printed_page": 295,
+     "scan_page": 173
+    },
+    {
+     "title_en": "General clinical features",
+     "title_hi": "शांग्रलं/७४",
+     "printed_page": 308,
+     "scan_page": 180
+    },
+    {
+     "title_en": "Curable jataharinis",
+     "title_hi": "साध्य जातहारिणी",
+     "printed_page": 309,
+     "scan_page": 180
+    }
+   ],
+   "concepts": [
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 29
+    },
+    {
+     "id": "garbhini",
+     "label": "Garbhini (pregnant woman)",
+     "count": 25
+    },
+    {
+     "id": "sweets",
+     "label": "Sugar, jaggery & honey",
+     "count": 22
+    },
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 21
+    },
+    {
+     "id": "water",
+     "label": "Water & fluids",
+     "count": 19
+    },
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 18
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 13
+    },
+    {
+     "id": "massage",
+     "label": "Massage & oil",
+     "count": 12
+    }
+   ],
+   "authorities": {
+    "Kasyapa": 16,
+    "Caraka": 12,
+    "Vagbhata": 12,
+    "Indu": 6,
+    "Susruta": 4,
+    "Harita": 4,
+    "Dalhana": 3,
+    "Cakrapani": 1,
+    "Arunadatta": 1
+   },
+   "key_terms": [
+    "jataharini",
+    "sugar",
+    "reliev",
+    "attack",
+    "revati",
+    "febrile",
+    "progeny",
+    "madhuka",
+    "unrighteous",
+    "jataharint",
+    "asura",
+    "lemon"
+   ]
+  },
+  {
+   "number": 7,
+   "title_en": "Disorders Of Fetus",
+   "title_hi": "गर्भ-व्यापद्",
+   "scan_start": 186,
+   "scan_end": 236,
+   "english_chunks": 76,
+   "english_words": 12491,
+   "sections": [
+    {
+     "title_en": "Complications of abortion",
+     "title_hi": "",
+     "printed_page": 331,
+     "scan_page": 192
+    },
+    {
+     "title_en": "Treatment of garbha calana",
+     "title_hi": "गर्भ-चलन की चिकित्सा",
+     "printed_page": 352,
+     "scan_page": 202
+    },
+    {
+     "title_en": "Garbhagosa or vatabhipanna garbha",
+     "title_hi": "गर्भशोष या वाताभिपन्नगर्भ",
+     "printed_page": 359,
+     "scan_page": 205
+    },
+    {
+     "title_en": "Upavistaka garbha",
+     "title_hi": "उपविष्टक गर्भ",
+     "printed_page": 361,
+     "scan_page": 207
+    },
+    {
+     "title_en": "Etiopathogenesis and clinical features",
+     "title_hi": "",
+     "printed_page": 361,
+     "scan_page": 207
+    },
+    {
+     "title_en": "Causes of onset of by slesma",
+     "title_hi": "तेज प्रसव प्रारम्भ होने के कारण",
+     "printed_page": 366,
+     "scan_page": 207
+    },
+    {
+     "title_en": "Nagodara or upasuska garbha",
+     "title_hi": "नागोदर या उपशुष्क गर्भ",
+     "printed_page": 363,
+     "scan_page": 208
+    },
+    {
+     "title_en": "Clinical features of upavistaka and upasuska garbha having predominance of vayu",
+     "title_hi": "लक्षण",
+     "printed_page": 365,
+     "scan_page": 208
+    },
+    {
+     "title_en": "intrauterine situation of the fetus : duri",
+     "title_hi": "",
+     "printed_page": 371,
+     "scan_page": 209
+    },
+    {
+     "title_en": "Satikagara or accouchement (Treatment of upasuska and upavistaka ward) BRS garbha",
+     "title_hi": "उपशुष्क एवं उपविष्टक गर्भ-चिकित्सा सूतिकागार",
+     "printed_page": 367,
+     "scan_page": 210
+    },
+    {
+     "title_en": "Lina garbha",
+     "title_hi": "लीन गर्भ",
+     "printed_page": 373,
+     "scan_page": 212
+    }
+   ],
+   "concepts": [
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 47
+    },
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 35
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 25
+    },
+    {
+     "id": "bleeding",
+     "label": "Bleeding",
+     "count": 24
+    },
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 24
+    },
+    {
+     "id": "ghee",
+     "label": "Ghee",
+     "count": 21
+    },
+    {
+     "id": "miscarriage",
+     "label": "Miscarriage & pregnancy loss",
+     "count": 20
+    },
+    {
+     "id": "sweets",
+     "label": "Sugar, jaggery & honey",
+     "count": 20
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 22,
+    "Susruta": 16,
+    "Indu": 15,
+    "Caraka": 14,
+    "Kasyapa": 10,
+    "Dalhana": 8,
+    "Bhela": 7,
+    "Bhavamisra": 6,
+    "Cakrapani": 5,
+    "Yogaratnakara": 5,
+    "Harita": 3,
+    "Madhava": 3,
+    "Arunadatta": 3
+   },
+   "key_terms": [
+    "raktagulma",
+    "bleed",
+    "upavistaka",
+    "upasuska",
+    "quiver",
+    "calana",
+    "vaginum",
+    "clinic",
+    "tumour",
+    "nagodara",
+    "gudma",
+    "amenorthoea"
+   ]
+  },
+  {
+   "number": 8,
+   "title_en": "Eutocia And Dystocia Or Normal And Abnormal Labour",
+   "title_hi": "प्रसव-विज्ञानीय",
+   "scan_start": 237,
+   "scan_end": 296,
+   "english_chunks": 101,
+   "english_words": 16386,
+   "sections": [
+    {
+     "title_en": "Treatment of tina features of different stages of labour",
+     "title_hi": "लीनगर्भ",
+     "printed_page": 436,
+     "scan_page": 244
+    },
+    {
+     "title_en": "Antepartum haemorthage",
+     "title_hi": "प्रसबपूर्व रक्तस्त्राव",
+     "printed_page": 470,
+     "scan_page": 261
+    },
+    {
+     "title_en": "Etiology",
+     "title_hi": "निदान",
+     "printed_page": 471,
+     "scan_page": 261
+    },
+    {
+     "title_en": "Midhagarbha orobstructed labour",
+     "title_hi": "भूढ़गर्भ",
+     "printed_page": 478,
+     "scan_page": 265
+    },
+    {
+     "title_en": "Definition",
+     "title_hi": "परिभाषा",
+     "printed_page": 478,
+     "scan_page": 265
+    },
+    {
+     "title_en": "Etiology",
+     "title_hi": "मूढ़गर्भ-निदान",
+     "printed_page": 483,
+     "scan_page": 268
+    },
+    {
+     "title_en": "Different presentations of sphigudaya",
+     "title_hi": "भन्र ५",
+     "printed_page": 497,
+     "scan_page": 274
+    },
+    {
+     "title_en": "Pratikhura mi 98",
+     "title_hi": "प्रतिखुर मूढ़गर्भ",
+     "printed_page": 499,
+     "scan_page": 276
+    },
+    {
+     "title_en": "Bighth gati, one foot in anus other in vagina",
+     "title_hi": "याद गुदा तथा दूसरा पायु में",
+     "printed_page": 499,
+     "scan_page": 276
+    },
+    {
+     "title_en": "Asadhya or incurable",
+     "title_hi": "असाध्य जातहारिणी",
+     "printed_page": 498,
+     "scan_page": 278
+    },
+    {
+     "title_en": "General Principles of treatment of miidhagarbha",
+     "title_hi": "",
+     "printed_page": 509,
+     "scan_page": 280
+    },
+    {
+     "title_en": "Effect of negligence or delay in the treatment of dead miidhagarbha",
+     "title_hi": "परिणाम",
+     "printed_page": 514,
+     "scan_page": 283
+    },
+    {
+     "title_en": "Consent of guardian before surgical intervention",
+     "title_hi": "",
+     "printed_page": 516,
+     "scan_page": 284
+    },
+    {
+     "title_en": "Procedure of manual extraction of fetus",
+     "title_hi": "",
+     "printed_page": 519,
+     "scan_page": 285
+    },
+    {
+     "title_en": "The madhagarbha fit for instrumentation",
+     "title_hi": "शस्त्रकर्माह मूढ़गर्भ",
+     "printed_page": 523,
+     "scan_page": 288
+    },
+    {
+     "title_en": "Method of deli . 2 Presentation",
+     "title_hi": "स्फिगुदय में प्रसव-विधि",
+     "printed_page": 520,
+     "scan_page": 289
+    }
+   ],
+   "concepts": [
+    {
+     "id": "garbha",
+     "label": "Garbha (embryo / foetus)",
+     "count": 76
+    },
+    {
+     "id": "labour",
+     "label": "Labour & delivery",
+     "count": 59
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 31
+    },
+    {
+     "id": "postpartum",
+     "label": "Postpartum care",
+     "count": 30
+    },
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 25
+    },
+    {
+     "id": "month_regimen",
+     "label": "Month-by-month (masa)",
+     "count": 16
+    },
+    {
+     "id": "contractions",
+     "label": "Contractions",
+     "count": 16
+    },
+    {
+     "id": "water",
+     "label": "Water & fluids",
+     "count": 12
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 45,
+    "Susruta": 40,
+    "Caraka": 25,
+    "Dalhana": 16,
+    "Kasyapa": 14,
+    "Harita": 14,
+    "Indu": 11,
+    "Madhava": 9,
+    "Bhavamisra": 9,
+    "Yogaratnakara": 8,
+    "Bhela": 6,
+    "Arunadatta": 4,
+    "Cakrapani": 3,
+    "Vangasena": 1
+   },
+   "key_terms": [
+    "descend",
+    "presentation",
+    "shoulder",
+    "miidhagarbha",
+    "surgeon",
+    "extract",
+    "transverse",
+    "dorso",
+    "breech",
+    "vertex",
+    "release",
+    "position"
+   ]
+  },
+  {
+   "number": 9,
+   "title_en": "Normal And Abnormal Puerperium",
+   "title_hi": "सूतिका-विज्ञानीय",
+   "scan_start": 297,
+   "scan_end": 331,
+   "english_chunks": 63,
+   "english_words": 10320,
+   "sections": [
+    {
+     "title_en": "Definition of siitika or Puerperal woman",
+     "title_hi": "सूतिका की परिभाषा",
+     "printed_page": 543,
+     "scan_page": 297
+    },
+    {
+     "title_en": "Sitika roga",
+     "title_hi": "सूत्रिका रोग",
+     "printed_page": 564,
+     "scan_page": 308
+    },
+    {
+     "title_en": "Treatment of yoniksata or vaginal ulcer of Puerperal woman",
+     "title_hi": "प्रसूता के योनिक्षत की चिकित्सा",
+     "printed_page": 573,
+     "scan_page": 312
+    },
+    {
+     "title_en": "Satika-jwara or Puerperal fever",
+     "title_hi": "सूत्रिका-ज्वर",
+     "printed_page": 585,
+     "scan_page": 319
+    },
+    {
+     "title_en": "Normal duration of interpre- Snancy period",
+     "title_hi": "सामान्य प्रसवान्तराल",
+     "printed_page": 607,
+     "scan_page": 329
+    },
+    {
+     "title_en": "Medicines for constriction of vagina after delivery",
+     "title_hi": "प्रसवोपरान्त योनि-गाढ़ीकरण-बिधि",
+     "printed_page": 608,
+     "scan_page": 330
+    },
+    {
+     "title_en": "Prescription for reducing the belly after delivery",
+     "title_hi": "प्रसवोषरान्त कुक्षि-हासार्थ औषधि",
+     "printed_page": 608,
+     "scan_page": 330
+    },
+    {
+     "title_en": "Contraceptives and abortifacients",
+     "title_hi": "विधि",
+     "printed_page": 608,
+     "scan_page": 330
+    }
+   ],
+   "concepts": [
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 35
+    },
+    {
+     "id": "fever",
+     "label": "Fever",
+     "count": 29
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 26
+    },
+    {
+     "id": "labour",
+     "label": "Labour & delivery",
+     "count": 25
+    },
+    {
+     "id": "ghee",
+     "label": "Ghee",
+     "count": 25
+    },
+    {
+     "id": "postpartum",
+     "label": "Postpartum care",
+     "count": 22
+    },
+    {
+     "id": "sweets",
+     "label": "Sugar, jaggery & honey",
+     "count": 21
+    },
+    {
+     "id": "sutika",
+     "label": "Sutika (postpartum woman)",
+     "count": 20
+    }
+   ],
+   "authorities": {
+    "Susruta": 11,
+    "Kasyapa": 10,
+    "Vagbhata": 9,
+    "Dalhana": 4,
+    "Caraka": 3,
+    "Indu": 3,
+    "Yogaratnakara": 3,
+    "Harita": 2,
+    "Bhavamisra": 2,
+    "Cakrapani": 2,
+    "Bhela": 1,
+    "Madhava": 1,
+    "Vangasena": 1
+   },
+   "key_terms": [
+    "vidradhi",
+    "abscess",
+    "oleaginous",
+    "raktavidradhi",
+    "prastha",
+    "madhuka",
+    "cured",
+    "contraceptiv",
+    "antarvidradhi",
+    "clinic",
+    "suppur",
+    "sannipata"
+   ]
+  },
+  {
+   "number": 10,
+   "title_en": "Management Of New Born Child",
+   "title_hi": "नवजात शिशु-परिचर्या विज्ञानीय",
+   "scan_start": 332,
+   "scan_end": 348,
+   "english_chunks": 25,
+   "english_words": 3983,
+   "sections": [
+    {
+     "title_en": "Resuscitation of unconscious or asphyxia- ted child",
+     "title_hi": "",
+     "printed_page": 619,
+     "scan_page": 339
+    },
+    {
+     "title_en": "Method of cutting of umbilical cord",
+     "title_hi": "नाभि-डपकल्पन-विधि",
+     "printed_page": 621,
+     "scan_page": 340
+    },
+    {
+     "title_en": "Procedure of bath of neonate and Water to be used for batheing",
+     "title_hi": "विशिष्ट जल एवं स्नान-विधि",
+     "printed_page": 622,
+     "scan_page": 341
+    },
+    {
+     "title_en": "Naming ceremony of the child",
+     "title_hi": "शिशु का नामकरण संस्कार",
+     "printed_page": 628,
+     "scan_page": 342
+    },
+    {
+     "title_en": "Feeding schedule of neo- nate from first to fourth day after birth",
+     "title_hi": "आहार व्यवस्था",
+     "printed_page": 627,
+     "scan_page": 343
+    },
+    {
+     "title_en": "Diseases afflicting the child due to improper care immediately after birth",
+     "title_hi": "",
+     "printed_page": 632,
+     "scan_page": 346
+    },
+    {
+     "title_en": "Diseases of umbilicus",
+     "title_hi": "नाभिगत व्याधियाँ",
+     "printed_page": 633,
+     "scan_page": 346
+    }
+   ],
+   "concepts": [
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 15
+    },
+    {
+     "id": "water",
+     "label": "Water & fluids",
+     "count": 12
+    },
+    {
+     "id": "sweets",
+     "label": "Sugar, jaggery & honey",
+     "count": 9
+    },
+    {
+     "id": "massage",
+     "label": "Massage & oil",
+     "count": 9
+    },
+    {
+     "id": "ghee",
+     "label": "Ghee",
+     "count": 9
+    },
+    {
+     "id": "labour",
+     "label": "Labour & delivery",
+     "count": 8
+    },
+    {
+     "id": "salt",
+     "label": "Salt",
+     "count": 6
+    },
+    {
+     "id": "postpartum",
+     "label": "Postpartum care",
+     "count": 5
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 15,
+    "Caraka": 10,
+    "Susruta": 10,
+    "Indu": 4,
+    "Harita": 2,
+    "Cakrapani": 1
+   },
+   "key_terms": [
+    "vernix",
+    "reviv",
+    "letter",
+    "jatakarma",
+    "caseosa",
+    "umbilic",
+    "packet",
+    "naming",
+    "clean",
+    "taila",
+    "sprinkl",
+    "neonate"
+   ]
+  },
+  {
+   "number": 11,
+   "title_en": "Stanya Or Breast Milk And Dhatri Or Wet Nurse",
+   "title_hi": "एवं धात्री प्रकरण",
+   "scan_start": 349,
+   "scan_end": 408,
+   "english_chunks": 64,
+   "english_words": 10090,
+   "sections": [
+    {
+     "title_en": "Cause of stanya pravrtti or RRR",
+     "title_hi": "स्तन्य-प्रवृत्ति-हेतु",
+     "printed_page": 640,
+     "scan_page": 350
+    },
+    {
+     "title_en": "Amount of stanya",
+     "title_hi": "स्तन्‍्य का प्रमाण",
+     "printed_page": 642,
+     "scan_page": 351
+    },
+    {
+     "title_en": "Stanasampat or merits of breasts",
+     "title_hi": "स्तन-सम्पत्‌",
+     "printed_page": 646,
+     "scan_page": 353
+    },
+    {
+     "title_en": "Diseases due to feeding with unexpressed breasts",
+     "title_hi": "अपरिस्तरुत स्तन्यपान जन्य विकार",
+     "printed_page": 649,
+     "scan_page": 354
+    },
+    {
+     "title_en": "Stanyasa- tapat or characteristics of normal breast milk",
+     "title_hi": "लक्षण",
+     "printed_page": 651,
+     "scan_page": 355
+    },
+    {
+     "title_en": "Effect on the child of the milk having different colours",
+     "title_hi": "तैलवर्णादि स्तन्य-पान का प्रभाव",
+     "printed_page": 652,
+     "scan_page": 356
+    },
+    {
+     "title_en": "Stanyanaéa and stanya- ksaya",
+     "title_hi": "एवं स्तन्यक्षय",
+     "printed_page": 653,
+     "scan_page": 357
+    },
+    {
+     "title_en": "Dhati-cikitsd or treatment of wet-nurse",
+     "title_hi": "धात्री-चिकित्सा",
+     "printed_page": 661,
+     "scan_page": 359
+    },
+    {
+     "title_en": "Stanya apanayana- kala or weaning period",
+     "title_hi": "अपनयन का काल",
+     "printed_page": 660,
+     "scan_page": 360
+    },
+    {
+     "title_en": "Stanya apanayana-vidht or method of weaning",
+     "title_hi": "अपनयन-विधि",
+     "printed_page": 661,
+     "scan_page": 360
+    },
+    {
+     "title_en": "Sasthi disease caused by abnormal dietetics of wet nurse",
+     "title_hi": "षष्ठी रोग",
+     "printed_page": 670,
+     "scan_page": 365
+    },
+    {
+     "title_en": "Purifying measures for wet-nurse",
+     "title_hi": "चिकित्सा",
+     "printed_page": 671,
+     "scan_page": 365
+    },
+    {
+     "title_en": "Abnormalities of breast-milk",
+     "title_hi": "स्तन्यवुष्टि",
+     "printed_page": 672,
+     "scan_page": 366
+    }
+   ],
+   "concepts": [
+    {
+     "id": "milk",
+     "label": "Milk",
+     "count": 48
+    },
+    {
+     "id": "breastfeeding",
+     "label": "Breastfeeding",
+     "count": 35
+    },
+    {
+     "id": "medication",
+     "label": "Medicines",
+     "count": 24
+    },
+    {
+     "id": "sweets",
+     "label": "Sugar, jaggery & honey",
+     "count": 23
+    },
+    {
+     "id": "vata",
+     "label": "Vata",
+     "count": 20
+    },
+    {
+     "id": "pitta",
+     "label": "Pitta",
+     "count": 19
+    },
+    {
+     "id": "rasa",
+     "label": "Rasa (taste / plasma)",
+     "count": 17
+    },
+    {
+     "id": "water",
+     "label": "Water & fluids",
+     "count": 17
+    }
+   ],
+   "authorities": {
+    "Vagbhata": 19,
+    "Kasyapa": 14,
+    "Susruta": 13,
+    "Indu": 8,
+    "Caraka": 6,
+    "Harita": 5,
+    "Madhava": 4,
+    "Bhavamisra": 4,
+    "Yogaratnakara": 4,
+    "Dalhana": 3
+   },
+   "key_terms": [
+    "nurse",
+    "allerg",
+    "ghana",
+    "stanya",
+    "priyangu",
+    "affec",
+    "wetnurse",
+    "streak",
+    "madana",
+    "dermatitis",
+    "carmadala",
+    "anurasa"
+   ]
+  }
+ ],
+ "authorities": {
+  "Vagbhata": 222,
+  "Susruta": 165,
+  "Caraka": 141,
+  "Kasyapa": 98,
+  "Harita": 74,
+  "Indu": 62,
+  "Dalhana": 58,
+  "Bhavamisra": 35,
+  "Bhela": 33,
+  "Cakrapani": 26,
+  "Arunadatta": 26,
+  "Yogaratnakara": 21,
+  "Madhava": 17,
+  "Sarngadhara": 2,
+  "Vangasena": 2,
+  "Videha (Nimi)": 1
+ },
+ "stats": {
+  "toc_rows_seen": 113,
+  "rejected_bad_page": 4,
+  "not_found_in_body": 15,
+  "verified_sections": 93,
+  "chapters": 11,
+  "glossary_pairs": 84,
+  "scanned_pages": 408,
+  "english_chunks": 567
+ },
+ "glossary": [
+  {
+   "hi": "अपनयन का काल",
+   "en": "Stanya apanayana- kala or weaning period",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "अपनयन-विधि",
+   "en": "Stanya apanayana-vidht or method of weaning",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "अपरिस्तरुत स्तन्यपान जन्य विकार",
+   "en": "Diseases due to feeding with unexpressed breasts",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "असाध्य जातहारिणी",
+   "en": "Asadhya or incurable",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "उपविष्टक गर्भ",
+   "en": "Upavistaka garbha",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "एवं स्तन्यक्षय",
+   "en": "Stanyanaéa and stanya- ksaya",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "कारण",
+   "en": "The cause of dominance of mana",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "कारण",
+   "en": "Factors for sex formation",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "कारण",
+   "en": "Cause of breast changes during pregnancy",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भ का सर्वप्रथम उत्पन्न होने बाला अड़",
+   "en": "First born body part of the fetus",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भ के पाह्भौतिक अड्भावयव",
+   "en": "Bhautika components of fetus",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भ में पञ्ञमहाभूतों के विभिन्न स्रोत",
+   "en": "Sources of paficamahbhiitas in fetus",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भ में मल इत्यादि के अभाव का कारण",
+   "en": "Reasons for absence of fetal excretas",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भ-चलन की चिकित्सा",
+   "en": "Treatment of garbha calana",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भजन्य विषमयता",
+   "en": "Toxaemia of pregnancy",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भप्राप्ति के लिए कर्त्तव्य",
+   "en": "Specific acts for achieving conception",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भशोष या वाताभिपन्नगर्भ",
+   "en": "Garbhagosa or vatabhipanna garbha",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भस्थापक औषधियाँ",
+   "en": "Garbhasthapaka drugs or",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भस्नाव चिकित्सा",
+   "en": "Treatment of abortion",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भाशयान्तर गर्भस्थिति",
+   "en": "intrauterine situation of fetus",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भिणी के उदावर्त की चिकित्सा",
+   "en": "Treatment",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भिणी के मासानुमासिक लक्षण",
+   "en": "Signs/ Symptoms during different gestational Periods",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भिणी ज्वर",
+   "en": "Fever of.pregnant woman",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भिणी-अतिसार",
+   "en": "Garbhini-atisdra or dia- pe",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भिणी-परिचर्या",
+   "en": "Antenatal care",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "गर्भोत्यत्ति के लिए आवश्यक घटक",
+   "en": "Factors essential for conception",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "चिकित्सा",
+   "en": "Purifying measures for wet-nurse",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "जातहारिणी के भेद",
+   "en": "Classification",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "तेज प्रसव प्रारम्भ होने के कारण",
+   "en": "Causes of onset of by slesma",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "दौहद",
+   "en": "Dauhrda",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "द्योतक विभिन्न शब्द",
+   "en": "Different words used to denote menstrual blood and",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "धात्री-चिकित्सा",
+   "en": "Dhati-cikitsd or treatment of wet-nurse",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "नागोदर या उपशुष्क गर्भ",
+   "en": "Nagodara or upasuska garbha",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "नाभि-डपकल्पन-विधि",
+   "en": "Method of cutting of umbilical cord",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "नाभिगत व्याधियाँ",
+   "en": "Diseases of umbilicus",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "निदान",
+   "en": "Etiology",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "परिभाषा",
+   "en": "Definition",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "परिशिष्ट ९ - मान",
+   "en": "Appendix |-Measures",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "पुंसवनकर्म",
+   "en": "Pumsawanakarma",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "प्रसबपूर्व रक्तस्त्राव",
+   "en": "Antepartum haemorthage",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "प्रसवोपरान्त योनि-गाढ़ीकरण-बिधि",
+   "en": "Medicines for constriction of vagina after delivery",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "प्रसवोषरान्त कुक्षि-हासार्थ औषधि",
+   "en": "Prescription for reducing the belly after delivery",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "प्रसूता के योनिक्षत की चिकित्सा",
+   "en": "Treatment of yoniksata or vaginal ulcer of Puerperal woman",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "भन्र ५",
+   "en": "Different presentations of sphigudaya",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "भूढ़गर्भ",
+   "en": "Midhagarbha orobstructed labour",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "मूढ़गर्भ-निदान",
+   "en": "Etiology",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "याद गुदा तथा दूसरा पायु में",
+   "en": "Bighth gati, one foot in anus other in vagina",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "लक्षण",
+   "en": "Stanyasa- tapat or characteristics of normal breast milk",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "लीन गर्भ",
+   "en": "Lina garbha",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "लीनगर्भ",
+   "en": "Treatment of tina features of different stages of labour",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "विधि",
+   "en": "Contraceptives and abortifacients",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "शस्त्रकर्माह मूढ़गर्भ",
+   "en": "The madhagarbha fit for instrumentation",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "शांग्रलं/७४",
+   "en": "General clinical features",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "शिशु का नामकरण संस्कार",
+   "en": "Naming ceremony of the child",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "षष्ठी रोग",
+   "en": "Sasthi disease caused by abnormal dietetics of wet nurse",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "सद्योगृहीत गर्भा के लक्षण",
+   "en": "Signs/symptoms of sadyograhitagarbha or immediaiely conceived woman",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "साध्य जातहारिणी",
+   "en": "Curable jataharinis",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "सामान्य प्रसवान्तराल",
+   "en": "Normal duration of interpre- Snancy period",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "सूतिका की परिभाषा",
+   "en": "Definition of siitika or Puerperal woman",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "सूत्रिका रोग",
+   "en": "Sitika roga",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "सूत्रिका-ज्वर",
+   "en": "Satika-jwara or Puerperal fever",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "स्तन-सम्पत्‌",
+   "en": "Stanasampat or merits of breasts",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "स्तन्यवुष्टि",
+   "en": "Abnormalities of breast-milk",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "स्तन्‍्य का प्रमाण",
+   "en": "Amount of stanya",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "स्त्री-शरीर की विशिष्ट अवस्थायें",
+   "en": "Specific epochs",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "स्त्री-शरीर-रचना",
+   "en": "Female Sukra",
+   "count": 1,
+   "source": "contents"
+  },
+  {
+   "hi": "विमर्श",
+   "en": "comments",
+   "count": 95,
+   "source": "body"
+  },
+  {
+   "hi": "चिकित्सा",
+   "en": "treatment",
+   "count": 11,
+   "source": "body"
+  },
+  {
+   "hi": "लक्षण",
+   "en": "clinical features",
+   "count": 9,
+   "source": "body"
+  },
+  {
+   "hi": "बाह्य प्रयोग",
+   "en": "external application",
+   "count": 4,
+   "source": "body"
+  },
+  {
+   "hi": "आश्यन्तर प्रयोग",
+   "en": "oral medicine",
+   "count": 3,
+   "source": "body"
+  },
+  {
+   "hi": "निदान एवं लक्षण",
+   "en": "etiology and clinical features",
+   "count": 3,
+   "source": "body"
+  },
+  {
+   "hi": "अन्य",
+   "en": "others",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "औषधियाँ",
+   "en": "drugs",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "गर्भ का पोषण",
+   "en": "fetal nourishment",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "गर्भ-विज्ञानीय अध्याय",
+   "en": "embryology",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "गर्भाशय",
+   "en": "uterus",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "चिकित्सा सिद्धान्त",
+   "en": "principles of treatment",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "जरायु की उत्पत्ति",
+   "en": "formation of placenta",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "धमनी",
+   "en": "arteries or channels",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "बाह्य औषधि-प्रयोग",
+   "en": "medicines for external application",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "रक्तगुल्म",
+   "en": "raktagulma",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "रक्तविद्रधि",
+   "en": "raktavidradhi",
+   "count": 2,
+   "source": "body"
+  },
+  {
+   "hi": "वियर्श",
+   "en": "comments",
+   "count": 2,
+   "source": "body"
+  }
+ ]
+}
