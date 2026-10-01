@@ -16,6 +16,9 @@ import type {
 import { ChatWidget, type WidgetSpec } from "@/components/chat-widgets";
 import { ResourceGrid } from "@/components/resource-cards";
 import { WeekRing } from "@/components/week-ring";
+import { TodayCard } from "@/components/today-card";
+import { MicButton, SpeakButton } from "@/components/voice";
+import { LANGS, loadLang, saveLang, type Lang } from "@/lib/language";
 import { ChatAnswer } from "@/components/chat-answer";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
@@ -58,6 +61,7 @@ interface ChatMessage {
   failed?: boolean;
   widget?: WidgetSpec;
   resources?: ResourceResponse[];
+  suggestions?: string[];
 }
 
 /** Everything that used to be its own page is now a chat action. Each is
@@ -85,11 +89,15 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: "evidence", label: "Evidence", command: "/evidence", icon: BookCheck, hint: "Guidelines & research", widget: { type: "library", types: ["guideline", "research"] } },
 ];
 
-const SUGGESTED_QUESTIONS = [
-  "What foods should I avoid in my first trimester?",
-  "Is it safe to do yoga during pregnancy?",
-  "What are signs I should call my doctor right away?",
+const STARTER_QUESTIONS: { q: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { q: "What foods should I eat and avoid at my stage?", icon: Apple },
+  { q: "Is it safe to do yoga during pregnancy?", icon: Dumbbell },
+  { q: "What does Ayurveda say about diet in pregnancy?", icon: Sprout },
+  { q: "Which signs mean I should call my doctor right away?", icon: TriangleAlert },
 ];
+
+/** Shown in the sidebar under "More" so the primary list stays short. */
+const PRIMARY_ACTION_IDS = new Set(["week", "nutrition", "ayurveda", "lifestyle"]);
 
 const URGENT_STATUSES = new Set(["high_risk", "urgent_escalation"]);
 const CONVERSATION_STORAGE_KEY = "matriva.conversationId";
@@ -209,9 +217,36 @@ function RelatedRecommendations({ items }: { items: RecommendationResponse[] }) 
   );
 }
 
+function ActionRow({
+  action,
+  disabled,
+  onRun,
+}: {
+  action: QuickAction;
+  disabled: boolean;
+  onRun: (a: QuickAction) => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onRun(action)}
+      className="group flex min-h-11 items-center gap-3 border-b border-border py-3 text-left transition-colors hover:text-accent disabled:opacity-50"
+    >
+      <action.icon className="h-4 w-4 shrink-0 text-accent" />
+      <span className="flex-1">
+        <span className="block text-[14px] font-medium">{action.label}</span>
+        <span className="block text-[11px] text-muted-foreground">{action.hint}</span>
+      </span>
+      <span className="eyebrow-sm hidden text-muted-foreground/70 xl:inline">{action.command}</span>
+    </button>
+  );
+}
+
 function ChatContent() {
   const { user } = useAuth();
   const [pregnancy, setPregnancy] = React.useState<PregnancyResponse | null>(null);
+  const [lang, setLang] = React.useState<Lang>("en");
   const [messages, setMessages] = React.useState<ChatMessage[]>([]);
   const [input, setInput] = React.useState("");
   const [conversationId, setConversationId] = React.useState<string | undefined>(undefined);
@@ -223,6 +258,15 @@ function ChatContent() {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const abortRef = React.useRef<AbortController | null>(null);
+
+  React.useEffect(() => {
+    setLang(loadLang());
+  }, []);
+
+  const changeLang = (next: Lang) => {
+    setLang(next);
+    saveLang(next);
+  };
 
   React.useEffect(() => {
     api
@@ -350,7 +394,7 @@ function ChatContent() {
 
     let safety = "";
     await streamChat(
-      { message: trimmed, conversation_id: conversationId },
+      { message: trimmed, conversation_id: conversationId, language: lang },
       {
         onDelta: (delta) => {
           patchMessage(assistantId, (m) => ({ text: m.text + delta }));
@@ -371,6 +415,7 @@ function ChatContent() {
             sources: data.sources,
             evidence: data.evidence,
             recommendations: data.recommendations,
+            suggestions: data.suggestions,
             streaming: false,
           });
           // Don't distract from an urgent-care answer with links.
@@ -455,6 +500,7 @@ function ChatContent() {
   const nearLimit = charCount > MAX_MESSAGE_CHARS * 0.85;
   const overLimit = charCount > MAX_MESSAGE_CHARS;
   const canRegenerate = !sending && messages.some((m) => m.role === "assistant");
+  const lastAssistantId = [...messages].reverse().find((m) => m.role === "assistant")?.id;
 
   return (
     <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1320px]">
@@ -483,35 +529,48 @@ function ChatContent() {
           </button>
         )}
         <nav aria-label="Companion actions" className="flex flex-col">
-          <p className="eyebrow-sm mb-2 text-muted-foreground">Ask or open</p>
-          {QUICK_ACTIONS.map((a) => (
-            <button
-              key={a.id}
-              type="button"
-              disabled={sending}
-              onClick={() => runAction(a)}
-              className="group flex items-center gap-3 border-b border-border py-3 text-left transition-colors hover:text-accent disabled:opacity-50"
-            >
-              <a.icon className="h-4 w-4 shrink-0 text-accent" />
-              <span className="flex-1">
-                <span className="block text-[14px] font-medium">{a.label}</span>
-                <span className="block text-[11px] text-muted-foreground">{a.hint}</span>
-              </span>
-              <span className="eyebrow-sm hidden text-muted-foreground/70 xl:inline">{a.command}</span>
-            </button>
+          <p className="eyebrow-sm mb-2 text-muted-foreground">Ask</p>
+          {QUICK_ACTIONS.filter((a) => PRIMARY_ACTION_IDS.has(a.id)).map((a) => (
+            <ActionRow key={a.id} action={a} disabled={sending} onRun={runAction} />
           ))}
+          <details className="group mt-4">
+            <summary className="eyebrow-sm flex cursor-pointer list-none items-center gap-1.5 text-muted-foreground transition-colors hover:text-accent">
+              <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180" aria-hidden="true" />
+              More
+            </summary>
+            <div className="mt-2 flex flex-col">
+              {QUICK_ACTIONS.filter((a) => !PRIMARY_ACTION_IDS.has(a.id)).map((a) => (
+                <ActionRow key={a.id} action={a} disabled={sending} onRun={runAction} />
+              ))}
+            </div>
+          </details>
         </nav>
       </aside>
     <main className="flex min-w-0 flex-1 flex-col px-6">
-      <div className="flex shrink-0 items-baseline justify-between border-b border-border py-6">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border py-3 sm:items-baseline sm:py-6">
         <div>
-          <h1 className="display text-2xl leading-none">The companion</h1>
-          <p className="eyebrow-sm mt-2 text-muted-foreground">
+          <h1 className="display whitespace-nowrap text-xl leading-none sm:text-2xl">The companion</h1>
+          <p className="eyebrow-sm mt-2 hidden text-muted-foreground sm:block">
             Ask anything, or type / for commands. Answers cite where they came from.
           </p>
         </div>
         <div className="flex items-center gap-5">
-          <span className="eyebrow-sm text-muted-foreground">{messages.length} messages</span>
+          <div role="group" aria-label="Answer language" className="flex border border-border">
+            {LANGS.map((l) => (
+              <button
+                key={l.id}
+                type="button"
+                title={l.name}
+                aria-pressed={lang === l.id}
+                onClick={() => changeLang(l.id)}
+                className={`h-9 min-w-9 px-2.5 text-[12px] font-semibold transition-colors ${
+                  lang === l.id ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-accent"
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             onClick={newThread}
@@ -519,7 +578,8 @@ function ChatContent() {
             className="eyebrow-sm flex items-center gap-1.5 border border-border px-3 py-2 text-foreground transition-colors hover:border-accent hover:text-accent disabled:pointer-events-none disabled:opacity-40"
           >
             <Plus className="h-3 w-3" aria-hidden="true" />
-            New thread
+            <span className="hidden sm:inline">New thread</span>
+            <span className="sr-only sm:hidden">New thread</span>
           </button>
         </div>
       </div>
@@ -535,17 +595,29 @@ function ChatContent() {
           )}
 
           {!historyLoading && messages.length === 0 && (
-            <div className="py-10 text-center">
+            <div className="py-8 text-center">
               <p className="display text-[1.6rem] leading-[1.15]">
                 What would you like to know{user?.full_name ? `, ${user.full_name.split(" ")[0]}` : ""}?
               </p>
-              <p className="mt-3 text-sm text-muted-foreground">
-                Everything lives here — nutrition, Ayurveda, your week, logging, videos and articles.
-                Pick an action, type <span className="font-mono text-foreground">/</span>, or just ask.
+              <p className="mx-auto mt-3 mb-7 max-w-md text-sm text-muted-foreground">
+                Ask in your own words, tap a question, or type <span className="font-mono text-foreground">/</span>{" "}
+                for shortcuts. Every answer names its source, or says plainly when it can&apos;t.
               </p>
-              <p className="eyebrow-sm mt-3 text-muted-foreground/70">
-                Every answer traces back to a reviewed source, or says plainly when it can&apos;t.
-              </p>
+              <TodayCard pregnancy={pregnancy} />
+              <div className="mx-auto grid max-w-xl gap-3 text-left sm:grid-cols-2">
+                {STARTER_QUESTIONS.map(({ q, icon: Icon }) => (
+                  <button
+                    key={q}
+                    type="button"
+                    disabled={sending}
+                    onClick={() => submit(q)}
+                    className="lift flex min-h-[72px] items-start gap-3 border border-border bg-card p-4 text-left disabled:opacity-50"
+                  >
+                    <Icon className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
+                    <span className="text-[14px] leading-snug">{q}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -599,7 +671,11 @@ function ChatContent() {
                         <span className="ml-0.5 inline-block h-4 w-[2px] animate-pulse-soft bg-accent align-middle" />
                       )}
 
-                      {m.safetyStatus && !m.streaming && <div className="mt-3.5">{<SafetyBadge status={m.safetyStatus} />}</div>}
+                      {m.safetyStatus && !m.streaming && m.safetyStatus !== "safe_general" && (
+                        <div className="mt-3.5">
+                          <SafetyBadge status={m.safetyStatus} />
+                        </div>
+                      )}
 
                       {m.citations && m.citations.length > 0 && (
                         <div className="mt-5 flex flex-col gap-2 border-t border-border pt-4">
@@ -631,6 +707,22 @@ function ChatContent() {
                       )}
 
                       {m.recommendations && <RelatedRecommendations items={m.recommendations} />}
+
+                      {!m.streaming && m.suggestions && m.suggestions.length > 0 && m.id === lastAssistantId && (
+                        <div className="mt-1 flex flex-wrap gap-2" aria-label="Suggested follow-up questions">
+                          {m.suggestions.map((q) => (
+                            <button
+                              key={q}
+                              type="button"
+                              disabled={sending}
+                              onClick={() => submit(q)}
+                              className="min-h-9 border border-border px-3.5 py-2 text-left text-[12px] text-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+                            >
+                              {q}
+                            </button>
+                          ))}
+                        </div>
+                      )}
 
                       {m.resources && m.resources.length > 0 && (
                         <div className="mt-2 flex flex-col gap-3 border-t border-border pt-4">
@@ -667,6 +759,7 @@ function ChatContent() {
                             <ThumbsDown className="h-3.5 w-3.5" />
                           </button>
                           <CopyButton text={m.text} />
+                          <SpeakButton text={m.text} lang={lang} />
                         </div>
                       )}
                     </div>
@@ -714,29 +807,18 @@ function ChatContent() {
           ))}
         </div>
 
-        <div className="mb-4 flex flex-wrap items-center gap-2.5">
-          {SUGGESTED_QUESTIONS.map((q) => (
-            <button
-              key={q}
-              type="button"
-              onClick={() => sendMessage(q)}
-              disabled={sending}
-              className="border border-border px-3.5 py-2 text-[11.5px] text-muted-foreground transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-            >
-              {q}
-            </button>
-          ))}
-          {canRegenerate && (
+        {canRegenerate && (
+          <div className="mb-2 flex justify-end">
             <button
               type="button"
               onClick={regenerate}
-              className="eyebrow-sm ml-auto flex items-center gap-1.5 text-muted-foreground transition-colors hover:text-accent"
+              className="eyebrow-sm flex min-h-9 items-center gap-1.5 text-muted-foreground transition-colors hover:text-accent"
             >
               <RotateCcw className="h-3 w-3" aria-hidden="true" />
               Regenerate
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         <form
           className="flex items-end gap-3 border border-border bg-card"
@@ -759,6 +841,7 @@ function ChatContent() {
               }
             }}
           />
+          <MicButton lang={lang} disabled={sending} onText={(t) => setInput((prev) => (prev ? `${prev} ${t}` : t))} />
           {sending ? (
             <button
               type="button"
