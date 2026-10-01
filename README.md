@@ -408,11 +408,17 @@ EMBEDDING_API_KEY=...
 <summary><b>Run the tests</b></summary>
 
 ```bash
-cd backend && pytest -q && ruff check . && mypy app/
-cd ../ingestion && pytest tests/
-cd ../evaluation && pytest tests/
-cd ../frontend && npm run lint && npx tsc --noEmit && npm run build && npx playwright test
+cd backend && pytest -q                       # 513 tests
+cd backend && ruff check . && mypy app/       # lint and types
+cd ingestion && pytest tests/                 # 43 tests
+cd evaluation && pytest tests/                # 36 tests
+cd frontend && npm run lint && npm run typecheck && npm run build
+cd frontend && npx playwright test            # 12 end-to-end tests, API mocked
+python backend/app/safety/guardrails          # not a test: prints what the guard rails contain
+python evaluation/local_rag/run.py            # retrieval quality on the question sets
 ```
+
+Playwright starts its own server on port 3000 (`npm run build && npm run start`). If something already listens there it reuses it, so stop a stale dev server first or you will test old code. More in [`docs/testing.md`](./docs/testing.md).
 </details>
 
 ---
