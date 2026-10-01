@@ -5,12 +5,13 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Query, status
 from sqlalchemy import select
 
-from app.api.deps import DBSession
+from app.api.deps import CurrentUser, DBSession
 from app.models import (
     ExerciseGuidance,
     FoodItem,
     Guideline,
 )
+from app.rag.local.corpus import get_engine
 from app.rag.retrieval import retrieve_chunks
 from app.repositories.knowledge import get_source, source_payload
 from app.schemas.api import (
@@ -164,3 +165,27 @@ def list_lifestyle(
         for item in items
         if not pregnancy_stage or pregnancy_stage in (item.suitable_stages or []) or not item.suitable_stages
     ]
+
+
+@router.get("/knowledge/graph")
+def knowledge_graph(
+    _: CurrentUser,
+    db: DBSession,
+    q: str = Query(default="", max_length=500),
+    concept: str | None = Query(default=None, max_length=60),
+) -> dict[str, object]:
+    """The slice of the knowledge graph around a question or concept, for the knowledge-map card.
+
+    Concepts come from the ontology; edges come only from approved passages that mention both concepts, so the
+    map can never show a link the reviewed knowledge base does not contain. With no `q`/`concept`, it shows
+    the three concepts the knowledge base covers most.
+    """
+    engine = get_engine(db)
+    graph = engine.graph
+    focus = [concept] if concept and concept in graph.concepts else graph.detect_text(q)[:4]
+    if not focus:
+        focus = sorted(graph.postings, key=lambda c: -len(graph.postings[c]))[:3]
+    result = graph.subgraph(focus)
+    result["focus"] = focus
+    result["stats"] = graph.stats()
+    return result

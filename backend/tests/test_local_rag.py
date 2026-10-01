@@ -257,3 +257,21 @@ def test_building_the_index_is_fast() -> None:
     t1 = time.perf_counter()
     search(eng, "iron in milk for the pregnant woman")
     assert build < 8 and time.perf_counter() - t1 < 1.0
+
+
+def test_knowledge_graph_endpoint_shows_only_what_approved_passages_support(client: TestClient, admin_headers, auth_headers) -> None:
+    empty = client.get("/knowledge/graph?q=iron and anaemia", headers=auth_headers).json()
+    assert empty["edges"] == [] and {n["id"] for n in empty["nodes"]} >= {"iron", "anaemia"}  # concepts, but no evidence-based links
+
+    _approve_seed(client, admin_headers)
+    full = client.get("/knowledge/graph?q=iron", headers=auth_headers).json()
+    assert full["focus"] == ["iron"] and full["stats"]["passages"] > 0 and full["nodes"]
+    ids = {n["id"] for n in full["nodes"]}
+    assert all(e["source"] in ids and e["target"] in ids for e in full["edges"])
+    assert client.get("/knowledge/graph", headers=auth_headers).json()["focus"]  # defaults to the best-covered concepts
+    assert client.get("/knowledge/graph").status_code in (401, 403)
+
+
+def test_trace_carries_the_quoted_sentences(engine: Engine) -> None:
+    trace = compose(engine, search(engine, "how much iron and folic acid")).trace
+    assert any("30-60 mg" in q for p in trace["passages"] for q in p["quotes"])

@@ -166,6 +166,9 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     ]
 
     used = order + [h for h in retrieval.hits if all(h.id != o.id for o in order)]
+    quotes: dict[str, list[str]] = {}
+    for p in picked:
+        quotes.setdefault(p.hit.id, []).append(p.sentence)
     trace = {
         "engine": "local",
         "confidence": retrieval.confidence,
@@ -185,6 +188,9 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
                 "coverage": round(h.coverage, 3),
                 "matched_terms": h.matched_terms[:8],
                 "matched_concepts": [engine.graph.concepts[c].label for c in h.matched_concepts],
+                "quotes": quotes.get(h.id, []),
+                "source": h.meta.get("source_title") or h.meta.get("source_name"),
+                "url": h.meta.get("url"),
             }
             for h in used
         ],
