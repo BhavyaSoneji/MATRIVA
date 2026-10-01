@@ -94,3 +94,16 @@ def test_approved_seed_content_is_discoverable_by_natural_questions(client: Test
             hits, _mode = retrieve_chunks_scored(db, question, limit=5)
             titles = [h.document.title for h in hits]
             assert any(expected.lower() in t.lower() for t in titles), (question, titles)
+
+
+def test_feedback_review_lists_low_rated_answers_with_their_questions(client: TestClient, admin_headers: dict[str, str], auth_headers: dict[str, str]) -> None:
+    chat = client.post("/chat", headers=auth_headers, json={"message": "Which dog breed suits a family with children?"}).json()
+    client.post("/feedback", headers=auth_headers, json={"message_id": chat["message_id"], "rating": 1, "comment": "not helpful"})
+    good = client.post("/chat", headers=auth_headers, json={"message": "Which foods should I eat for iron?", "conversation_id": chat["conversation_id"]}).json()
+    client.post("/feedback", headers=auth_headers, json={"message_id": good["message_id"], "rating": 5})
+
+    items = client.get("/admin/feedback", headers=admin_headers).json()
+    assert len(items) == 1  # the 5-star rating is not a problem to review
+    assert items[0]["question"] == "Which dog breed suits a family with children?"
+    assert items[0]["comment"] == "not helpful" and items[0]["had_evidence"] is False
+    assert client.get("/admin/feedback", headers=auth_headers).status_code == 403
