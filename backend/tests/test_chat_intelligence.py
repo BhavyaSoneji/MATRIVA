@@ -51,6 +51,7 @@ def test_questions_and_non_statements_are_not_logged() -> None:
 def test_chat_logs_wellness_and_accumulates_water(client: TestClient, auth_headers: dict[str, str]) -> None:
     first = client.post("/chat", headers=auth_headers, json={"message": "I drank 2 glasses of water"}).json()
     assert "Logged 500 ml" in first["answer"] and first["sources"] == []
+    assert first["suggestions"] == [] and first["recommendations"] == []  # a confirmation, not a topic to follow up on
     second = client.post("/chat", headers=auth_headers, json={"message": "I drank 1 glass of water and slept 8 hours"}).json()
     assert "today: 750 ml" in second["answer"]
     log = client.get("/wellness/daily", headers=auth_headers).json()
