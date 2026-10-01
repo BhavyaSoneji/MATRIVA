@@ -376,8 +376,10 @@ Or run everything at once with `docker compose up --build`: see [`docs/deploymen
 cd backend
 python scripts/ingest_real_knowledge.py     # guidelines, foods, book chunks (pending review)
 python scripts/build_book_index.py          # book structure, authorities, glossary
-# then approve documents as an admin in the Admin page
+# then sign in as an admin, open Admin → Documents, review and approve
 ```
+
+Everything the scripts insert starts **pending**: only approved, active documents can answer a question, and approving one is a deliberate human step. `--dry-run` parses without writing; `--book-only` and `--seed-only` load one half. The book is loaded one chapter per document (11 in all).
 </details>
 
 <details>
