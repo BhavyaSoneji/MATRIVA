@@ -51,6 +51,19 @@ It is **not** a doctor. It does not diagnose, prescribe, dose, or tell anyone to
 
 ---
 
+## 🎯 Why it exists
+
+A pregnant woman asks *can I eat papaya? is this headache normal? what does Ayurveda say about the third month?* and gets answers that blend modern guidelines with unverified tradition, with no sign of which is which, how strong the evidence is, or when to stop reading and call a doctor.
+
+Two failures matter more than any feature, and everything here is built around them:
+
+1. **A confident wrong answer**: an invented dose, a made-up rule.
+2. **A missed emergency**: bleeding, a severe headache with swelling, a baby that has stopped moving, handled as an ordinary wellness question.
+
+So MATRIVA answers only from approved sources, refuses what it cannot source, never advises on medicines, and sends emergencies to 112 before it does anything else. The story of how it got there, including what failed, is in the [tech blog](./docs/TECH_BLOG.md).
+
+---
+
 ## ✨ What it does
 
 Everything lives in **one chat window**. Ask in your own words, tap a sidebar shortcut, or type `/` for commands. There are no feature pages to hunt through.
