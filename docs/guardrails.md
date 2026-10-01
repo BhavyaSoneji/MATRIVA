@@ -122,3 +122,20 @@ English, Hinglish (Roman Hindi), Hindi and Gujarati terms are matched. Refusals,
 - **The "general question or personal report" split is a heuristic**, tested on a set of examples, not a language model.
 - **It cannot know what it was not told.** The safety profile is only as good as what you entered.
 - A refusal is not an answer. The user is sent to a doctor, who may be hard to reach; the messages therefore name 112, ANM/ASHA, free government care (JSSK, PMSMA on the 9th) and the helplines where they apply.
+
+## For reviewers
+
+The rules are data in `backend/app/data/guardrails/`. A reviewer does not need to read code:
+
+| File | Holds |
+|---|---|
+| `medications.yaml`, `medicines_prescription.yaml`, `medicines_specialist.yaml`, `medicines_common.yaml`, `vaccines.yaml` | Medicines: one rule per drug, with its class, reason, sources and brand names |
+| `herbs.yaml`, `foods.yaml`, `exposures.yaml`, `substances.yaml` | Herbs and Ayurvedic products, foods and drinks, habits and exposures |
+| `symptoms.yaml` | Warning signs, with the action and the weeks they apply to |
+| `requests.yaml` | Dose, which medicine, stopping a medicine, home abortion or induction, the baby's sex, acting as a doctor |
+| `condition_rules.yaml`, `watch.yaml` | Rules that apply because of the person's own conditions, and standing reminders |
+| `output.yaml` | The checks on the bot's own answer |
+| `classes.yaml`, `messages.yaml` | What is said for each medicine class, and the shared emergency, helpline and referral wording in three languages |
+| `sources.yaml`, `conditions.yaml` | The 40 named sources, and the conditions and risk factors the rules understand |
+
+[`clinical-review.md`](./clinical-review.md) has the checklists for an obstetrician, a pharmacist and a native speaker, and says how to record a review.
