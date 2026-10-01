@@ -1,0 +1,120 @@
+# Concept lexicon for the local knowledge graph (app/rag/local/graph.py).
+#
+# Each concept has an id, a display label, a type, and synonyms the text may use. Matching is on
+# stemmed, diacritic-folded tokens, so spelling variants of Sanskrit terms (garbha / garbh, kapha / kaphah)
+# mostly collapse by themselves. This file contains NO medical claims and no hand-written relations:
+# edges between concepts are computed from which concepts co-occur in the reviewed passages, so the
+# graph can only say what the knowledge base itself says.
+#
+# `parent` gives a simple is-a hierarchy (ragi is a millet; millet is a food) used to widen a search.
+
+types:
+  nutrient: Nutrient
+  food: Food
+  symptom: Symptom
+  condition: Condition
+  practice: Practice & lifestyle
+  care: Care & screening
+  ayurveda: Ayurveda term
+  stage: Stage
+
+concepts:
+  # ---------- nutrients ----------
+  - {id: iron, label: Iron, type: nutrient, synonyms: [haemoglobin, hemoglobin, ferrous]}
+  - {id: folate, label: "Folic acid (folate)", type: nutrient, synonyms: [folic acid, folate, vitamin b9, neural tube]}
+  - {id: calcium, label: Calcium, type: nutrient, synonyms: []}
+  - {id: protein, label: Protein, type: nutrient, synonyms: [amino acids]}
+  - {id: vitamin_c, label: Vitamin C, type: nutrient, synonyms: [ascorbic acid]}
+  - {id: vitamin_d, label: Vitamin D, type: nutrient, synonyms: [sunshine vitamin]}
+  - {id: vitamin_a, label: Vitamin A, type: nutrient, synonyms: [retinol]}
+  - {id: vitamin_b12, label: Vitamin B12, type: nutrient, synonyms: [cobalamin, b12]}
+  - {id: zinc, label: Zinc, type: nutrient, synonyms: []}
+  - {id: magnesium, label: Magnesium, type: nutrient, synonyms: []}
+  - {id: fibre, label: Fibre, type: nutrient, synonyms: [fiber, roughage]}
+  - {id: caffeine, label: Caffeine, type: nutrient, synonyms: []}
+  - {id: omega3, label: Omega-3, type: nutrient, synonyms: [omega 3, dha, fish oil]}
+  - {id: water, label: Water & fluids, type: nutrient, synonyms: [hydration, fluids, drink water]}
+  # ---------- foods ----------
+  - {id: milk, label: Milk, type: food, synonyms: [dairy, doodh, ksira, ksheera, kshira, dugdha, toned milk]}
+  - {id: curd, label: Curd / yogurt, type: food, synonyms: [yogurt, yoghurt, dahi, dadhi, buttermilk]}
+  - {id: ghee, label: Ghee, type: food, synonyms: [ghrita, ghrta, clarified butter, butter oil]}
+  - {id: egg, label: Eggs, type: food, synonyms: [eggs]}
+  - {id: fish, label: Fish, type: food, synonyms: [seafood, salmon, sardine, carp, rohu, mercury]}
+  - {id: meat, label: Meat, type: food, synonyms: [chicken, mutton, poultry]}
+  - {id: liver, label: Liver, type: food, synonyms: []}
+  - {id: lentils, label: "Lentils & pulses", type: food, synonyms: [dal, daal, pulses, legumes, moong, mung, masoor, toor, chana, chickpea, rajma, beans, soybean]}
+  - {id: grains, label: "Grains & cereals", type: food, synonyms: [cereal, rice, wheat, oats, shali, sali, yava, barley, roti, atta, bread]}
+  - {id: millet, label: Millets, type: food, parent: grains, synonyms: [bajra, jowar, sorghum, amaranth, rajgira, quinoa]}
+  - {id: ragi, label: Ragi (finger millet), type: food, parent: millet, synonyms: [finger millet, nachni, mandua]}
+  - {id: leafy_greens, label: Leafy greens, type: food, synonyms: [spinach, palak, greens, fenugreek leaves, methi, amaranth leaves, drumstick leaves, moringa, mustard greens]}
+  - {id: vegetables, label: Vegetables, type: food, synonyms: [carrot, pumpkin, gourd, lauki, okra, bhindi, cauliflower, broccoli, beetroot, tomato, cabbage, brinjal, eggplant, peas]}
+  - {id: fruits, label: Fruits, type: food, synonyms: [banana, orange, guava, mango, apple, pomegranate, papaya, watermelon, grapes, dates, figs, raisins]}
+  - {id: nuts_seeds, label: Nuts & seeds, type: food, synonyms: [almond, walnut, cashew, pistachio, peanut, flaxseed, sesame, til, pumpkin seeds, chia]}
+  - {id: sweets, label: "Sugar, jaggery & honey", type: food, synonyms: [sugar, jaggery, gud, honey, madhu, sweets, sugary]}
+  - {id: salt, label: Salt, type: food, synonyms: [sodium, saindhava, lavana]}
+  - {id: spices, label: Spices & herbs, type: food, synonyms: [ginger, turmeric, cumin, fennel, saffron, asafoetida, hing, pepper, garlic, ajwain, cardamom]}
+  - {id: alcohol, label: Alcohol, type: food, synonyms: [wine, beer, liquor, alcoholic]}
+  - {id: raw_foods, label: "Raw & unpasteurised foods", type: food, synonyms: [unpasteurised, unpasteurized, raw milk, undercooked, raw meat, soft cheese, pate, listeria, salmonella]}
+  # ---------- symptoms ----------
+  - {id: nausea, label: Nausea & vomiting, type: symptom, synonyms: [morning sickness, vomiting, ulti, chardi, hyperemesis, emesis, sickness]}
+  - {id: back_pain, label: Back pain, type: symptom, synonyms: [backache, pelvic pain, lower back]}
+  - {id: heartburn, label: Heartburn & acidity, type: symptom, synonyms: [acidity, acid reflux, indigestion, gas]}
+  - {id: constipation, label: Constipation, type: symptom, synonyms: [kabz, hard stools]}
+  - {id: swelling, label: Swelling, type: symptom, synonyms: [oedema, edema, puffiness, shotha]}
+  - {id: fatigue, label: Tiredness, type: symptom, synonyms: [tired, fatigue, exhaustion, weakness]}
+  - {id: bleeding, label: Bleeding, type: symptom, synonyms: [spotting, haemorrhage, hemorrhage, raktasrava]}
+  - {id: headache, label: Headache, type: symptom, synonyms: [migraine]}
+  - {id: cramps, label: Cramps & abdominal pain, type: symptom, synonyms: [abdominal pain, cramping, colic, stomach pain]}
+  - {id: fever, label: Fever, type: symptom, synonyms: [temperature, jwara]}
+  - {id: reduced_movement, label: Baby's movements, type: symptom, synonyms: [fetal movement, kick count, quickening, baby movement, kicks]}
+  - {id: contractions, label: Contractions, type: symptom, synonyms: [tightenings, braxton hicks, labour pains, labor pains]}
+  # ---------- conditions ----------
+  - {id: anaemia, label: Anaemia, type: condition, synonyms: [anemia, low haemoglobin, pandu, iron deficiency]}
+  - {id: gdm, label: Gestational diabetes, type: condition, synonyms: [diabetes, blood sugar, glucose, madhumeha, gestational diabetes]}
+  - {id: preeclampsia, label: Pre-eclampsia, type: condition, synonyms: [preeclampsia, eclampsia, hypertension, high blood pressure, blood pressure, garbhini jwara]}
+  - {id: miscarriage, label: "Miscarriage & pregnancy loss", type: condition, synonyms: [abortion, garbhasrava, garbhapata, abortions, stillbirth, still birth, habitual abortion]}
+  - {id: preterm, label: Preterm birth, type: condition, synonyms: [premature, premature birth, preterm labour]}
+  - {id: infection, label: Infection, type: condition, synonyms: [uti, urinary infection, flu, influenza, whooping cough, rsv]}
+  - {id: depression, label: "Depression & anxiety", type: condition, synonyms: [anxiety, stress, mental health, postnatal depression, mood, sadness]}
+  - {id: thyroid, label: Thyroid, type: condition, synonyms: [hypothyroid, hyperthyroid]}
+  # ---------- practices ----------
+  - {id: exercise, label: Exercise, type: practice, synonyms: [physical activity, workout, walking, walk, swimming, vyayam, stretching, pelvic floor]}
+  - {id: yoga, label: Yoga, type: practice, parent: exercise, synonyms: [pranayama, asana, asanas, meditation, prenatal yoga]}
+  - {id: sleep, label: Sleep & rest, type: practice, synonyms: [rest, sleeping, nap, insomnia, nidra, sleeping position, bed rest]}
+  - {id: smoking, label: Smoking & tobacco, type: practice, synonyms: [tobacco, cigarette, nicotine]}
+  - {id: travel, label: Travel, type: practice, synonyms: [flying, journey, vehicle, riding]}
+  - {id: sex, label: Intercourse, type: practice, synonyms: [coitus, maithuna, sexual]}
+  - {id: massage, label: "Massage & oil", type: practice, synonyms: [abhyanga, oil massage, snehana, oleation, bath]}
+  - {id: breastfeeding, label: Breastfeeding, type: practice, synonyms: [lactation, nursing, breastmilk, breast milk, stanya, stanyapana, wet nurse, dhatri]}
+  # ---------- care & screening ----------
+  - {id: antenatal_visit, label: Antenatal visits, type: care, synonyms: [antenatal, prenatal, checkup, check-up, appointment, anc, visit, midwife, contact, pmsma]}
+  - {id: ultrasound, label: Ultrasound & scans, type: care, synonyms: [scan, sonography, anomaly scan, ultrasonography]}
+  - {id: vaccine, label: Vaccines, type: care, synonyms: [vaccination, immunisation, immunization, tetanus, td, tdap, flu jab]}
+  - {id: supplements, label: Supplements, type: care, synonyms: [supplement, vitamins, tablets, prenatal vitamin, folic acid tablet]}
+  - {id: medication, label: Medicines, type: care, synonyms: [medicine, drug, drugs, paracetamol, antibiotic, dose, aushadha]}
+  - {id: labour, label: Labour & delivery, type: care, synonyms: [labor, delivery, birth, childbirth, prasava, prasav, parturition, caesarean, c-section, cesarean]}
+  - {id: postpartum, label: Postpartum care, type: care, synonyms: [postnatal, puerperium, sutika, sutikagara, after delivery, newborn, lochia]}
+  - {id: schemes, label: Government schemes, type: care, synonyms: [pmmvy, pmsma, janani, poshan, scheme, benefit, anganwadi, asha]}
+  # ---------- Ayurveda ----------
+  - {id: dosha, label: Doshas, type: ayurveda, synonyms: [tridosha, doshas]}
+  - {id: vata, label: Vata, type: ayurveda, parent: dosha, synonyms: [vayu, vata dosha, apana, vyana, prana]}
+  - {id: pitta, label: Pitta, type: ayurveda, parent: dosha, synonyms: [pitta dosha]}
+  - {id: kapha, label: Kapha, type: ayurveda, parent: dosha, synonyms: [kaphah, kapha dosha, shleshma]}
+  - {id: garbha, label: "Garbha (embryo / foetus)", type: ayurveda, synonyms: [embryo, fetus, foetus, garbhastha, garbhashaya, womb]}
+  - {id: garbhini, label: Garbhini (pregnant woman), type: ayurveda, synonyms: [pregnant woman, antarvatni, garbhavati, gravida]}
+  - {id: paricharya, label: "Garbhini paricharya (antenatal regimen)", type: ayurveda, synonyms: [garbhini paricarya, masanumasika, month wise regimen, monthly regimen, pathya, regimen for pregnant]}
+  - {id: ojas, label: Ojas, type: ayurveda, synonyms: [vitality, essence of dhatus]}
+  - {id: artava, label: Artava (menstrual blood / ovum), type: ayurveda, synonyms: [artav, menstrual blood, ovum, shonita, raja]}
+  - {id: shukra, label: Shukra (semen), type: ayurveda, synonyms: [sukra, semen, sperm, shukra dhatu]}
+  - {id: dhatu, label: Dhatus (tissues), type: ayurveda, synonyms: [rasa dhatu, rakta, mamsa, meda, asthi, majja, tissues]}
+  - {id: rasa, label: Rasa (taste / plasma), type: ayurveda, synonyms: [taste, madhura, sweet taste, amla, lavana taste, katu, tikta, kashaya]}
+  - {id: agni, label: Agni (digestive fire), type: ayurveda, synonyms: [digestive fire, digestion, ama, mandagni]}
+  - {id: shatavari, label: Shatavari, type: ayurveda, parent: spices, synonyms: [satavari, satavar, asparagus racemosus]}
+  - {id: madhuka, label: "Madhuka (liquorice)", type: ayurveda, synonyms: [yashtimadhu, yastimadhu, liquorice, licorice]}
+  - {id: sutika, label: "Sutika (postpartum woman)", type: ayurveda, synonyms: [sutikagara, puerperal woman]}
+  - {id: sanskar, label: Garbha sanskar, type: ayurveda, synonyms: [garbhasanskar, samskara, ritual, rituals, punsavana, pumsavana, rites]}
+  - {id: month_regimen, label: "Month-by-month (masa)", type: ayurveda, synonyms: [first month, second month, third month, fourth month, fifth month, sixth month, seventh month, eighth month, ninth month]}
+  # ---------- stage ----------
+  - {id: first_trimester, label: First trimester, type: stage, synonyms: [first trimester, early pregnancy, weeks 1-12, first three months]}
+  - {id: second_trimester, label: Second trimester, type: stage, synonyms: [second trimester, middle pregnancy, mid pregnancy]}
+  - {id: third_trimester, label: Third trimester, type: stage, synonyms: [third trimester, late pregnancy, last trimester, last months]}
