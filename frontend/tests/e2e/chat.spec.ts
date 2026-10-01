@@ -30,7 +30,7 @@ const sse = (events: [string, unknown][]) =>
 
 async function mockBackend(page: Page, opts: { onChatBody?: (body: Record<string, unknown>) => void } = {}) {
   await page.addInitScript(() => window.localStorage.setItem("matriva_token", "test-token"));
-  await page.route(/\/(auth\/me|pregnancy|pregnancy\/next-visit|wellness\/daily|wellness\/summary|resources|chat\/stream|chat\/history|recommendations)(\?.*)?$/, async (route) => {
+  await page.route(/\/(auth\/me|pregnancy|pregnancy\/next-visit|wellness\/daily|wellness\/summary|resources|chat\/stream|chat\/history|recommendations|knowledge\/book|knowledge\/book\/glossary)(\?.*)?$/, async (route) => {
     const req = route.request();
     if (req.resourceType() === "document") return route.fallback(); // page navigations (e.g. /recommendations) are real
     if (req.method() === "OPTIONS") return route.fulfill({ status: 204, headers: CORS });
@@ -46,6 +46,16 @@ async function mockBackend(page: Page, opts: { onChatBody?: (body: Record<string
     if (path === "/resources") return json(route, { verified_on: "2026-10-01", topics: { nutrition: "Nutrition" }, resources: [VIDEO] });
     if (path === "/recommendations") return json(route, []);
     if (path === "/chat/history") return json(route, { detail: "none" }, 404);
+    if (path === "/knowledge/book/glossary") return json(route, { query: "stanya", results: [{ hi: "स्तन्य", en: "Stanya or breast milk", count: 1, source: "contents" }] });
+    if (path === "/knowledge/book")
+      return json(route, {
+        available: true, title: "Prasutitantra", author: "Prof. Premvati Tiwari", publisher: "Chaukhambha", source: "scan",
+        authorities: { Vagbhata: 222, Caraka: 141 }, stats: { verified_sections: 93, english_chunks: 567, scanned_pages: 408 },
+        review: { "1": "approved" },
+        chapters: [{ number: 1, title_en: "Anatomy Of Female Reproductive System", title_hi: "स्त्री-शरीर-रचना", scan_start: 27, scan_end: 41,
+          english_chunks: 17, english_words: 2000, sections: [{ title_en: "Pelvis", title_hi: "श्रोणि", printed_page: 3, scan_page: 28 }],
+          concepts: [{ id: "garbha", label: "Garbha", count: 4 }], authorities: { Caraka: 3 }, key_terms: ["pesi"] }],
+      });
     if (path === "/chat/stream") {
       opts.onChatBody?.(JSON.parse(req.postData() ?? "{}"));
       return route.fulfill({
@@ -55,7 +65,7 @@ async function mockBackend(page: Page, opts: { onChatBody?: (body: Record<string
         body: sse([
           ["delta", { text: "Eat iron-rich foods with vitamin C." }],
           ["final", { answer: "Eat iron-rich foods with vitamin C.", safety_status: "safe_general", citations: [], corrected: false }],
-          ["done", { conversation_id: "c1", message_id: "m1", sources: [], evidence: {}, recommendations: [], suggestions: ["Which foods should I avoid?"] }],
+          ["done", { conversation_id: "c1", message_id: "m1", sources: [{ id: "s1", name: "guide", title: "Guide", source_type: "government", evidence_level: "supported", review_status: "approved", extra_metadata: {} }], evidence: {}, recommendations: [], suggestions: ["Which foods should I avoid?"] }],
         ]),
       });
     }
@@ -110,4 +120,17 @@ test("the language toggle is sent with the question", async ({ page }) => {
   await page.keyboard.press("Enter");
   await expect(page.getByText("Eat iron-rich foods with vitamin C.")).toBeVisible();
   expect(body.language).toBe("hi");
+});
+
+
+test("the /book card shows the book's chapters, review state and glossary", async ({ page }) => {
+  await mockBackend(page);
+  await page.goto("/chat");
+  await page.getByPlaceholder(/Ask anything/).fill("/book");
+  await page.keyboard.press("Enter");
+  await expect(page.getByText("Anatomy Of Female Reproductive System")).toBeVisible();
+  await expect(page.getByText("Approved for answers")).toBeVisible();
+  await expect(page.getByText("Vagbhata")).toBeVisible();
+  await page.getByPlaceholder(/Search a term/).fill("stanya");
+  await expect(page.getByText("Stanya or breast milk")).toBeVisible();
 });
