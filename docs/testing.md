@@ -13,7 +13,7 @@ Static checks: `ruff check .` and `mypy app/` (backend), `npm run lint`, `npm ru
 
 ## Backend
 
-The backend tests use an in-memory-style SQLite database that is dropped and recreated for every test, with real FastAPI requests through `TestClient`. Provider keys are blanked in `conftest.py`, so no test can reach Groq, Gemini or the web.
+The backend tests use a SQLite file that is dropped and recreated for every test, with real FastAPI requests through `TestClient`. Provider keys are blanked in `conftest.py`, so no test can reach Groq, Gemini or the web.
 
 | Area | Files |
 |---|---|
