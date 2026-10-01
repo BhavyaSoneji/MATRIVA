@@ -91,7 +91,7 @@ come from `backend/app/data/care_rules.yaml`, each with a source and
 | `DELETE` | `/care/meals/{id}` | Delete a meal |
 | `GET` | `/care/screening/questions` | Red-flag questions filtered by week |
 | `POST` | `/care/screening/assess` | Triage result: emergency / urgent / soon, with sources |
-| `GET` | `/care/food-guide` | The book's food regimen for this month and, with `?need=iron`, the foods richest in a nutrient; respects diet and allergies |
+| `GET` | `/care/food-guide` | The book's food regimen for this month (`?month=1..9` to choose one) and, with `?need=` one of `iron`, `calcium`, `protein`, `folate`, `vitamin_c`, `vitamin_b12`, `zinc`, `magnesium`, `vitamin_a`, `fibre`, the foods richest in that nutrient. Respects diet and allergies. Foods only |
 | `GET` | `/care/summary` | One-page doctor summary |
 | `PUT` / `GET` / `DELETE` | `/care/emergency-contact` | Manage the emergency contact |
 
@@ -221,7 +221,7 @@ curl -s "localhost:8000/care/food-guide?need=iron" -H "authorization: Bearer $TO
 - `413`: upload exceeds the configured limit
 - `415`: unsupported upload type
 - `422`: invalid input
-- `429`: rate limit exceeded
+- `429`: rate limit exceeded (read `Retry-After`)
 
 Other routes: `GET /health` (app and database) and staff-only `GET /internal/metrics`.
 - `503`: safety or required dependency unavailable (fail closed)
