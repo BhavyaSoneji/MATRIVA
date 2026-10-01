@@ -311,7 +311,8 @@ flowchart TB
 | Generation | Offline extractive composer (default) · optional Groq `openai/gpt-oss-120b` |
 | OCR | Tesseract (local) for lab-report photos and the book |
 | Auth | JWT, consent versioning |
-| Quality | pytest, Playwright, ruff, mypy, ESLint, secret scan |
+| Safety | Rule engine with rules as YAML data: 1,231 rules, 40 named sources, English · Hinglish · Hindi · Gujarati |
+| Quality | pytest, Playwright, ruff, mypy, ESLint, secret scan, GitHub Actions CI |
 | Ship | Docker, Docker Compose |
 
 A modular monolith **on purpose**: RAG, safety, API, ingestion and evaluation are cleanly separated without the operational weight of microservices.
