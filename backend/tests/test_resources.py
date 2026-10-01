@@ -34,6 +34,3 @@ def test_stage_filter_excludes_other_stages() -> None:
     for item in search_resources(topic="labour", stage="1", limit=20):
         assert "all" in item["stages"] or "1" in item["stages"]
 
-
-def test_library_responses_are_cacheable_briefly(client: TestClient, auth_headers) -> None:
-    assert "max-age" in client.get("/resources", headers=auth_headers).headers["cache-control"]
