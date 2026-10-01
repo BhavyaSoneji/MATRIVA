@@ -1,0 +1,1530 @@
+{
+ "per": "100 g",
+ "foods": [
+  {
+   "id": "food-usda-172421",
+   "name": "Lentils (masoor dal)",
+   "category": "legume",
+   "aliases": [
+    "masoor dal",
+    "lentils",
+    "masoor"
+   ],
+   "per_100g": {
+    "energy": 116,
+    "protein": 9.02,
+    "fibre": 7.9,
+    "calcium": 19.0,
+    "iron": 3.33,
+    "magnesium": 36.0,
+    "zinc": 1.27,
+    "vitamin C": 1.5,
+    "folate (DFE)": 181,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Lentils, mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-173757",
+   "name": "Chickpeas (chana)",
+   "category": "legume",
+   "aliases": [
+    "chickpeas",
+    "chana"
+   ],
+   "per_100g": {
+    "energy": 164,
+    "protein": 8.86,
+    "fibre": 7.6,
+    "calcium": 49.0,
+    "iron": 2.89,
+    "magnesium": 48.0,
+    "zinc": 1.53,
+    "vitamin C": 1.3,
+    "folate (DFE)": 172,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-174257",
+   "name": "Mung beans (moong)",
+   "category": "legume",
+   "aliases": [
+    "mung beans",
+    "moong"
+   ],
+   "per_100g": {
+    "energy": 105,
+    "protein": 7.02,
+    "fibre": 7.6,
+    "calcium": 27.0,
+    "iron": 1.4,
+    "magnesium": 48.0,
+    "zinc": 0.84,
+    "vitamin C": 1.0,
+    "folate (DFE)": 159,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Mung beans, mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-172437",
+   "name": "Pigeon peas (toor / arhar dal)",
+   "category": "legume",
+   "aliases": [
+    "pigeon peas",
+    "arhar dal",
+    "arhar",
+    "toor"
+   ],
+   "per_100g": {
+    "energy": 121,
+    "protein": 6.76,
+    "fibre": 6.7,
+    "calcium": 43.0,
+    "iron": 1.11,
+    "magnesium": 46.0,
+    "zinc": 0.9,
+    "vitamin C": 0.0,
+    "folate (DFE)": 111,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Pigeon peas (red gram), mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-173740",
+   "name": "Kidney beans (rajma)",
+   "category": "legume",
+   "aliases": [
+    "kidney beans",
+    "rajma"
+   ],
+   "per_100g": {
+    "energy": 127,
+    "protein": 8.67,
+    "fibre": 6.4,
+    "calcium": 35.0,
+    "iron": 2.22,
+    "magnesium": 42.0,
+    "zinc": 1.0,
+    "vitamin C": 1.2,
+    "folate (DFE)": 130,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Beans, kidney, all types, mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-173759",
+   "name": "Cowpeas (lobia / chawli)",
+   "category": "legume",
+   "aliases": [
+    "cowpeas",
+    "chawli",
+    "lobia"
+   ],
+   "per_100g": {
+    "energy": 116,
+    "protein": 7.73,
+    "fibre": 6.5,
+    "calcium": 24.0,
+    "iron": 2.51,
+    "magnesium": 53.0,
+    "zinc": 1.29,
+    "vitamin C": 0.4,
+    "folate (DFE)": 208,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Cowpeas, common (blackeyes, crowder, southern), mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-173735",
+   "name": "Black beans",
+   "category": "legume",
+   "aliases": [
+    "black beans"
+   ],
+   "per_100g": {
+    "energy": 132,
+    "protein": 8.86,
+    "fibre": 8.7,
+    "calcium": 27.0,
+    "iron": 2.1,
+    "magnesium": 70.0,
+    "zinc": 1.12,
+    "vitamin C": 0.0,
+    "folate (DFE)": 149,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Beans, black, mature seeds, cooked, boiled, without salt"
+  },
+  {
+   "id": "food-usda-174299",
+   "name": "Soybeans",
+   "category": "legume",
+   "aliases": [
+    "soybeans"
+   ],
+   "per_100g": {
+    "energy": 172,
+    "protein": 18.2,
+    "fibre": 6.0,
+    "calcium": 102,
+    "iron": 5.14,
+    "magnesium": 86.0,
+    "zinc": 1.15,
+    "vitamin C": 1.7,
+    "folate (DFE)": 54.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Soybeans, mature seeds, cooked, boiled, with salt"
+  },
+  {
+   "id": "food-usda-172475",
+   "name": "Tofu (firm)",
+   "category": "legume",
+   "aliases": [
+    "tofu"
+   ],
+   "per_100g": {
+    "energy": 144,
+    "protein": 17.3,
+    "fibre": 2.3,
+    "calcium": 683,
+    "iron": 2.66,
+    "magnesium": 58.0,
+    "zinc": 1.57,
+    "vitamin C": 0.2,
+    "folate (DFE)": 29.0,
+    "vitamin B12": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Tofu, raw, firm, prepared with calcium sulfate"
+  },
+  {
+   "id": "food-usda-168871",
+   "name": "Millet (cooked)",
+   "category": "grain",
+   "aliases": [
+    "millet"
+   ],
+   "per_100g": {
+    "energy": 119,
+    "protein": 3.51,
+    "fibre": 1.3,
+    "calcium": 3.0,
+    "iron": 0.63,
+    "magnesium": 44.0,
+    "zinc": 0.91,
+    "vitamin C": 0.0,
+    "folate (DFE)": 19.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Millet, cooked"
+  },
+  {
+   "id": "food-usda-169704",
+   "name": "Brown rice (cooked)",
+   "category": "grain",
+   "aliases": [
+    "brown rice"
+   ],
+   "per_100g": {
+    "energy": 123,
+    "protein": 2.74,
+    "fibre": 1.6,
+    "calcium": 3.0,
+    "iron": 0.56,
+    "magnesium": 39.0,
+    "zinc": 0.71,
+    "vitamin C": 0.0,
+    "folate (DFE)": 9.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+   "id": "food-usda-168878",
+   "name": "White rice (cooked)",
+   "category": "grain",
+   "aliases": [
+    "white rice"
+   ],
+   "per_100g": {
+    "energy": 130,
+    "protein": 2.69,
+    "fibre": 0.4,
+    "calcium": 10.0,
+    "iron": 1.2,
+    "magnesium": 12.0,
+    "zinc": 0.49,
+    "vitamin C": 0.0,
+    "folate (DFE)": 97.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Rice, white, long-grain, regular, enriched, cooked"
+  },
+  {
+   "id": "food-usda-168893",
+   "name": "Whole wheat flour (atta)",
+   "category": "grain",
+   "aliases": [
+    "whole wheat flour",
+    "atta"
+   ],
+   "per_100g": {
+    "energy": 340,
+    "protein": 13.2,
+    "fibre": 10.7,
+    "calcium": 34.0,
+    "iron": 3.6,
+    "magnesium": 137,
+    "zinc": 2.6,
+    "vitamin C": 0.0,
+    "folate (DFE)": 44.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+   "id": "food-usda-169705",
+   "name": "Oats",
+   "category": "grain",
+   "aliases": [
+    "oats"
+   ],
+   "per_100g": {
+    "energy": 389,
+    "protein": 16.9,
+    "fibre": 10.6,
+    "calcium": 54.0,
+    "iron": 4.72,
+    "magnesium": 177,
+    "zinc": 3.97,
+    "vitamin C": 0.0,
+    "folate (DFE)": 56.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Oats (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+   "id": "food-usda-169716",
+   "name": "Sorghum (jowar)",
+   "category": "grain",
+   "aliases": [
+    "sorghum",
+    "jowar"
+   ],
+   "per_100g": {
+    "energy": 329,
+    "protein": 10.6,
+    "fibre": 6.7,
+    "calcium": 13.0,
+    "iron": 3.36,
+    "magnesium": 165,
+    "zinc": 1.67,
+    "vitamin C": 0.0,
+    "folate (DFE)": 20.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Sorghum grain"
+  },
+  {
+   "id": "food-usda-170682",
+   "name": "Amaranth grain (rajgira)",
+   "category": "grain",
+   "aliases": [
+    "amaranth grain",
+    "rajgira"
+   ],
+   "per_100g": {
+    "energy": 371,
+    "protein": 13.6,
+    "fibre": 6.7,
+    "calcium": 159,
+    "iron": 7.61,
+    "magnesium": 248,
+    "zinc": 2.87,
+    "vitamin C": 4.2,
+    "folate (DFE)": 82.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Amaranth grain, uncooked"
+  },
+  {
+   "id": "food-usda-168917",
+   "name": "Quinoa (cooked)",
+   "category": "grain",
+   "aliases": [
+    "quinoa"
+   ],
+   "per_100g": {
+    "energy": 120,
+    "protein": 4.4,
+    "fibre": 2.8,
+    "calcium": 17.0,
+    "iron": 1.49,
+    "magnesium": 64.0,
+    "zinc": 1.09,
+    "vitamin C": 0.0,
+    "folate (DFE)": 42.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Quinoa, cooked"
+  },
+  {
+   "id": "food-usda-172688",
+   "name": "Whole wheat bread",
+   "category": "grain",
+   "aliases": [
+    "whole wheat bread"
+   ],
+   "per_100g": {
+    "energy": 252,
+    "protein": 12.4,
+    "fibre": 6.0,
+    "calcium": 161,
+    "iron": 2.47,
+    "magnesium": 75.0,
+    "zinc": 1.77,
+    "vitamin C": 0.0,
+    "folate (DFE)": 42.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Bread, whole-wheat, commercially prepared"
+  },
+  {
+   "id": "food-usda-171267",
+   "name": "Milk (2% fat)",
+   "category": "dairy_egg",
+   "aliases": [
+    "milk"
+   ],
+   "per_100g": {
+    "energy": 50.0,
+    "protein": 3.3,
+    "fibre": 0.0,
+    "calcium": 120,
+    "iron": 0.02,
+    "magnesium": 11.0,
+    "zinc": 0.48,
+    "vitamin C": 0.2,
+    "folate (DFE)": 5.0,
+    "vitamin B12": 0.53,
+    "vitamin A (RAE)": 55.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+  },
+  {
+   "id": "food-usda-170886",
+   "name": "Plain yogurt (dahi / curd)",
+   "category": "dairy_egg",
+   "aliases": [
+    "plain yogurt",
+    "curd",
+    "dahi"
+   ],
+   "per_100g": {
+    "energy": 63.0,
+    "protein": 5.25,
+    "fibre": 0.0,
+    "calcium": 183,
+    "iron": 0.08,
+    "magnesium": 17.0,
+    "zinc": 0.89,
+    "vitamin C": 0.8,
+    "folate (DFE)": 11.0,
+    "vitamin B12": 0.56,
+    "vitamin A (RAE)": 14.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Yogurt, plain, low fat"
+  },
+  {
+   "id": "food-usda-172182",
+   "name": "Cottage cheese (low fat)",
+   "category": "dairy_egg",
+   "aliases": [
+    "cottage cheese"
+   ],
+   "per_100g": {
+    "energy": 81.0,
+    "protein": 10.4,
+    "fibre": 0.0,
+    "calcium": 111,
+    "iron": 0.13,
+    "magnesium": 9.0,
+    "zinc": 0.51,
+    "vitamin C": 0.0,
+    "folate (DFE)": 8.0,
+    "vitamin B12": 0.47,
+    "vitamin A (RAE)": 68.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Cheese, cottage, lowfat, 2% milkfat"
+  },
+  {
+   "id": "food-usda-173412",
+   "name": "Ghee (anhydrous butter oil)",
+   "category": "dairy_egg",
+   "aliases": [
+    "anhydrous butter oil",
+    "anhydrous",
+    "butter",
+    "ghee"
+   ],
+   "per_100g": {
+    "energy": 876,
+    "protein": 0.28,
+    "fibre": 0.0,
+    "calcium": 4.0,
+    "iron": 0.0,
+    "magnesium": 0.0,
+    "zinc": 0.01,
+    "vitamin C": 0.0,
+    "folate (DFE)": 0.0,
+    "vitamin B12": 0.01,
+    "vitamin A (RAE)": 840
+   },
+   "source": "USDA FoodData Central SR Legacy: Butter oil, anhydrous"
+  },
+  {
+   "id": "food-usda-173424",
+   "name": "Egg (hard-boiled)",
+   "category": "dairy_egg",
+   "aliases": [
+    "egg"
+   ],
+   "per_100g": {
+    "energy": 155,
+    "protein": 12.6,
+    "fibre": 0.0,
+    "calcium": 50.0,
+    "iron": 1.19,
+    "magnesium": 10.0,
+    "zinc": 1.05,
+    "vitamin C": 0.0,
+    "folate (DFE)": 44.0,
+    "vitamin B12": 1.11,
+    "vitamin A (RAE)": 149
+   },
+   "source": "USDA FoodData Central SR Legacy: Egg, whole, cooked, hard-boiled"
+  },
+  {
+   "id": "food-usda-171477",
+   "name": "Chicken breast (roasted)",
+   "category": "meat_fish",
+   "aliases": [
+    "chicken breast"
+   ],
+   "per_100g": {
+    "energy": 165,
+    "protein": 31.0,
+    "fibre": 0.0,
+    "calcium": 15.0,
+    "iron": 1.04,
+    "magnesium": 29.0,
+    "zinc": 1.0,
+    "vitamin C": 0.0,
+    "folate (DFE)": 4.0,
+    "vitamin B12": 0.34,
+    "vitamin A (RAE)": 6.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Chicken, broilers or fryers, breast, meat only, cooked, roasted"
+  },
+  {
+   "id": "food-usda-171061",
+   "name": "Chicken liver (cooked)",
+   "category": "meat_fish",
+   "aliases": [
+    "chicken liver"
+   ],
+   "per_100g": {
+    "energy": 167,
+    "protein": 24.5,
+    "fibre": 0.0,
+    "calcium": 11.0,
+    "iron": 11.6,
+    "magnesium": 25.0,
+    "zinc": 3.98,
+    "vitamin C": 27.9,
+    "folate (DFE)": 578,
+    "vitamin B12": 16.8,
+    "vitamin A (RAE)": 3980.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Chicken, liver, all classes, cooked, simmered"
+  },
+  {
+   "id": "food-usda-174185",
+   "name": "Carp (cooked; rohu is a carp)",
+   "category": "meat_fish",
+   "aliases": [
+    "; rohu is a carp",
+    "carp",
+    "rohu"
+   ],
+   "per_100g": {
+    "energy": 162,
+    "protein": 22.9,
+    "fibre": 0.0,
+    "calcium": 52.0,
+    "iron": 1.59,
+    "magnesium": 38.0,
+    "zinc": 1.9,
+    "vitamin C": 1.6,
+    "folate (DFE)": 17.0,
+    "vitamin B12": 1.47,
+    "vitamin A (RAE)": 10.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Fish, carp, cooked, dry heat"
+  },
+  {
+   "id": "food-usda-175168",
+   "name": "Salmon (cooked)",
+   "category": "meat_fish",
+   "aliases": [
+    "salmon"
+   ],
+   "per_100g": {
+    "energy": 206,
+    "protein": 22.1,
+    "fibre": 0.0,
+    "calcium": 15.0,
+    "iron": 0.34,
+    "magnesium": 30.0,
+    "zinc": 0.43,
+    "vitamin C": 3.7,
+    "folate (DFE)": 34.0,
+    "vitamin B12": 2.8,
+    "vitamin A (RAE)": 69.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Fish, salmon, Atlantic, farmed, cooked, dry heat"
+  },
+  {
+   "id": "food-usda-175139",
+   "name": "Sardines (canned, with bone)",
+   "category": "meat_fish",
+   "aliases": [
+    "sardines"
+   ],
+   "per_100g": {
+    "energy": 208,
+    "protein": 24.6,
+    "fibre": 0.0,
+    "calcium": 382,
+    "iron": 2.92,
+    "magnesium": 39.0,
+    "zinc": 1.31,
+    "vitamin C": 0.0,
+    "folate (DFE)": 10.0,
+    "vitamin B12": 8.94,
+    "vitamin A (RAE)": 32.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Fish, sardine, Atlantic, canned in oil, drained solids with bone"
+  },
+  {
+   "id": "food-usda-168463",
+   "name": "Spinach (palak, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "spinach",
+    "palak"
+   ],
+   "per_100g": {
+    "energy": 23.0,
+    "protein": 2.97,
+    "fibre": 2.4,
+    "calcium": 136,
+    "iron": 3.57,
+    "magnesium": 87.0,
+    "zinc": 0.76,
+    "vitamin C": 9.8,
+    "folate (DFE)": 146,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 524
+   },
+   "source": "USDA FoodData Central SR Legacy: Spinach, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169202",
+   "name": "Amaranth leaves (chaulai, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "amaranth leaves",
+    "chaulai"
+   ],
+   "per_100g": {
+    "energy": 21.0,
+    "protein": 2.11,
+    "calcium": 209,
+    "iron": 2.26,
+    "magnesium": 55.0,
+    "zinc": 0.88,
+    "vitamin C": 41.1,
+    "folate (DFE)": 57.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 139
+   },
+   "source": "USDA FoodData Central SR Legacy: Amaranth leaves, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-168416",
+   "name": "Drumstick leaves (moringa / sahjan)",
+   "category": "vegetable",
+   "aliases": [
+    "drumstick leaves",
+    "moringa",
+    "sahjan"
+   ],
+   "per_100g": {
+    "energy": 64.0,
+    "protein": 9.4,
+    "fibre": 2.0,
+    "calcium": 185,
+    "iron": 4.0,
+    "magnesium": 42.0,
+    "zinc": 0.6,
+    "vitamin C": 51.7,
+    "folate (DFE)": 40.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 378
+   },
+   "source": "USDA FoodData Central SR Legacy: Drumstick leaves, raw"
+  },
+  {
+   "id": "food-usda-169257",
+   "name": "Mustard greens (sarson, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "mustard greens",
+    "sarson"
+   ],
+   "per_100g": {
+    "energy": 26.0,
+    "protein": 2.56,
+    "fibre": 2.0,
+    "calcium": 118,
+    "iron": 0.87,
+    "magnesium": 13.0,
+    "zinc": 0.22,
+    "vitamin C": 25.3,
+    "folate (DFE)": 9.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 618
+   },
+   "source": "USDA FoodData Central SR Legacy: Mustard greens, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-170393",
+   "name": "Carrot (gajar)",
+   "category": "vegetable",
+   "aliases": [
+    "carrot",
+    "gajar"
+   ],
+   "per_100g": {
+    "energy": 41.0,
+    "protein": 0.93,
+    "fibre": 2.8,
+    "calcium": 33.0,
+    "iron": 0.3,
+    "magnesium": 12.0,
+    "zinc": 0.24,
+    "vitamin C": 5.9,
+    "folate (DFE)": 19.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 835
+   },
+   "source": "USDA FoodData Central SR Legacy: Carrots, raw"
+  },
+  {
+   "id": "food-usda-168449",
+   "name": "Pumpkin (kaddu, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "pumpkin",
+    "kaddu"
+   ],
+   "per_100g": {
+    "energy": 20.0,
+    "protein": 0.72,
+    "fibre": 1.1,
+    "calcium": 15.0,
+    "iron": 0.57,
+    "magnesium": 9.0,
+    "zinc": 0.23,
+    "vitamin C": 4.7,
+    "folate (DFE)": 9.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 288
+   },
+   "source": "USDA FoodData Central SR Legacy: Pumpkin, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-168483",
+   "name": "Sweet potato (shakarkandi)",
+   "category": "vegetable",
+   "aliases": [
+    "sweet potato",
+    "shakarkandi"
+   ],
+   "per_100g": {
+    "energy": 90.0,
+    "protein": 2.01,
+    "fibre": 3.3,
+    "calcium": 38.0,
+    "iron": 0.69,
+    "magnesium": 27.0,
+    "zinc": 0.32,
+    "vitamin C": 19.6,
+    "folate (DFE)": 6.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 961
+   },
+   "source": "USDA FoodData Central SR Legacy: Sweet potato, cooked, baked in skin, flesh, without salt"
+  },
+  {
+   "id": "food-usda-169146",
+   "name": "Beetroot (chukandar, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "chukandar",
+    "beetroot"
+   ],
+   "per_100g": {
+    "energy": 44.0,
+    "protein": 1.68,
+    "fibre": 2.0,
+    "calcium": 16.0,
+    "iron": 0.79,
+    "magnesium": 23.0,
+    "zinc": 0.35,
+    "vitamin C": 3.6,
+    "folate (DFE)": 80.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 2.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Beets, cooked, boiled, drained"
+  },
+  {
+   "id": "food-usda-170397",
+   "name": "Cauliflower (gobi, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "cauliflower",
+    "gobi"
+   ],
+   "per_100g": {
+    "energy": 23.0,
+    "protein": 1.84,
+    "fibre": 2.3,
+    "calcium": 16.0,
+    "iron": 0.32,
+    "magnesium": 9.0,
+    "zinc": 0.17,
+    "vitamin C": 44.3,
+    "folate (DFE)": 44.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Cauliflower, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169967",
+   "name": "Broccoli (cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "broccoli"
+   ],
+   "per_100g": {
+    "energy": 35.0,
+    "protein": 2.38,
+    "fibre": 3.3,
+    "calcium": 40.0,
+    "iron": 0.67,
+    "magnesium": 21.0,
+    "zinc": 0.45,
+    "vitamin C": 64.9,
+    "folate (DFE)": 108,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 77.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Broccoli, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169261",
+   "name": "Okra (bhindi, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "bhindi",
+    "okra"
+   ],
+   "per_100g": {
+    "energy": 22.0,
+    "protein": 1.87,
+    "fibre": 2.5,
+    "calcium": 77.0,
+    "iron": 0.28,
+    "magnesium": 36.0,
+    "zinc": 0.43,
+    "vitamin C": 16.3,
+    "folate (DFE)": 46.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 14.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Okra, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-170457",
+   "name": "Tomato (raw)",
+   "category": "vegetable",
+   "aliases": [
+    "tomato"
+   ],
+   "per_100g": {
+    "energy": 18.0,
+    "protein": 0.88,
+    "fibre": 1.2,
+    "calcium": 10.0,
+    "iron": 0.27,
+    "magnesium": 11.0,
+    "zinc": 0.17,
+    "vitamin C": 13.7,
+    "folate (DFE)": 15.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 42.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Tomatoes, red, ripe, raw, year round average"
+  },
+  {
+   "id": "food-usda-169976",
+   "name": "Cabbage (cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "cabbage"
+   ],
+   "per_100g": {
+    "energy": 23.0,
+    "protein": 1.27,
+    "fibre": 1.9,
+    "calcium": 48.0,
+    "iron": 0.17,
+    "magnesium": 15.0,
+    "zinc": 0.2,
+    "vitamin C": 37.5,
+    "folate (DFE)": 30.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 4.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Cabbage, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169232",
+   "name": "Bottle gourd (lauki / doodhi)",
+   "category": "vegetable",
+   "aliases": [
+    "bottle gourd",
+    "doodhi",
+    "lauki"
+   ],
+   "per_100g": {
+    "energy": 14.0,
+    "protein": 0.62,
+    "fibre": 0.5,
+    "calcium": 26.0,
+    "iron": 0.2,
+    "magnesium": 11.0,
+    "zinc": 0.7,
+    "vitamin C": 10.1,
+    "folate (DFE)": 6.0,
+    "vitamin B12": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Gourd, white-flowered (calabash), raw"
+  },
+  {
+   "id": "food-usda-170420",
+   "name": "Green peas (matar, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "green peas",
+    "matar"
+   ],
+   "per_100g": {
+    "energy": 84.0,
+    "protein": 5.36,
+    "fibre": 5.5,
+    "calcium": 27.0,
+    "iron": 1.54,
+    "magnesium": 39.0,
+    "zinc": 1.19,
+    "vitamin C": 14.2,
+    "folate (DFE)": 63.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 40.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Peas, green, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169141",
+   "name": "Green beans (cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "green beans"
+   ],
+   "per_100g": {
+    "energy": 35.0,
+    "protein": 1.89,
+    "fibre": 3.2,
+    "calcium": 44.0,
+    "iron": 0.65,
+    "magnesium": 18.0,
+    "zinc": 0.25,
+    "vitamin C": 9.7,
+    "folate (DFE)": 33.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 32.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Beans, snap, green, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-169229",
+   "name": "Eggplant (baingan, cooked)",
+   "category": "vegetable",
+   "aliases": [
+    "eggplant",
+    "baingan"
+   ],
+   "per_100g": {
+    "energy": 35.0,
+    "protein": 0.83,
+    "fibre": 2.5,
+    "calcium": 6.0,
+    "iron": 0.25,
+    "magnesium": 11.0,
+    "zinc": 0.12,
+    "vitamin C": 1.3,
+    "folate (DFE)": 14.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 2.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Eggplant, cooked, boiled, drained, without salt"
+  },
+  {
+   "id": "food-usda-170108",
+   "name": "Red bell pepper (raw)",
+   "category": "vegetable",
+   "aliases": [
+    "red bell pepper"
+   ],
+   "per_100g": {
+    "energy": 26.0,
+    "protein": 0.99,
+    "fibre": 2.1,
+    "calcium": 7.0,
+    "iron": 0.43,
+    "magnesium": 12.0,
+    "zinc": 0.25,
+    "vitamin C": 128,
+    "folate (DFE)": 46.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 157
+   },
+   "source": "USDA FoodData Central SR Legacy: Peppers, sweet, red, raw"
+  },
+  {
+   "id": "food-usda-170438",
+   "name": "Potato (aloo, boiled)",
+   "category": "vegetable",
+   "aliases": [
+    "potato",
+    "aloo"
+   ],
+   "per_100g": {
+    "energy": 87.0,
+    "protein": 1.87,
+    "fibre": 1.8,
+    "calcium": 5.0,
+    "iron": 0.31,
+    "magnesium": 22.0,
+    "zinc": 0.3,
+    "vitamin C": 13.0,
+    "folate (DFE)": 10.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Potatoes, boiled, cooked in skin, flesh, without salt"
+  },
+  {
+   "id": "food-usda-173944",
+   "name": "Banana (kela)",
+   "category": "fruit",
+   "aliases": [
+    "banana",
+    "kela"
+   ],
+   "per_100g": {
+    "energy": 89.0,
+    "protein": 1.09,
+    "fibre": 2.6,
+    "calcium": 5.0,
+    "iron": 0.26,
+    "magnesium": 27.0,
+    "zinc": 0.15,
+    "vitamin C": 8.7,
+    "folate (DFE)": 20.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 3.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Bananas, raw"
+  },
+  {
+   "id": "food-usda-169097",
+   "name": "Orange (santra)",
+   "category": "fruit",
+   "aliases": [
+    "orange",
+    "santra"
+   ],
+   "per_100g": {
+    "energy": 47.0,
+    "protein": 0.94,
+    "fibre": 2.4,
+    "calcium": 40.0,
+    "iron": 0.1,
+    "magnesium": 10.0,
+    "zinc": 0.07,
+    "vitamin C": 53.2,
+    "folate (DFE)": 30.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 11.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Oranges, raw, all commercial varieties"
+  },
+  {
+   "id": "food-usda-173044",
+   "name": "Guava (amrood)",
+   "category": "fruit",
+   "aliases": [
+    "amrood",
+    "guava"
+   ],
+   "per_100g": {
+    "energy": 68.0,
+    "protein": 2.55,
+    "fibre": 5.4,
+    "calcium": 18.0,
+    "iron": 0.26,
+    "magnesium": 22.0,
+    "zinc": 0.23,
+    "vitamin C": 228,
+    "folate (DFE)": 49.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 31.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Guavas, common, raw"
+  },
+  {
+   "id": "food-usda-169910",
+   "name": "Mango (aam)",
+   "category": "fruit",
+   "aliases": [
+    "mango",
+    "aam"
+   ],
+   "per_100g": {
+    "energy": 60.0,
+    "protein": 0.82,
+    "fibre": 1.6,
+    "calcium": 11.0,
+    "iron": 0.16,
+    "magnesium": 10.0,
+    "zinc": 0.09,
+    "vitamin C": 36.4,
+    "folate (DFE)": 43.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 54.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Mangos, raw"
+  },
+  {
+   "id": "food-usda-169926",
+   "name": "Ripe papaya (papita)",
+   "category": "fruit",
+   "aliases": [
+    "ripe papaya",
+    "papita"
+   ],
+   "per_100g": {
+    "energy": 43.0,
+    "protein": 0.47,
+    "fibre": 1.7,
+    "calcium": 20.0,
+    "iron": 0.25,
+    "magnesium": 21.0,
+    "zinc": 0.08,
+    "vitamin C": 60.9,
+    "folate (DFE)": 37.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 47.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Papayas, raw"
+  },
+  {
+   "id": "food-usda-169134",
+   "name": "Pomegranate (anar)",
+   "category": "fruit",
+   "aliases": [
+    "pomegranate",
+    "anar"
+   ],
+   "per_100g": {
+    "energy": 83.0,
+    "protein": 1.67,
+    "fibre": 4.0,
+    "calcium": 10.0,
+    "iron": 0.3,
+    "magnesium": 12.0,
+    "zinc": 0.35,
+    "vitamin C": 10.2,
+    "folate (DFE)": 38.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Pomegranates, raw"
+  },
+  {
+   "id": "food-usda-171688",
+   "name": "Apple (seb)",
+   "category": "fruit",
+   "aliases": [
+    "apple",
+    "seb"
+   ],
+   "per_100g": {
+    "energy": 52.0,
+    "protein": 0.26,
+    "fibre": 2.4,
+    "calcium": 6.0,
+    "iron": 0.12,
+    "magnesium": 5.0,
+    "zinc": 0.04,
+    "vitamin C": 4.6,
+    "folate (DFE)": 3.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 3.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+   "id": "food-usda-168191",
+   "name": "Dates (khajoor, medjool)",
+   "category": "fruit",
+   "aliases": [
+    "khajoor",
+    "dates"
+   ],
+   "per_100g": {
+    "energy": 277,
+    "protein": 1.81,
+    "fibre": 6.7,
+    "calcium": 64.0,
+    "iron": 0.9,
+    "magnesium": 54.0,
+    "zinc": 0.44,
+    "vitamin C": 0.0,
+    "folate (DFE)": 15.0,
+    "vitamin A (RAE)": 7.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Dates, medjool"
+  },
+  {
+   "id": "food-usda-174665",
+   "name": "Dried figs (anjeer)",
+   "category": "fruit",
+   "aliases": [
+    "dried figs",
+    "anjeer"
+   ],
+   "per_100g": {
+    "energy": 249,
+    "protein": 3.3,
+    "fibre": 9.8,
+    "calcium": 162,
+    "iron": 2.03,
+    "magnesium": 68.0,
+    "zinc": 0.55,
+    "vitamin C": 1.2,
+    "folate (DFE)": 9.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Figs, dried, uncooked"
+  },
+  {
+   "id": "food-usda-168165",
+   "name": "Raisins (kishmish)",
+   "category": "fruit",
+   "aliases": [
+    "kishmish",
+    "raisins"
+   ],
+   "per_100g": {
+    "energy": 299,
+    "protein": 3.3,
+    "fibre": 4.5,
+    "calcium": 62.0,
+    "iron": 1.79,
+    "magnesium": 36.0,
+    "zinc": 0.36,
+    "vitamin C": 2.3,
+    "folate (DFE)": 5.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Raisins, dark, seedless (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+   "id": "food-usda-167765",
+   "name": "Watermelon (tarbooz)",
+   "category": "fruit",
+   "aliases": [
+    "watermelon",
+    "tarbooz"
+   ],
+   "per_100g": {
+    "energy": 30.0,
+    "protein": 0.61,
+    "fibre": 0.4,
+    "calcium": 7.0,
+    "iron": 0.24,
+    "magnesium": 10.0,
+    "zinc": 0.1,
+    "vitamin C": 8.1,
+    "folate (DFE)": 3.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 28.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Watermelon, raw"
+  },
+  {
+   "id": "food-usda-170567",
+   "name": "Almonds (badam)",
+   "category": "nut_seed",
+   "aliases": [
+    "almonds",
+    "badam"
+   ],
+   "per_100g": {
+    "energy": 579,
+    "protein": 21.2,
+    "fibre": 12.5,
+    "calcium": 269,
+    "iron": 3.71,
+    "magnesium": 270,
+    "zinc": 3.12,
+    "vitamin C": 0.0,
+    "folate (DFE)": 44.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Nuts, almonds"
+  },
+  {
+   "id": "food-usda-170187",
+   "name": "Walnuts (akhrot)",
+   "category": "nut_seed",
+   "aliases": [
+    "walnuts",
+    "akhrot"
+   ],
+   "per_100g": {
+    "energy": 654,
+    "protein": 15.2,
+    "fibre": 6.7,
+    "calcium": 98.0,
+    "iron": 2.91,
+    "magnesium": 158,
+    "zinc": 3.09,
+    "vitamin C": 1.3,
+    "folate (DFE)": 98.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Nuts, walnuts, english"
+  },
+  {
+   "id": "food-usda-170162",
+   "name": "Cashews (kaju)",
+   "category": "nut_seed",
+   "aliases": [
+    "cashews",
+    "kaju"
+   ],
+   "per_100g": {
+    "energy": 553,
+    "protein": 18.2,
+    "fibre": 3.3,
+    "calcium": 37.0,
+    "iron": 6.68,
+    "magnesium": 292,
+    "zinc": 5.78,
+    "vitamin C": 0.5,
+    "folate (DFE)": 25.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Nuts, cashew nuts, raw"
+  },
+  {
+   "id": "food-usda-170184",
+   "name": "Pistachios (pista)",
+   "category": "nut_seed",
+   "aliases": [
+    "pistachios",
+    "pista"
+   ],
+   "per_100g": {
+    "energy": 560,
+    "protein": 20.2,
+    "fibre": 10.6,
+    "calcium": 105,
+    "iron": 3.92,
+    "magnesium": 121,
+    "zinc": 2.2,
+    "vitamin C": 5.6,
+    "folate (DFE)": 51.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 26.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Nuts, pistachio nuts, raw"
+  },
+  {
+   "id": "food-usda-174262",
+   "name": "Peanuts (moongphali, dry-roasted)",
+   "category": "nut_seed",
+   "aliases": [
+    "moongphali",
+    "peanuts"
+   ],
+   "per_100g": {
+    "energy": 587,
+    "protein": 24.4,
+    "fibre": 8.4,
+    "calcium": 58.0,
+    "iron": 1.58,
+    "magnesium": 178,
+    "zinc": 2.77,
+    "vitamin C": 0.0,
+    "folate (DFE)": 97.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Peanuts, all types, dry-roasted, with salt"
+  },
+  {
+   "id": "food-usda-169414",
+   "name": "Flaxseed (alsi)",
+   "category": "nut_seed",
+   "aliases": [
+    "flaxseed",
+    "alsi"
+   ],
+   "per_100g": {
+    "energy": 534,
+    "protein": 18.3,
+    "fibre": 27.3,
+    "calcium": 255,
+    "iron": 5.73,
+    "magnesium": 392,
+    "zinc": 4.34,
+    "vitamin C": 0.6,
+    "folate (DFE)": 87.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Seeds, flaxseed"
+  },
+  {
+   "id": "food-usda-170150",
+   "name": "Sesame seeds (til)",
+   "category": "nut_seed",
+   "aliases": [
+    "sesame seeds",
+    "til"
+   ],
+   "per_100g": {
+    "energy": 573,
+    "protein": 17.7,
+    "fibre": 11.8,
+    "calcium": 975,
+    "iron": 14.6,
+    "magnesium": 351,
+    "zinc": 7.75,
+    "vitamin C": 0.0,
+    "folate (DFE)": 97.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Seeds, sesame seeds, whole, dried"
+  },
+  {
+   "id": "food-usda-170556",
+   "name": "Pumpkin seeds (kaddu ke beej)",
+   "category": "nut_seed",
+   "aliases": [
+    "kaddu ke beej",
+    "pumpkin seeds",
+    "kaddu",
+    "beej"
+   ],
+   "per_100g": {
+    "energy": 559,
+    "protein": 30.2,
+    "fibre": 6.0,
+    "calcium": 46.0,
+    "iron": 8.82,
+    "magnesium": 592,
+    "zinc": 7.81,
+    "vitamin C": 1.9,
+    "folate (DFE)": 58.0,
+    "vitamin B12": 0.0,
+    "vitamin A (RAE)": 1.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Seeds, pumpkin and squash seed kernels, dried"
+  },
+  {
+   "id": "food-usda-170554",
+   "name": "Chia seeds",
+   "category": "nut_seed",
+   "aliases": [
+    "chia seeds"
+   ],
+   "per_100g": {
+    "energy": 486,
+    "protein": 16.5,
+    "fibre": 34.4,
+    "calcium": 631,
+    "iron": 7.72,
+    "magnesium": 335,
+    "zinc": 4.58,
+    "vitamin C": 1.6,
+    "vitamin B12": 0.0
+   },
+   "source": "USDA FoodData Central SR Legacy: Seeds, chia seeds, dried"
+  }
+ ]
+}
