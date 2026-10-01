@@ -13,6 +13,7 @@ import type {
   WellnessSummary,
 } from "@/lib/types";
 import { WeekRing } from "@/components/week-ring";
+import { BookWidget } from "@/components/book-widget";
 import { NextVisitCard } from "@/components/next-visit-card";
 import { ResourceGrid } from "@/components/resource-cards";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
@@ -27,7 +28,8 @@ export type WidgetSpec =
   | { type: "foryou" }
   | { type: "log" }
   | { type: "library"; topic?: string; types?: ResourceResponse["type"][] }
-  | { type: "map"; q?: string };
+  | { type: "map"; q?: string }
+  | { type: "book" };
 
 const TRIMESTER_LABEL: Record<number, string> = { 1: "First", 2: "Second", 3: "Third" };
 
@@ -491,5 +493,7 @@ export function ChatWidget({
       return <LibraryWidget spec={spec} stage={pregnancy ? String(pregnancy.trimester) : undefined} />;
     case "map":
       return <MapWidget q={spec.q} onAsk={onAsk} />;
+    case "book":
+      return <BookWidget onAsk={onAsk} />;
   }
 }
