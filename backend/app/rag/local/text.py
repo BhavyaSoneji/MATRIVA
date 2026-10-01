@@ -33,7 +33,7 @@ QUERY_SYNONYMS = {
     "gynaecologist": "doctor", "eat": "food", "eating": "food", "diet": "food", "meal": "food",
     "meals": "food", "foods": "food", "fetal": "fetus", "foetal": "fetus", "foetus": "fetus",
     "baby": "fetus", "tummy": "abdomen", "stomach": "abdomen", "safe": "safe", "unsafe": "unsafe",
-    "hemoglobin": "haemoglobin", "ayurvedic": "ayurveda", "ayurved": "ayurveda", "ayurvedik": "ayurveda", "women": "woman", "mothers": "mother", "babies": "fetus", "anemia": "anaemia", "labor": "labour", "esophagus": "oesophagus",
+    "hemoglobin": "haemoglobin", "chai": "tea", "chaay": "tea", "doodh": "milk", "dahi": "curd", "kabz": "constipation", "paani": "water", "ayurvedic": "ayurveda", "ayurved": "ayurveda", "ayurvedik": "ayurveda", "women": "woman", "mothers": "mother", "babies": "fetus", "anemia": "anaemia", "labor": "labour", "esophagus": "oesophagus",
 }
 
 _WORD = re.compile(r"[a-z0-9]+")
@@ -46,28 +46,35 @@ def fold(text: str) -> str:
 
 
 def stem(word: str) -> str:
-    """A deliberately light suffix stripper (plurals, -ing, -ed, -ly, -ion, -ness...).
-
-    Over-stemming is harmless here because both query and corpus go through the same function.
+    """A deliberately light suffix stripper (plurals, -ing, -ed, -ly, -ion, -ness...) plus a final -e drop, so that
+    "exercise" and "exercises", "tablet" and "tablets" meet. Over-stemming is harmless here because query and corpus go
+    through the same function.
     """
     w = word
     if len(w) <= 3:
         return w
-    for suffix, minimum in (
+    rules = (
         ("ies", 3), ("ing", 4), ("edly", 4), ("ness", 4), ("ment", 4), ("ation", 4), ("tion", 4), ("sion", 4),
-        ("ity", 4), ("ally", 4), ("ly", 4), ("ed", 4), ("es", 4), ("s", 4), ("al", 4), ("ic", 4),
-    ):
-        if suffix == "ed" and w.endswith("eed"):
-            continue  # "feed" / "breastfeed" are not past tenses
-        if suffix == "s" and w.endswith(("ss", "us", "is")):
-            continue  # "illness", "uterus", "analysis"
-        if w.endswith(suffix) and len(w) - len(suffix) >= minimum:
-            w = w[: -len(suffix)]
-            if suffix == "ies":
-                w += "y"
-            break
+        ("ity", 4), ("ally", 4), ("ly", 4), ("ed", 4), ("al", 4), ("ic", 4),
+    )
+    stripped = False
+    if w.endswith(("sses", "xes", "zes", "ches", "shes", "ses")) and len(w) - 2 >= 4:
+        w, stripped = w[:-2], True  # "classes" -> "class", "exercises" -> "exercis" (then the -e rule below)
+    elif w.endswith("s") and not w.endswith(("ss", "us", "is")) and len(w) - 1 >= 4:
+        w, stripped = w[:-1], True
+    if not stripped:
+        for suffix, minimum in rules:
+            if suffix == "ed" and w.endswith("eed"):
+                continue  # "feed" / "breastfeed" are not past tenses
+            if w.endswith(suffix) and len(w) - len(suffix) >= minimum:
+                w = w[: -len(suffix)]
+                if suffix == "ies":
+                    w += "y"
+                break
     if len(w) > 4 and w[-1] == w[-2] and w[-1] not in "aeiouls":  # "running" -> "runn" -> "run"
         w = w[:-1]
+    if len(w) > 4 and w.endswith("e"):
+        w = w[:-1]  # "exercise" ~ "exercis"
     return w
 
 

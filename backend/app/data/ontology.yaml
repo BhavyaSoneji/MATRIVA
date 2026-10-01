@@ -93,15 +93,15 @@ concepts:
   - {id: supplements, label: Supplements, type: care, synonyms: [supplement, vitamins, tablets, prenatal vitamin, folic acid tablet]}
   - {id: medication, label: Medicines, type: care, synonyms: [medicine, drug, drugs, paracetamol, antibiotic, dose, aushadha]}
   - {id: labour, label: Labour & delivery, type: care, synonyms: [labor, delivery, birth, childbirth, prasava, prasav, parturition, caesarean, c-section, cesarean]}
-  - {id: postpartum, label: Postpartum care, type: care, synonyms: [postnatal, puerperium, sutika, sutikagara, after delivery, newborn, lochia]}
+  - {id: postpartum, label: Postpartum care, type: care, synonyms: [postnatal, puerperium, sutika, sutikagara, lochia]}
   - {id: schemes, label: Government schemes, type: care, synonyms: [pmmvy, pmsma, janani, poshan, scheme, benefit, anganwadi, asha]}
   # ---------- Ayurveda ----------
   - {id: dosha, label: Doshas, type: ayurveda, synonyms: [tridosha, doshas]}
   - {id: vata, label: Vata, type: ayurveda, parent: dosha, synonyms: [vayu, vata dosha, apana, vyana, prana]}
   - {id: pitta, label: Pitta, type: ayurveda, parent: dosha, synonyms: [pitta dosha]}
   - {id: kapha, label: Kapha, type: ayurveda, parent: dosha, synonyms: [kaphah, kapha dosha, shleshma]}
-  - {id: garbha, label: "Garbha (embryo / foetus)", type: ayurveda, synonyms: [embryo, fetus, foetus, garbhastha, garbhashaya, womb]}
-  - {id: garbhini, label: Garbhini (pregnant woman), type: ayurveda, synonyms: [pregnant woman, antarvatni, garbhavati, gravida]}
+  - {id: garbha, label: "Garbha (embryo / foetus)", type: ayurveda, synonyms: [embryo, garbhastha, garbhashaya, womb]}
+  - {id: garbhini, label: Garbhini (pregnant woman), type: ayurveda, synonyms: [antarvatni, garbhavati]}
   - {id: paricharya, label: "Garbhini paricharya (antenatal regimen)", type: ayurveda, synonyms: [garbhini paricarya, masanumasika, month wise regimen, monthly regimen, pathya, regimen for pregnant]}
   - {id: ojas, label: Ojas, type: ayurveda, synonyms: [vitality, essence of dhatus]}
   - {id: artava, label: Artava (menstrual blood / ovum), type: ayurveda, synonyms: [artav, menstrual blood, ovum, shonita, raja]}
