@@ -53,18 +53,25 @@ python backend/scripts/ingest_real_knowledge.py --seed-only   # guidelines, food
 ## Evaluation
 
 `python evaluation/local_rag/run.py` builds the index from the repo's data files (guidelines, USDA foods, the
-book) and asks `evaluation/local_rag/questions.yaml` (34 in-scope, 13 out-of-scope questions):
+book) and asks `evaluation/local_rag/questions.yaml` (39 in-scope, 13 out-of-scope questions):
 
 | metric | value |
 |---|---|
-| right document in top 1 / 3 / 5 | 91% / 100% / 100% |
-| mean reciprocal rank | 0.96 |
-| in-scope questions answered | 94% |
+| right document in top 1 / 3 / 5 | 95% / 100% / 100% |
+| mean reciprocal rank | 0.97 |
+| in-scope questions answered | 92% |
 | out-of-scope questions refused | 92% (12 of 13) |
 
 `backend/tests/test_local_rag_eval.py` fails CI if these drop. The one out-of-scope miss is "newborn vaccines",
 which is genuinely near the pregnancy-vaccines passage. The thresholds in `retriever.py` were calibrated on this
 question set, so treat the numbers as an upper bound for unseen questions.
+
+## Sources behind the answers
+
+Approved content in the default knowledge base: 20+ WHO / NHS / Government of India guidance entries (including six
+from ICMR-NIN's *Dietary Guidelines for Indians*, the main source for Indian diet advice), 67 USDA nutrient profiles
+for foods common in Indian diets, the FOGSI visit schedule, and the Prasuti Tantra English passages. Each is
+paraphrased with its source URL; the wording has not been reviewed line by line by a clinician.
 
 ## Limits (honest)
 
