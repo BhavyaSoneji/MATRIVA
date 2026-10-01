@@ -151,14 +151,68 @@ class RetrievedChunk:
 
 _WORD_RE = re.compile(r"[\wÀ-ÿ]+", re.UNICODE)
 _STOPWORDS = {
-    "a", "an", "and", "are", "do", "during", "for", "how", "i", "in", "is", "it", "me", "my",
-    "of", "on", "the", "to", "what", "when", "with", "pregnancy", "woman", "women",
+    "a", "an", "and", "are", "do", "does", "did", "during", "for", "how", "i", "in", "is", "it",
+    "me", "my", "of", "on", "the", "to", "what", "when", "with", "pregnancy", "woman", "women",
+    # Generic words that carry near-zero topical signal on their own -- left
+    # unfiltered, a single incidental match (e.g. "all" appearing in an
+    # unrelated document's "across all trimesters") was enough to clear the
+    # old `score > 0` gate and let a fully off-topic or adversarial query
+    # (e.g. a prompt-injection attempt with no pregnancy content at all)
+    # retrieve and confidently answer from an unrelated document instead of
+    # correctly falling through to "insufficient evidence". See
+    # MIN_KEYWORD_RELEVANCE below for the other half of that fix.
+    "all", "any", "can", "could", "not", "please", "should", "tell", "you", "your", "will", "would",
+}
+
+# A query must share at least this fraction of its meaningful (non-stopword)
+# tokens with a chunk's content before that chunk counts as relevant in
+# keyword mode. `score_text`'s raw overlap count alone isn't a safe filter:
+# a single shared word out of many query tokens (score > 0) is not the same
+# claim as "this document is actually about what was asked".
+#
+# 0.3, not something tighter: real natural-language questions about one
+# specific topic routinely surround the one real content word with 2-3
+# generic ones ("is it safe to eat ragi during pregnancy" tokenizes to
+# {safe, eat, ragi} after stopwords -- a real, single-topic question, but
+# only "ragi" actually overlaps the matching document, for a ratio of
+# 1/3 = 0.333). A 0.34 floor rejected that live query outright (verified:
+# it fell through to "insufficient evidence" for a question the corpus
+# genuinely could answer) -- 0.3 keeps that same 1-real-word-in-~3 case
+# working while still rejecting a long unrelated/adversarial query that
+# shares only one incidental word with a document (a 7-8 token query with a
+# single overlap scores ~0.13-0.14, well under this floor).
+MIN_KEYWORD_RELEVANCE = 0.3
+
+# Verified live: "When is my next prenatal checkup?" scored a flat 0 against
+# the FOGSI antenatal-care document and fell through to "insufficient
+# evidence", even though it is the exact question that document answers --
+# the document's actual words are "antenatal" and "visit"/"contact", never
+# "prenatal" or "checkup". Keyword overlap can only ever match the literal
+# string a source happened to use, so it is blind to any synonym a real user
+# reaches for instead -- a plain relevance-ratio fix (MIN_KEYWORD_RELEVANCE)
+# can't help this case at all, since the true overlap is zero either way.
+# This maps a handful of common alternate phrasings, drawn from vocabulary
+# that actually appears in this corpus, onto the corpus's own word before
+# scoring -- deliberately small and corpus-grounded rather than a general
+# thesaurus, so it closes known real gaps without inflating matches on
+# words nothing here actually discusses.
+_SYNONYMS: dict[str, str] = {
+    "prenatal": "antenatal",
+    "checkup": "visit", "check-up": "visit", "checkups": "visit",
+    "appointment": "visit", "appointments": "visit",
+    "contact": "visit", "contacts": "visit", "visits": "visit",
+    "physician": "doctor", "obstetrician": "doctor", "gynecologist": "doctor",
+    "obgyn": "doctor", "provider": "doctor", "clinician": "doctor",
+    "foods": "food", "diet": "food", "nutrition": "food",
+    "eat": "food", "eating": "food", "meal": "food", "meals": "food",
+    "fetus": "baby", "fetal": "baby", "infant": "baby",
+    "safety": "safe",
 }
 
 
 def tokenize(value: str) -> set[str]:
     return {
-        token.lower()
+        _SYNONYMS.get(token.lower(), token.lower())
         for token in _WORD_RE.findall(value)
         if len(token) > 1 and token.lower() not in _STOPWORDS
     }
@@ -285,16 +339,26 @@ def retrieve_chunks_scored(
             for chunk, document, source in candidates
         ]
 
-    # Note: this only drops exactly-zero-relevance candidates -- it is NOT
-    # the Section 43 "insufficient evidence" safety gate. That gate lives in
-    # app.rag.grounding.has_sufficient_evidence, is mode-aware (0.75 for
-    # vector, 0.0 for keyword), and is what pipeline.answer_question's chat
-    # path actually enforces via candidate_scoring_mode. Applying the
-    # stricter vector threshold here too would also gate non-chat callers
-    # (recommendations, /knowledge/search) that have no such safety
-    # requirement and just want ranked candidates.
+    # This is NOT the Section 43 "insufficient evidence" safety gate used by
+    # the LLM-enabled pipeline (app.rag.grounding.has_sufficient_evidence,
+    # only reached via answer_question's `if settings.llm_api_key:` branch)
+    # -- that gate scores candidates on a totally different scale (raw
+    # integer keyword-overlap counts x 0.1 via hybrid_retrieve/
+    # keyword_overlap_score) and must not share a threshold with this one.
+    # This filter is the ONLY relevance gate the no-key local path
+    # (retrieve_chunks_scored -> generate_grounded_answer, what every caller
+    # here actually runs without an LLM key: chat, recommendations,
+    # /knowledge/search) has at all: drop vector-mode near-misses at plain
+    # 0, but for keyword mode require real topical overlap -- via
+    # `score_text`'s 0-1 ratio scale, MIN_KEYWORD_RELEVANCE -- rather than a
+    # single incidental shared word, so an off-topic or adversarial query
+    # can't "match" an unrelated document by coincidence and confidently
+    # answer from it instead of correctly reporting insufficient evidence.
     if query.strip():
-        scored = [item for item in scored if item.score > 0]
+        if scoring_mode == "keyword":
+            scored = [item for item in scored if item.score >= MIN_KEYWORD_RELEVANCE]
+        else:
+            scored = [item for item in scored if item.score > 0]
     scored.sort(key=lambda item: item.score, reverse=True)
     return scored[: max(1, min(limit, 25))], scoring_mode
 
