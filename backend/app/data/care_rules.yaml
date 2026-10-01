@@ -1,0 +1,186 @@
+# Rules behind the care features: visit calendar, supplement timing, reading flags, red-flag screening, nutrition targets.
+#
+# Every rule names its source. Thresholds and triage levels are taken from the cited public guidance and are marked
+# `review: pending_clinical_review` -- they are NOT clinically validated by MATRIVA. A qualified reviewer must sign
+# them off before the product is used with real patients (see docs/care-features.md).
+
+visit_schedule:
+  source: FOGSI / WHO 8-contact antenatal care model (knowledge/seed/seed.yaml)
+  weeks: [12, 20, 26, 30, 34, 36, 38, 40, 41]
+  review: pending_clinical_review
+
+pmsma:
+  source: Ministry of Health and Family Welfare, Pradhan Mantri Surakshit Matritva Abhiyan
+  url: https://www.nhm.gov.in/index1.php?lang=1&level=2&sublinkid=822&lid=218
+  day_of_month: 9
+  from_week: 14  # second and third trimester
+  note: Free check-up by a doctor at government facilities on the 9th of every month.
+
+supplements:
+  - id: folic_acid
+    label: Folic acid
+    until_week: 12
+    instruction: Folic acid every day until week 12 (400 micrograms; your doctor may advise more).
+    source: NHS - Have a healthy diet in pregnancy / ICMR-NIN
+    url: https://www.nhs.uk/pregnancy/keeping-well/have-a-healthy-diet/
+  - id: ifa
+    label: Iron and folic acid (IFA) tablet
+    from_week: 16
+    days: 100
+    instruction: One iron + folic acid tablet every day from week 16, for at least 100 days (ICMR-NIN advises 100 mg elemental iron with 0.5 mg folic acid). Take it with a vitamin C food, away from tea.
+    source: ICMR-NIN Dietary Guidelines for Indians
+    url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  - id: calcium
+    label: Calcium
+    from_week: 16
+    instruction: Calcium supplement after week 14-16 if your doctor advises it; milk, curd and ragi help too.
+    source: ICMR-NIN Dietary Guidelines for Indians
+    url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  - id: td
+    label: Tetanus-diphtheria (Td) vaccine
+    from_week: 12
+    instruction: Ask your doctor or ANM when your Td doses are due.
+    source: ICMR-NIN (tetanus toxoid immunisation) / NHS vaccinations
+    url: https://www.nhs.uk/pregnancy/keeping-well/vaccinations/
+
+# Flags for numbers the user records. `low`/`high` are shown to the user as "ask your doctor", never as a diagnosis.
+readings:
+  hb:
+    label: Haemoglobin
+    unit: g/dL
+    min: 3
+    max: 20
+    low: 11.0
+    low_message: Below 11 g/dL counts as anaemia in pregnancy. Tell your doctor and ask about your iron treatment.
+    source: WHO - Anaemia fact sheet
+    url: https://www.who.int/news-room/fact-sheets/detail/anaemia
+  bp:
+    label: Blood pressure
+    unit: mmHg
+    systolic_high: 140
+    diastolic_high: 90
+    systolic_severe: 160
+    diastolic_severe: 110
+    high_message: 140/90 or higher can be a sign of high blood pressure or pre-eclampsia. Contact your doctor or midwife today; do not wait for the next visit.
+    severe_message: 160/110 or higher is dangerously high in pregnancy. Go to a hospital or call your doctor immediately.
+    source: Standard hypertension thresholds (ACOG / NHS pre-eclampsia guidance); confirm with your clinician
+    url: https://www.nhs.uk/conditions/pre-eclampsia/
+  weight:
+    label: Weight
+    unit: kg
+    min: 25
+    max: 200
+    total_gain_range: [10, 12]
+    gain_message: ICMR-NIN gives about 10-12 kg as healthy total weight gain over a whole pregnancy; your doctor sets your own target.
+    source: ICMR-NIN Dietary Guidelines for Indians
+    url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  glucose:
+    label: Blood sugar
+    unit: mg/dL
+    min: 20
+    max: 600
+    note: Record it, and ask your doctor to interpret it. A glucose tolerance test is usually offered between 24 and 28 weeks if you are at risk.
+    source: NHS - Gestational diabetes
+    url: https://www.nhs.uk/conditions/gestational-diabetes/
+
+# Daily US pregnancy RDA used for the meal log's "gap" view (NIH Office of Dietary Supplements, adults 19-50).
+nutrition_targets:
+  source: NIH Office of Dietary Supplements, recommended allowances in pregnancy
+  review: pending_clinical_review
+  per_day:
+    protein: 71
+    iron: 27
+    calcium: 1000
+    folate (DFE): 600
+    vitamin C: 85
+    zinc: 11
+    magnesium: 350
+    vitamin B12: 2.6
+    vitamin A (RAE): 770
+  note: Indian guidance (ICMR-NIN) also recommends iron and folic acid tablets, because plant-based diets rarely reach the iron target.
+
+# Red-flag screening. Levels: emergency > urgent > soon. `min_week` hides items that cannot apply earlier.
+screening:
+  levels:
+    emergency:
+      title: Get emergency help now
+      action: Call 112 (108 / 102 for an ambulance) or go to the nearest hospital now. Do not wait or travel alone if you can avoid it.
+    urgent:
+      title: Call your doctor or maternity unit now
+      action: Phone your doctor, midwife or maternity unit straight away, even at night. If you cannot reach them, go to the nearest hospital.
+    soon:
+      title: Tell your doctor soon
+      action: Mention this to your doctor or ANM within a day or two, and at your next visit.
+    none:
+      title: No warning signs reported
+      action: Keep going with your routine and check-ups. If anything changes or you feel something is wrong, trust that feeling and call your doctor.
+  questions:
+    - {id: heavy_bleeding, level: emergency, text: "Are you bleeding heavily from the vagina (soaking a pad within an hour)?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: seizure, level: emergency, text: "Have you had a fit (seizure) or lost consciousness?", source: NHS - Pre-eclampsia, url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+    - {id: breathing, level: emergency, text: "Do you have chest pain or serious difficulty breathing?", source: Emergency warning signs, url: "https://www.nhs.uk/pregnancy/complications/"}
+    - {id: push_urge, level: emergency, min_week: 28, text: "Do you feel the baby is coming now, with a strong urge to push?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: self_harm, level: emergency, text: "Are you having thoughts of harming yourself?", source: NHS - Mental health in pregnancy, url: "https://www.nhs.uk/pregnancy/mental-health-in-pregnancy-and-after-the-birth/mental-health/"}
+    - {id: any_bleeding, level: urgent, text: "Is there any vaginal bleeding?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: reduced_movement, level: urgent, min_week: 20, text: "Is your baby moving less than usual, or have the movements stopped?", source: NHS - Your baby's movements, url: "https://www.nhs.uk/pregnancy/keeping-well/your-babys-movements/"}
+    - {id: waters_broke, level: urgent, text: "Have your waters broken (fluid leaking)?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: severe_headache, level: urgent, min_week: 20, text: "Do you have a severe headache that does not go away?", source: NHS - Pre-eclampsia, url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+    - {id: vision, level: urgent, min_week: 20, text: "Is your vision blurred, or are you seeing flashing lights?", source: NHS - Pre-eclampsia, url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+    - {id: rib_pain, level: urgent, min_week: 20, text: "Is there pain just below your ribs, on the right side?", source: NHS - Pre-eclampsia, url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+    - {id: sudden_swelling, level: urgent, min_week: 20, text: "Is there sudden swelling of your face, hands or feet?", source: NHS - Pre-eclampsia, url: "https://www.nhs.uk/conditions/pre-eclampsia/"}
+    - {id: contractions, level: urgent, min_week: 20, text: "Are you having regular painful contractions, every 5 minutes or closer?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: preterm_labour, level: urgent, min_week: 20, max_week: 36, text: "Do you think you might be going into labour before 37 weeks?", source: NHS - Signs that labour has begun, url: "https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/"}
+    - {id: cannot_keep_fluids, level: urgent, text: "Have you been unable to keep food or fluids down for 24 hours, vomited blood, or passed no urine for 8 hours?", source: NHS - Morning sickness, url: "https://www.nhs.uk/pregnancy/common-symptoms/vomiting-and-morning-sickness/"}
+    - {id: fever, level: urgent, text: "Do you have a fever, or fever together with back pain or pain when passing urine?", source: NHS - Back pain in pregnancy, url: "https://www.nhs.uk/pregnancy/common-symptoms/back-pain/"}
+    - {id: severe_abdominal_pain, level: urgent, text: "Do you have severe tummy pain that is not easing?", source: NHS - Pregnancy complications, url: "https://www.nhs.uk/pregnancy/complications/"}
+    - {id: low_mood, level: soon, text: "Have you felt very low, anxious or unable to cope for more than two weeks?", source: NHS - Mental health in pregnancy, url: "https://www.nhs.uk/pregnancy/mental-health-in-pregnancy-and-after-the-birth/mental-health/"}
+    - {id: sickness_daily_life, level: soon, max_week: 20, text: "Is nausea or vomiting badly affecting your day-to-day life?", source: NHS - Morning sickness, url: "https://www.nhs.uk/pregnancy/common-symptoms/vomiting-and-morning-sickness/"}
+    - {id: painful_back, level: soon, text: "Is back or pelvic pain very painful or getting worse?", source: NHS - Back pain in pregnancy, url: "https://www.nhs.uk/pregnancy/common-symptoms/back-pain/"}
+
+# Everyday names for the portions people actually use, in grams of the food as eaten (approximate).
+portions:
+  katori: 150
+  bowl: 150
+  cup: 200
+  glass: 250
+  tbsp: 15
+  tsp: 5
+  handful: 30
+  piece: 100
+  slice: 30
+  g: 1
+  gm: 1
+  gram: 1
+  grams: 1
+  ml: 1
+default_serving_g:
+  legume: 150
+  grain: 150
+  dairy_egg: 150
+  meat_fish: 100
+  vegetable: 100
+  fruit: 100
+  nut_seed: 30
+
+# Words people use for foods in the structured nutrient table, with a per-piece weight where "2 roti" makes sense.
+food_aliases:
+  roti: {food: food-usda-168893, piece_g: 30, note: "per roti about 30 g of whole-wheat flour (approximate)"}
+  chapati: {food: food-usda-168893, piece_g: 30}
+  phulka: {food: food-usda-168893, piece_g: 25}
+  atta: {food: food-usda-168893}
+  rice: {food: food-usda-168878, serving_g: 150}
+  chawal: {food: food-usda-168878, serving_g: 150}
+  dal: {food: food-usda-172421, serving_g: 150}
+  daal: {food: food-usda-172421, serving_g: 150}
+  curd: {food: food-usda-170886, serving_g: 150}
+  dahi: {food: food-usda-170886, serving_g: 150}
+  yogurt: {food: food-usda-170886, serving_g: 150}
+  milk: {food: food-usda-171267, serving_g: 200}
+  doodh: {food: food-usda-171267, serving_g: 200}
+  egg: {food: food-usda-173424, piece_g: 50}
+  eggs: {food: food-usda-173424, piece_g: 50}
+  banana: {food: food-usda-173944, piece_g: 100}
+  paneer: {food: food-usda-172182, serving_g: 100, note: "cottage cheese values are used for paneer (approximate)"}
+  ghee: {food: food-usda-173412, serving_g: 5}
+  bhindi: {food: food-usda-169261, serving_g: 100}
+  palak: {food: food-usda-168463, serving_g: 100}
+  poha: {food: food-usda-168878, serving_g: 100, note: "rice values are used for poha (approximate)"}
