@@ -249,6 +249,9 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
                 "matched_terms": h.matched_terms[:8],
                 "matched_concepts": [engine.graph.concepts[c].label for c in h.matched_concepts],
                 "quotes": quotes.get(h.id, []),
+                "chapter": h.meta.get("chapter"),
+                "section": h.meta.get("section"),
+                "original_hi": h.meta.get("original_hi"),
                 "source": h.meta.get("source_title") or h.meta.get("source_name"),
                 "url": h.meta.get("url"),
             }

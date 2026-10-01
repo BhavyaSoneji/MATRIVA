@@ -80,7 +80,9 @@ def load_passages(db: Session) -> list[Passage]:
             Passage(
                 id=chunk.id,
                 text=chunk.content,
-                tokens=tokens(f"{chunk.content} {title} {source.topic or ''}"),
+                tokens=tokens(
+                    f"{chunk.content} {title} {source.topic or ''} {extra.get('section') or ''} {extra.get('chapter_title') or ''}"
+                ),
                 meta={
                     "title": title,
                     "document_id": document.id,
@@ -97,6 +99,9 @@ def load_passages(db: Session) -> list[Passage]:
                     "evidence_level": source.evidence_level,
                     "locator": extra.get("page_or_section"),
                     "readability": (extra.get("ocr_quality") or {}).get("readability", 1.0),
+                    "chapter": extra.get("chapter"),
+                    "section": extra.get("section"),
+                    "original_hi": extra.get("original_hi"),
                 },
             )
         )
