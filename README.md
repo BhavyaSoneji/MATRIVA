@@ -337,25 +337,37 @@ CI runs the backend (ruff, secret scan, mypy, pytest), ingestion, evaluation and
 
 ## 🚀 Run it
 
-**Prerequisites:** Python 3.11+, Node 20+. Docker is optional. API keys are optional — the offline engine needs none.
+**You need:** Python 3.11+ and Node 20+. Docker is optional. No API key is needed: the default engine runs offline.
+
+**1. Backend**
 
 ```bash
-# 1. Backend
 cd backend
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
-cp ../.env.example .env            # set JWT_SECRET (>= 32 chars)
-alembic upgrade head
-uvicorn app.main:app --reload --port 8010     # docs at /docs
-
-# 2. Frontend
-cd ../frontend
-npm install
-echo "NEXT_PUBLIC_API_URL=http://localhost:8010" > .env.local
-npm run dev                         # http://localhost:3000
+cp ../.env.example .env            # then set JWT_SECRET to 32+ random characters
+alembic upgrade head               # creates the schema (SQLite by default)
+uvicorn app.main:app --reload --port 8010     # interactive docs at http://localhost:8010/docs
 ```
 
-Or everything at once: `docker compose up --build` (see [`docs/deployment.md`](./docs/deployment.md)).
+**2. Frontend**
+
+```bash
+cd frontend
+npm install
+echo "NEXT_PUBLIC_API_URL=http://localhost:8010" > .env.local
+npm run dev                        # http://localhost:3000
+```
+
+**3. Try it in five minutes**
+
+1. Open <http://localhost:3000>, sign up, and accept consent.
+2. In onboarding, give your week (or last period, or due date).
+3. Type `/plan`, then `/foods`, then ask *"Can I take paracetamol?"* and watch it refuse and explain.
+4. In **Settings**, add a condition and a medicine, then ask a symptom question again: the warning is now personal.
+5. The chat will say it has no reviewed source for most nutrition questions until an admin approves documents: see *Load the real knowledge* below.
+
+Or run everything at once with `docker compose up --build`: see [`docs/deployment.md`](./docs/deployment.md). Every setting is listed in [`docs/configuration.md`](./docs/configuration.md).
 
 <details>
 <summary><b>Load the real knowledge (book + guidelines + library)</b></summary>
