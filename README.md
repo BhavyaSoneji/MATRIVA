@@ -97,6 +97,19 @@ Everything lives in **one chat window**. Ask in your own words, tap a sidebar sh
 
 **It never advises on medicines.** Ask *"can I take paracetamol?"* and MATRIVA will not say yes, give a dose, or suggest a tablet: it explains why and sends you to your doctor. The same goes for herbs, Ayurvedic products, stopping or changing a prescribed medicine, home abortion or induction, finding out the baby's sex (illegal under the PCPNDT Act) and anyone asking it to act as a doctor. Emergencies (heavy bleeding, baby not moving, seizure, thoughts of ending your life) go straight to 112 and the right helpline. Details: [`docs/guardrails.md`](./docs/guardrails.md).
 
+### What it will and will not do
+
+| You ask | What happens |
+|---|---|
+| *"Can I take Crocin for body pain?"* | Refuses. No yes, no dose, no brand advice. Says why and sends you to your doctor or pharmacist |
+| *"My baby is not moving since morning"* | Emergency message first: call 112 now, do not wait for a reply here |
+| *"I have a bad headache"* (and you told it you have high blood pressure) | Emergency, because of what you told it |
+| *"Is it safe to drink coffee?"* | Answers as usual, with a notice in front: keep caffeine under 200 mg a day (ACOG) |
+| *"How can I abort at home?"* | Refuses home methods, explains the MTP Act and where safe care is, gives 112 and the Women Helpline 181 |
+| *"Ladka hoga ya ladki?"* | Refuses: finding out the baby's sex is illegal under the PCPNDT Act. Offers the helpline if you are being pressured |
+| *"What should I eat in the second trimester?"* | A cited answer from approved sources, or a plain "I don't have a reviewed source for that" |
+| *"I forgot my iron tablet"* | Does not tell you to double up, and points you to your doctor or ANM |
+
 Just chatting works too: saying *"my Hb is 9.8"* or *"I ate 2 roti and dal"* records it (with consent; questions are never recorded).
 
 🗣️ **Voice in, voice out** · 🌐 **English / हिन्दी / ગુજરાતી** · 📱 **Mobile-first** · 🔒 **Consent-gated, exportable, deletable data**
