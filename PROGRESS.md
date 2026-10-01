@@ -19,6 +19,27 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-01 — @neevmodh — Documentation overhaul
+
+- README rebuilt section by section: what MATRIVA is and why, an at-a-glance table, commands grouped into plan and
+  track, stay safe and learn, real examples of what it will and will not do, an updated pipeline diagram with the
+  guard rails and output check, a food-guide section, a privacy section, three-step run instructions with a
+  five-minute walkthrough, every test command, an updated project tree, a documentation index by reader, a roadmap,
+  grouped honest limits, quick answers, and a plain note that no licence is chosen yet.
+- New pages: `docs/README.md` (index by role), `configuration.md`, `testing.md`, `data-sources.md`, `privacy.md`,
+  `faq.md`, `glossary.md`, `clinical-review.md` (checklists for a clinician, a pharmacist and a native speaker),
+  `roadmap.md`; plus `CONTRIBUTING.md`, `SECURITY.md`, `backend/README.md` and a pull request template.
+- Existing pages improved: architecture (overview, modules, request path, data model, failure behaviour), API
+  (conventions, stream events, worked examples from the running app), safety (layers), guard rails (reviewer's map),
+  deployment (services, what the image lacks, release steps), compliance (where each law is enforced), features
+  (status table), submission (what changed), tech blog (guard-rail and food-guide sections), care features
+  (a journey), frontend README (add a card, tests).
+- Found while writing, and written down rather than hidden: chat history is not deleted with the profile (only with
+  the account); the care, profile, privacy and resources routes have no rate limit; the Docker image does not
+  contain the knowledge files, the ingestion scripts or Tesseract. One fix: the guard-rail registry now loads at
+  start-up so an invalid rule file stops the boot.
+- Status: done. Notes: all three gaps above are on the roadmap. The clinical review is still pending.
+
 ### 2026-10-01 — @neevmodh — What to eat (`/foods`), from the book
 
 - New `GET /care/food-guide` and a `/foods` card: the Prasuti Tantra month-wise dietary regimen (chapter 5, scanned
