@@ -100,7 +100,11 @@ Full functionality scope derived from `Master Prompt.txt`. Each section maps to 
   unknown, medical concern, urgent, prompt injection, source contradiction, empty retrieval)
 - Evaluation dashboard (UI)
 
-## 12. Frontend Pages (17 total)
+## 12. Frontend pages (original plan: 17)
+
+> **Built as:** the landing page, sign-up and login, onboarding, **one chat workspace** (every former page became a card or an answer inside it), settings (profile, safety profile, consent, export, delete) and admin (documents, evaluation, feedback). Old URLs redirect into the chat.
+
+The original list, kept for the record:
 Landing · Sign up/login · Onboarding · Dashboard · AI chat · Nutrition · Lifestyle ·
 Ayurveda/traditional knowledge · Stage-wise guidance · Recommendations · Saved items ·
 Sources/evidence explorer · Profile/settings · Privacy/consent · Admin dashboard ·
@@ -131,6 +135,25 @@ Knowledge management · Evaluation dashboard
 - All care data is consent-gated, exportable and purged on consent withdrawal or deletion
 - Guard rails: 1,231 sourced rules covering medicines, herbs, foods, exposures, warning signs, risky requests and the person's own conditions, plus a check on the bot's own answer; never advises on a medicine ([`guardrails.md`](./guardrails.md))
 - Safety profile in Settings: conditions, current medicines, allergies, pregnancy history, age, blood group
+
+## Status of each section (Oct 2026)
+
+| Section | Status |
+|---|---|
+| 1 User and account | Built. Consent version recorded; export and deletion work; chat history is removed with the account, not the profile |
+| 2 Pregnancy profile and personalisation | Built, plus a safety profile (conditions, current medicines, allergies, history, age, blood group) |
+| 3 AI assistant | Built (chat and streaming, intents, follow-ups) |
+| 4 Knowledge and RAG | Built; the offline engine is the default, Groq and Gemini optional |
+| 5 Evidence and attribution | Built |
+| 6 Safety layer | Built and much larger than planned: 1,231 guard-rail rules and an output check ([`guardrails.md`](./guardrails.md)). **Not clinically verified** |
+| 7 Recommendations | Built |
+| 8 Food and regional engine | Built, plus the book's month-wise food guide ([`food-guide.md`](./food-guide.md)) |
+| 9 Lifestyle | Built |
+| 10 Admin and knowledge management | Built; approval is a human step |
+| 11 Evaluation | Built; held-out sets and an ablation ([`local-rag.md`](./local-rag.md)) |
+| 12 Frontend pages | Built as one workspace |
+| 13 Platform | Built; branch protection and rate limits on the care routes are open ([`roadmap.md`](./roadmap.md)) |
+| 14 Care companion | Built; clinical review pending |
 
 ## Ownership (see `.github/CODEOWNERS`)
 | Area | Owner |
