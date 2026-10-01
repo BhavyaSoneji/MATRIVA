@@ -414,6 +414,7 @@ def answer_question(
     domain: str | None = None,
     stage: str | None = None,
     region: str | None = None,
+    profile: UserContext | None = None,
 ) -> tuple[GenerationResult, list[RetrievedChunk]]:
     """Run the full RAG pipeline when a provider key is configured.
 
@@ -436,7 +437,7 @@ def answer_question(
 
     if settings.llm_api_key:
         try:
-            profile = UserContext(pregnancy_stage=stage, region=region)
+            profile = profile or UserContext(pregnancy_stage=stage, region=region)
             rag_chunks = [_as_rag_chunk(item) for item in retrieved]
             result = answer_query(
                 query,
@@ -497,6 +498,7 @@ def answer_question_stream(
     domain: str | None = None,
     stage: str | None = None,
     region: str | None = None,
+    profile: UserContext | None = None,
 ) -> Iterator[ChatStreamEvent]:
     """Streaming counterpart to `answer_question`, for POST /chat/stream.
 
@@ -517,7 +519,7 @@ def answer_question_stream(
         # No live model configured at all -- reuse the exact non-streaming
         # local-grounded/no-evidence result and emit it as one event; there
         # is nothing to stream token-by-token without Groq.
-        generation, chunks = answer_question(db, query, domain=domain, stage=stage, region=region)
+        generation, chunks = answer_question(db, query, domain=domain, stage=stage, region=region, profile=profile)
         yield ChatStreamEvent(kind="delta", text=generation.text)
         yield ChatStreamEvent(kind="final", text=generation.text, generation=generation, chunks=chunks)
         return
@@ -527,7 +529,7 @@ def answer_question_stream(
         yield ChatStreamEvent(kind="final", text="", generation=generation, chunks=retrieved)
         return
 
-    profile = UserContext(pregnancy_stage=stage, region=region)
+    profile = profile or UserContext(pregnancy_stage=stage, region=region)
     rag_chunks = [_as_rag_chunk(item) for item in retrieved]
     try:
         for event in answer_query_stream(
