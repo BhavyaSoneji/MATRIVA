@@ -14,6 +14,8 @@ import type {
   RecommendationResponse,
 } from "@/lib/types";
 import { ChatWidget, type WidgetSpec } from "@/components/chat-widgets";
+import type { RetrievalTrace } from "@/lib/types";
+import { RetrievalTracePanel } from "@/components/retrieval-trace";
 import { ResourceGrid } from "@/components/resource-cards";
 import { WeekRing } from "@/components/week-ring";
 import { TodayCard } from "@/components/today-card";
@@ -43,6 +45,7 @@ import {
   Library,
   ClipboardPen,
   BookCheck,
+  Network,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -86,6 +89,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: "foryou", label: "For you", command: "/foryou", icon: Sparkles, hint: "Personal suggestions", widget: { type: "foryou" } },
   { id: "log", label: "Log today", command: "/log", icon: ClipboardPen, hint: "Water, sleep, activity", widget: { type: "log" } },
   { id: "library", label: "Library", command: "/library", icon: Library, hint: "Videos & articles", widget: { type: "library" } },
+  { id: "map", label: "Knowledge map", command: "/map", icon: Network, hint: "How topics connect", widget: { type: "map" } },
   { id: "evidence", label: "Evidence", command: "/evidence", icon: BookCheck, hint: "Guidelines & research", widget: { type: "library", types: ["guideline", "research"] } },
 ];
 
@@ -126,6 +130,11 @@ function sourcesFromCitations(citations: Citation[]): SourceResponse[] {
   }));
 }
 
+function traceOf(m: { evidence?: Record<string, unknown> }): RetrievalTrace | null {
+  const t = m.evidence?.trace as RetrievalTrace | undefined;
+  return t && t.engine === "local" ? t : null;
+}
+
 function timeLabel(iso?: string) {
   const d = iso ? new Date(iso) : new Date();
   return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
@@ -161,12 +170,15 @@ function EvidencePanel({ evidence, citations }: { evidence: Record<string, unkno
   const validation = evidence.citation_validation;
   const webCitations = citations.filter((c) => c.source_type === "external_web");
 
+  const trace = traceOf({ evidence });
   return (
     <details className="group mt-1">
       <summary className="eyebrow-sm flex w-fit cursor-pointer list-none items-center gap-1.5 text-muted-foreground transition-colors hover:text-accent">
         <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180" aria-hidden="true" />
         How this was answered
       </summary>
+      {trace && <RetrievalTracePanel trace={trace} />}
+      {!trace && (
       <dl className="mt-3 grid grid-cols-2 gap-x-6 gap-y-2 border-l-2 border-border pl-4 text-[11.5px] text-muted-foreground sm:grid-cols-4">
         <div>
           <dt className="eyebrow-sm">Passages checked</dt>
@@ -185,6 +197,7 @@ function EvidencePanel({ evidence, citations }: { evidence: Record<string, unkno
           <dd className="mt-1 capitalize text-foreground">{String(validation ?? "—")}</dd>
         </div>
       </dl>
+      )}
       {webSearchUsed && (
         <p className="mt-3 flex items-center gap-1.5 pl-4 text-[11.5px] text-accent">
           <Globe className="h-3 w-3" aria-hidden="true" />
@@ -316,6 +329,18 @@ function ChatContent() {
     if (pinnedToBottom) scrollRef.current?.scrollIntoView({ block: "end" });
   }, [messages, pinnedToBottom]);
 
+  // Cards (map, library, evidence) grow after their data loads; keep the view pinned to the bottom as they do.
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  React.useEffect(() => {
+    const el = contentRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      if (pinnedToBottom) scrollRef.current?.scrollIntoView({ block: "end" });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [pinnedToBottom]);
+
   // auto-grow the composer up to a sane cap
   React.useEffect(() => {
     const el = textareaRef.current;
@@ -435,7 +460,11 @@ function ChatContent() {
   const runAction = (action: QuickAction) => {
     if (sending) return;
     setInput("");
-    if (action.widget) addWidget(action.widget, action.command);
+    if (action.widget?.type === "map") {
+      // map around the most recent real question, so it explains what was just asked
+      const last = [...messages].reverse().find((m) => m.role === "user" && !m.text.startsWith("/"));
+      addWidget({ type: "map", q: last?.text }, action.command);
+    } else if (action.widget) addWidget(action.widget, action.command);
     else if (action.ask) void sendMessage(action.ask.prompt, { topic: action.ask.topic });
   };
 
@@ -622,7 +651,7 @@ function ChatContent() {
             </div>
           )}
 
-          <div className="flex flex-col gap-10">
+          <div ref={contentRef} className="flex flex-col gap-10">
             {messages.map((m) => (
               <div key={m.id}>
                 {m.role === "user" ? (
@@ -655,10 +684,10 @@ function ChatContent() {
                         </div>
                       )}
 
-                      {m.widget && <ChatWidget spec={m.widget} pregnancy={pregnancy} />}
+                      {m.widget && <ChatWidget spec={m.widget} pregnancy={pregnancy} onAsk={(q) => void submit(q)} />}
 
                       {m.text ? (
-                        <ChatAnswer text={m.text} sources={m.sources ?? []} />
+                        <ChatAnswer text={m.text} sources={m.sources ?? []} citeId={`cite-${m.id}`} />
                       ) : m.streaming ? (
                         <span className="inline-flex items-center gap-1.5 text-muted-foreground" aria-live="polite">
                           <span className="sr-only">MATRIVA is checking sources…</span>
@@ -684,30 +713,53 @@ function ChatContent() {
 
                       {m.citations && m.citations.length > 0 && (
                         <div className="mt-5 flex flex-col gap-2 border-t border-border pt-4">
-                          {m.citations.map((c, i) => (
-                            <div key={i} className="flex items-baseline gap-3.5 text-muted-foreground">
-                              <span className="eyebrow-sm shrink-0 text-accent">{i + 1}</span>
-                              {c.source_type === "external_web" ? (
-                                <Globe className="h-3 w-3 shrink-0" aria-hidden="true" />
-                              ) : null}
-                              <span className="flex-1 text-xs leading-relaxed">
-                                {c.url ? (
-                                  <a
-                                    href={c.url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-foreground underline decoration-border underline-offset-2 hover:text-accent"
-                                  >
-                                    {c.source_name}
-                                  </a>
-                                ) : (
-                                  <span className="text-foreground">{c.source_name}</span>
+                          {m.citations.map((c, i) => {
+                            const tp = traceOf(m)?.passages.find((p) => p.citation === i + 1);
+                            return (
+                              <div key={i} id={`cite-${m.id}-${i + 1}`} className="scroll-mt-24 target:bg-accent/5">
+                                <div className="flex items-baseline gap-3.5 text-muted-foreground">
+                                  <span className="eyebrow-sm shrink-0 text-accent">{i + 1}</span>
+                                  {c.source_type === "external_web" ? (
+                                    <Globe className="h-3 w-3 shrink-0" aria-hidden="true" />
+                                  ) : null}
+                                  <span className="flex-1 text-xs leading-relaxed">
+                                    {c.url ? (
+                                      <a
+                                        href={c.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="text-foreground underline decoration-border underline-offset-2 hover:text-accent"
+                                      >
+                                        {tp?.title ?? c.source_name}
+                                      </a>
+                                    ) : (
+                                      <span className="text-foreground">{tp?.title ?? c.source_name}</span>
+                                    )}
+                                    {c.locator && <span className="text-muted-foreground"> · {c.locator}</span>}
+                                  </span>
+                                  <EvidenceBadge level={c.evidence_level} />
+                                </div>
+                                {tp && tp.quotes.length > 0 && (
+                                  <details className="group ml-7 mt-1.5">
+                                    <summary className="eyebrow-sm flex w-fit cursor-pointer list-none items-center gap-1 text-muted-foreground transition-colors hover:text-accent">
+                                      <ChevronDown className="h-3 w-3 transition-transform group-open:rotate-180" aria-hidden="true" />
+                                      Show the passage
+                                    </summary>
+                                    <blockquote className="mt-2 border-l-2 border-accent/40 pl-3 text-[12.5px] italic leading-relaxed text-foreground/80">
+                                      {tp.quotes.map((q, qi) => (
+                                        <p key={qi}>&ldquo;{q}&rdquo;</p>
+                                      ))}
+                                    </blockquote>
+                                    {tp.matched_terms.length > 0 && (
+                                      <p className="mt-1.5 text-[11px] text-muted-foreground">
+                                        Matched: {tp.matched_terms.join(", ")}
+                                      </p>
+                                    )}
+                                  </details>
                                 )}
-                                {c.locator && <span className="text-muted-foreground"> · {c.locator}</span>}
-                              </span>
-                              <EvidenceBadge level={c.evidence_level} />
-                            </div>
-                          ))}
+                              </div>
+                            );
+                          })}
                         </div>
                       )}
 

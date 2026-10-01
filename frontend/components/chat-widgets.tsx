@@ -3,6 +3,8 @@
 import * as React from "react";
 import { api, ApiError } from "@/lib/api";
 import type {
+  GraphNode,
+  KnowledgeGraphResponse,
   PregnancyResponse,
   RecommendationResponse,
   ResourceLibraryResponse,
@@ -24,7 +26,8 @@ export type WidgetSpec =
   | { type: "visit" }
   | { type: "foryou" }
   | { type: "log" }
-  | { type: "library"; topic?: string; types?: ResourceResponse["type"][] };
+  | { type: "library"; topic?: string; types?: ResourceResponse["type"][] }
+  | { type: "map"; q?: string };
 
 const TRIMESTER_LABEL: Record<number, string> = { 1: "First", 2: "Second", 3: "Third" };
 
@@ -362,7 +365,119 @@ function LibraryWidget({ spec, stage }: { spec: Extract<WidgetSpec, { type: "lib
   );
 }
 
-export function ChatWidget({ spec, pregnancy }: { spec: WidgetSpec; pregnancy: PregnancyResponse | null }) {
+const TYPE_COLOR: Record<string, string> = {
+  nutrient: "hsl(var(--accent))",
+  food: "hsl(var(--sage-300))",
+  symptom: "hsl(var(--blush-500))",
+  condition: "hsl(var(--blush-500) / 0.65)",
+  practice: "hsl(var(--sky-500))",
+  care: "hsl(var(--sky-700))",
+  ayurveda: "hsl(var(--ink))",
+  stage: "hsl(var(--sage-200))",
+};
+
+function layout(nodes: GraphNode[]): Record<string, { x: number; y: number }> {
+  const W = 640;
+  const H = 400;
+  const cx = W / 2;
+  const cy = H / 2;
+  const focus = nodes.filter((n) => n.focus);
+  const rest = nodes.filter((n) => !n.focus);
+  const pos: Record<string, { x: number; y: number }> = {};
+  focus.forEach((n, i) => {
+    if (focus.length === 1) pos[n.id] = { x: cx, y: cy };
+    else {
+      const a = (i / focus.length) * Math.PI * 2 - Math.PI / 2;
+      pos[n.id] = { x: cx + Math.cos(a) * 70, y: cy + Math.sin(a) * 52 };
+    }
+  });
+  rest.forEach((n, i) => {
+    const a = (i / Math.max(rest.length, 1)) * Math.PI * 2 - Math.PI / 2;
+    pos[n.id] = { x: cx + Math.cos(a) * 235, y: cy + Math.sin(a) * 150 };
+  });
+  return pos;
+}
+
+function MapWidget({ q, onAsk }: { q?: string; onAsk?: (question: string) => void }) {
+  const [graph, setGraph] = React.useState<KnowledgeGraphResponse | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    api
+      .get<KnowledgeGraphResponse>(`/knowledge/graph?q=${encodeURIComponent(q ?? "")}`)
+      .then((g) => !cancelled && setGraph(g))
+      .catch((err) => !cancelled && setError(err instanceof ApiError ? err.message : "Could not load the map."));
+    return () => {
+      cancelled = true;
+    };
+  }, [q]);
+
+  if (error) return <WidgetFrame title="Knowledge map"><p className="text-sm text-blush-500">{error}</p></WidgetFrame>;
+  if (!graph) return <WidgetFrame title="Knowledge map"><p className="text-sm text-muted-foreground">Mapping…</p></WidgetFrame>;
+
+  const pos = layout(graph.nodes);
+  const presentTypes = Array.from(new Set(graph.nodes.map((n) => n.type)));
+  return (
+    <WidgetFrame title="Knowledge map">
+      <svg viewBox="0 0 640 400" role="img" aria-label="Map of related topics" className="w-full">
+        {graph.edges.map((e) => {
+          const a = pos[e.source];
+          const b = pos[e.target];
+          if (!a || !b) return null;
+          return (
+            <line key={`${e.source}-${e.target}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="hsl(var(--border))" strokeWidth={1 + e.weight * 3} opacity={0.9}>
+              <title>{`Mentioned together in ${e.passages} reviewed passages`}</title>
+            </line>
+          );
+        })}
+        {graph.nodes.map((n) => {
+          const p = pos[n.id];
+          const r = n.focus ? 17 : 11 + Math.min(n.passages, 40) / 8;
+          return (
+            <g
+              key={n.id}
+              transform={`translate(${p.x} ${p.y})`}
+              tabIndex={0}
+              role="button"
+              aria-label={`Ask about ${n.label}`}
+              className="cursor-pointer outline-none"
+              onClick={() => onAsk?.(`Tell me about ${n.label}`)}
+              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onAsk?.(`Tell me about ${n.label}`)}
+            >
+              <circle r={r} fill={TYPE_COLOR[n.type] ?? "hsl(var(--sage-200))"} stroke={n.focus ? "hsl(var(--foreground))" : "none"} strokeWidth={1.5} />
+              <text y={r + 13} textAnchor="middle" fontSize={11.5} fill="hsl(var(--foreground))">
+                {n.label.length > 24 ? `${n.label.slice(0, 23)}…` : n.label}
+              </text>
+              <title>{`${n.label} — in ${n.passages} reviewed passages`}</title>
+            </g>
+          );
+        })}
+      </svg>
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-muted-foreground">
+        {presentTypes.map((t) => (
+          <span key={t} className="flex items-center gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: TYPE_COLOR[t] ?? "hsl(var(--sage-200))" }} />
+            {graph.types[t] ?? t}
+          </span>
+        ))}
+        <span className="ml-auto">
+          {graph.stats.passages.toLocaleString()} approved passages · links appear only when sources mention both topics · tap a topic to ask
+        </span>
+      </div>
+    </WidgetFrame>
+  );
+}
+
+export function ChatWidget({
+  spec,
+  pregnancy,
+  onAsk,
+}: {
+  spec: WidgetSpec;
+  pregnancy: PregnancyResponse | null;
+  onAsk?: (question: string) => void;
+}) {
   switch (spec.type) {
     case "week":
       return <WeekWidget pregnancy={pregnancy} />;
@@ -374,5 +489,7 @@ export function ChatWidget({ spec, pregnancy }: { spec: WidgetSpec; pregnancy: P
       return <LogWidget />;
     case "library":
       return <LibraryWidget spec={spec} stage={pregnancy ? String(pregnancy.trimester) : undefined} />;
+    case "map":
+      return <MapWidget q={spec.q} onAsk={onAsk} />;
   }
 }
