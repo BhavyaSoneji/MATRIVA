@@ -646,7 +646,7 @@ function ChatContent() {
                 Ask in your own words, tap a question, or type <span className="font-mono text-foreground">/</span>{" "}
                 for shortcuts. Every answer names its source, or says plainly when it can&apos;t.
               </p>
-              <TodayCard pregnancy={pregnancy} />
+              <TodayCard pregnancy={pregnancy} onOpen={(a) => addWidget({ type: a }, `/${a}`)} />
               <div className="mx-auto grid max-w-xl gap-3 text-left sm:grid-cols-2">
                 {STARTER_QUESTIONS.map(({ q, icon: Icon }) => (
                   <button

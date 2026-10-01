@@ -3,13 +3,15 @@
 import * as React from "react";
 import { api } from "@/lib/api";
 import type { NextVisitResponse, PregnancyResponse, WellnessLog } from "@/lib/types";
-import { CalendarHeart, Droplets } from "lucide-react";
+import type { Reminder } from "@/lib/care-types";
+import { Bell, CalendarHeart, Droplets } from "lucide-react";
 
 const ML_PER_GLASS = 250;
 
 /** The one-glance "today" strip shown above the first message: where you are, your next visit,
  * and a one-tap water log. Quietly renders nothing for a user with no pregnancy details yet. */
-export function TodayCard({ pregnancy }: { pregnancy: PregnancyResponse | null }) {
+export function TodayCard({ pregnancy, onOpen }: { pregnancy: PregnancyResponse | null; onOpen?: (action: NonNullable<Reminder["action"]>) => void }) {
+  const [reminder, setReminder] = React.useState<Reminder | null>(null);
   const [visit, setVisit] = React.useState<NextVisitResponse | null>(null);
   const [waterMl, setWaterMl] = React.useState(0);
   const [saving, setSaving] = React.useState(false);
@@ -25,6 +27,10 @@ export function TodayCard({ pregnancy }: { pregnancy: PregnancyResponse | null }
       .get<WellnessLog>("/wellness/daily")
       .then((l) => !cancelled && setWaterMl(l.water_intake_ml ?? 0))
       .catch(() => undefined); // 404 = nothing logged yet today
+    api
+      .get<{ reminders: Reminder[] }>("/care/reminders")
+      .then((r) => !cancelled && setReminder(r.reminders[0] ?? null))
+      .catch(() => undefined); // no dates / no consent yet: just no reminder
     return () => {
       cancelled = true;
     };
@@ -71,6 +77,18 @@ export function TodayCard({ pregnancy }: { pregnancy: PregnancyResponse | null }
           + Glass
         </button>
       </div>
+      {reminder && (
+        <div className="flex items-start gap-3 bg-card p-4 sm:col-span-2">
+          <Bell className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
+          <div className="flex-1">
+            <p className="eyebrow-sm text-muted-foreground">Today</p>
+            <p className="mt-1 text-[13px] leading-snug"><strong>{reminder.title}</strong> {reminder.detail}</p>
+          </div>
+          {reminder.action && onOpen && (
+            <button type="button" onClick={() => onOpen(reminder.action!)} className="eyebrow-sm h-9 shrink-0 border border-border px-3 hover:border-accent hover:text-accent">Open</button>
+          )}
+        </div>
+      )}
     </section>
   );
 }
