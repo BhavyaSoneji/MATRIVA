@@ -59,7 +59,8 @@ for path in (_BACKEND_DIR, _INGESTION_DIR):
 
 from google.api_core.exceptions import ResourceExhausted
 from pipelines.chunker import _group_blocks
-from pipelines.ocr_english import build_sections
+from pipelines.book_structure import build_outline, hindi_excerpt, section_for
+from pipelines.ocr_english import build_sections, chunk_paragraphs, extract_paragraphs, split_pages
 from pipelines.parser import clean_text
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -284,6 +285,128 @@ def ingest_book(db: Session, *, api_key: str | None, dry_run: bool) -> None:
         f"[book] done: {len(groups)} chunks stored, {high_quality} scored high-quality by "
         f"heuristic, {embedded} embedded. review_status=pending (not visible to chat yet)."
     )
+
+
+BOOK_CHAPTERS_SOURCE = "prasuti-tantra-chapters"
+
+
+def ingest_book_chapters(db: Session, *, dry_run: bool, replace: bool = False) -> None:
+    """Ingest the book chapter by chapter, with its structure (ingestion/pipelines/book_structure.py).
+
+    One source, one document per chapter (11), every chunk carrying chapter, section, scanned-page span, an OCR
+    readability score and the Hindi/Sanskrit original that sits beside it on the page. Everything is pending; a
+    reviewer approves chapter by chapter in Admin -> Documents. `replace` removes the book's earlier
+    page-range-section ingestion first.
+    """
+    raw = BOOK_PATH.read_text(encoding="utf-8")
+    pages = dict(split_pages(raw))
+    chapters, stats = build_outline(raw)
+    plan = []
+    for ch in chapters:
+        paras = []
+        for page in range(ch.scan_start, ch.scan_end + 1):
+            paras += extract_paragraphs(page, pages.get(page, ""))
+        plan.append((ch, chunk_paragraphs(paras)))
+    total = sum(len(c) for _, c in plan)
+    print(f"[book] {len(chapters)} chapters, {total} English chunks, {stats['verified_sections']} verified sections")
+    if dry_run:
+        print("[book] --dry-run: not writing to the database")
+        return
+
+    if replace:
+        for name in (BOOK_SECTIONS_SOURCE, BOOK_CHAPTERS_SOURCE):
+            old = db.execute(select(KnowledgeSource).where(KnowledgeSource.name == name)).scalar_one_or_none()
+            if old:
+                db.delete(old)
+        db.commit()
+        print("[book] removed the earlier book ingestion")
+    elif db.execute(select(KnowledgeSource).where(KnowledgeSource.name == BOOK_CHAPTERS_SOURCE)).scalar_one_or_none():
+        print(f"[book] source '{BOOK_CHAPTERS_SOURCE}' already ingested -- skipping (use --replace to redo it)")
+        return
+
+    ingestion_user = _get_or_create_ingestion_user(db)
+    source = KnowledgeSource(
+        name=BOOK_CHAPTERS_SOURCE,
+        title="Prasuti Tantra evam Stri Roga (Vol. 1) - English passages by chapter",
+        source_type="traditional",
+        authority="Prof. Premvati Tiwari; Chaukhambha Orientalia, Varanasi",
+        jurisdiction="India",
+        topic="prasuti_tantra",
+        review_status=ReviewStatus.PENDING.value,
+        evidence_level="traditional",
+        description=(
+            "Classical Ayurveda obstetrics textbook (11 chapters). Only the English-translation paragraphs of a raw OCR "
+            "scan are used; each passage keeps its chapter, section and scanned-page number, and the Hindi/Sanskrit "
+            "original beside it is stored as unverified provenance. Cleaned, never rewritten. NOT clinically reviewed; "
+            "traditional knowledge, not modern medical evidence."
+        ),
+        extra_metadata={"real_data": True, "ocr_source": True, "pending_reason": "clinical_review"},
+    )
+    db.add(source)
+    db.flush()
+    db.add(
+        EvidenceMetadata(
+            source_id=source.id,
+            evidence_level="traditional",
+            evidence_label="Classical text (English passages from OCR), unreviewed",
+            review_status=ReviewStatus.PENDING.value,
+            notes="Review each chapter against the scanned pages before approving.",
+        )
+    )
+    for ch, chunks in plan:
+        if not chunks:
+            continue
+        content = "\n\n".join(c.text for c in chunks)
+        title = f"Prasuti Tantra - Chapter {ch.number}: {ch.title_en}"
+        document = KnowledgeDocument(
+            source_id=source.id,
+            title=title,
+            domain="ayurveda",
+            subdomain="prasuti_tantra",
+            language="en",
+            region="IN",
+            pregnancy_stage=None,
+            review_status=ReviewStatus.PENDING.value,
+            index_status="indexed",
+            content_hash=str(hash(content)),
+            file_name=f"prasuti-tantra-chapter-{ch.number}.txt",
+            mime_type="text/plain",
+            raw_content=content.encode("utf-8"),
+            active=False,
+            created_by=ingestion_user.id,
+        )
+        db.add(document)
+        db.flush()
+        for index, chunk in enumerate(chunks):
+            sec = section_for(ch, chunk.page_start)
+            pages_label = (
+                f"scanned p. {chunk.page_start}"
+                if chunk.page_start == chunk.page_end
+                else f"scanned pp. {chunk.page_start}-{chunk.page_end}"
+            )
+            trail = f"Ch. {ch.number}" + (f" \u203a {sec.title_en}" if sec else "")
+            db.add(
+                KnowledgeChunk(
+                    document_id=document.id,
+                    source_id=source.id,
+                    chunk_index=index,
+                    content=chunk.text,
+                    embedding=None,
+                    extra_metadata={
+                        "page_or_section": f"{trail} \u00b7 {pages_label}",
+                        "chapter": ch.number,
+                        "chapter_title": ch.title_en,
+                        "chapter_title_hi": ch.title_hi,
+                        "section": sec.title_en if sec else None,
+                        "section_title_hi": sec.title_hi if sec else None,
+                        "ocr_quality": {"readability": chunk.quality},
+                        "original_hi": hindi_excerpt(pages.get(chunk.page_start, "")),
+                        "real_data": True,
+                    },
+                )
+            )
+    db.commit()
+    print(f"[book] stored {len(plan)} pending chapters ({total} chunks) -- review in Admin -> Documents")
 
 
 BOOK_SECTIONS_SOURCE = "prasuti-tantra-english-sections"
@@ -516,6 +639,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--book-only", action="store_true")
     parser.add_argument("--whole-book", action="store_true", help="Legacy: ingest the raw OCR as ONE document (not recommended)")
+    parser.add_argument("--page-sections", action="store_true", help="Legacy: 12-page sections instead of chapters")
+    parser.add_argument("--replace", action="store_true", help="Remove the book's earlier ingestion before ingesting")
     parser.add_argument("--seed-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true", help="Parse/chunk only, don't write to the database")
     args = parser.parse_args()
@@ -528,8 +653,10 @@ def main() -> None:
         if not args.seed_only:
             if args.whole_book:
                 ingest_book(db, api_key=api_key, dry_run=args.dry_run)
-            else:
+            elif args.page_sections:
                 ingest_book_sections(db, dry_run=args.dry_run)
+            else:
+                ingest_book_chapters(db, dry_run=args.dry_run, replace=args.replace)
         if not args.book_only:
             ingest_seed_yaml(db, api_key=api_key, dry_run=args.dry_run)
 

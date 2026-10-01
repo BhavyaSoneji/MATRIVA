@@ -196,3 +196,42 @@ def test_book_sections_are_pending_paged_and_scored(client, tmp_path, monkeypatc
         assert not any("देवनागरी" in c.content for c in chunks)  # Devanagari OCR is excluded
         ingest_module.ingest_book_sections(db, dry_run=False)  # idempotent
         assert db.query(KnowledgeDocument).filter_by(source_id=source.id).count() == 3
+
+
+def _chapter_book(pages: int = 12) -> str:
+    """A tiny book in the shape of the real scan: two chapters headed `अध्याय / CHAPTER / (TITLE)`."""
+    out = ["# header\n"]
+    for n in range(1, 27 + pages):
+        head = ""
+        if n == 27:
+            head = "अध्याय १\nCHAPTER I\nप्रथम शीर्षक\n(ANATOMY OF THE WOMAN)\n"
+        if n == 27 + pages // 2:
+            head = "अध्याय २\nCHAPTER II\nद्वितीय शीर्षक\n(MILK AND REGIMEN FOR PREGNANCY)\n"
+        out.append(f"\n---\n## Scanned page {n:03d}\n\n{head}देवनागरी मूल पाठ यहाँ हिन्दी में लिखा है जो मूल है\n\n{_ENGLISH_PAGE * 3 if n >= 27 else ''}\n")
+    return "".join(out)
+
+
+def test_book_chapters_ingest_with_structure_provenance_and_pending(client, tmp_path, monkeypatch) -> None:
+    fixture = tmp_path / "book.txt"
+    fixture.write_text(_chapter_book(), encoding="utf-8")
+    monkeypatch.setattr(ingest_module, "BOOK_PATH", fixture)
+    with SessionLocal() as db:
+        ingest_module.ingest_book_chapters(db, dry_run=False)
+        source = db.query(KnowledgeSource).filter_by(name=ingest_module.BOOK_CHAPTERS_SOURCE).one()
+        assert source.review_status == "pending" and source.evidence_level == "traditional"
+        docs = db.query(KnowledgeDocument).filter_by(source_id=source.id).order_by(KnowledgeDocument.title).all()
+        assert [d.title for d in docs] == [
+            "Prasuti Tantra - Chapter 1: Anatomy Of The Woman",
+            "Prasuti Tantra - Chapter 2: Milk And Regimen For Pregnancy",
+        ]
+        assert all(d.review_status == "pending" and d.active is False for d in docs)
+        chunks = db.query(KnowledgeChunk).filter_by(document_id=docs[1].id).all()
+        meta = chunks[0].extra_metadata
+        assert meta["chapter"] == 2 and meta["page_or_section"].startswith("Ch. 2")
+        assert "scanned p" in meta["page_or_section"] and "readability" in meta["ocr_quality"]
+        assert "देवनागरी" in meta["original_hi"]  # Hindi original kept as provenance...
+        assert not any("देवनागरी" in c.content for c in chunks)  # ...but never searched or quoted
+        ingest_module.ingest_book_chapters(db, dry_run=False)  # idempotent
+        assert db.query(KnowledgeDocument).filter_by(source_id=source.id).count() == 2
+        ingest_module.ingest_book_chapters(db, dry_run=False, replace=True)  # replace rebuilds, no duplicates
+        assert db.query(KnowledgeSource).filter_by(name=ingest_module.BOOK_CHAPTERS_SOURCE).count() == 1
