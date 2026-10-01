@@ -17,6 +17,12 @@ import { BookWidget } from "@/components/book-widget";
 import { NextVisitCard } from "@/components/next-visit-card";
 import { ResourceGrid } from "@/components/resource-cards";
 import { EvidenceBadge, SafetyBadge } from "@/components/evidence-badge";
+import { PlanWidget, type CareAction } from "@/components/care/plan-widget";
+import { CheckinWidget } from "@/components/care/checkin-widget";
+import { ReadingsWidget } from "@/components/care/readings-widget";
+import { MealsWidget } from "@/components/care/meals-widget";
+import { ScreenWidget } from "@/components/care/screen-widget";
+import { SummaryWidget } from "@/components/care/summary-widget";
 import { Button } from "@/components/ui/button";
 import { Bookmark, BookmarkCheck, Droplets, Moon, Activity, Minus, Plus } from "lucide-react";
 
@@ -29,7 +35,8 @@ export type WidgetSpec =
   | { type: "log" }
   | { type: "library"; topic?: string; types?: ResourceResponse["type"][] }
   | { type: "map"; q?: string }
-  | { type: "book" };
+  | { type: "book" }
+  | { type: CareAction };
 
 const TRIMESTER_LABEL: Record<number, string> = { 1: "First", 2: "Second", 3: "Third" };
 
@@ -475,10 +482,12 @@ export function ChatWidget({
   spec,
   pregnancy,
   onAsk,
+  onOpen,
 }: {
   spec: WidgetSpec;
   pregnancy: PregnancyResponse | null;
   onAsk?: (question: string) => void;
+  onOpen?: (action: CareAction) => void;
 }) {
   switch (spec.type) {
     case "week":
@@ -495,5 +504,17 @@ export function ChatWidget({
       return <MapWidget q={spec.q} onAsk={onAsk} />;
     case "book":
       return <BookWidget onAsk={onAsk} />;
+    case "plan":
+      return <PlanWidget onAsk={onAsk} onOpen={onOpen} />;
+    case "checkin":
+      return <CheckinWidget />;
+    case "readings":
+      return <ReadingsWidget />;
+    case "meals":
+      return <MealsWidget />;
+    case "screen":
+      return <ScreenWidget />;
+    case "summary":
+      return <SummaryWidget />;
   }
 }

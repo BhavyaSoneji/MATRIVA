@@ -47,6 +47,11 @@ import {
   BookCheck,
   Network,
   BookOpen,
+  HeartPulse,
+  Activity,
+  Utensils,
+  ShieldAlert,
+  FileText,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -82,6 +87,12 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
+  { id: "plan", label: "My plan", command: "/plan", icon: CalendarDays, hint: "This week, visits, reminders", widget: { type: "plan" } },
+  { id: "checkin", label: "Daily check-in", command: "/checkin", icon: HeartPulse, hint: "How are you today?", widget: { type: "checkin" } },
+  { id: "screen", label: "Safety check", command: "/check", icon: ShieldAlert, hint: "Is something worrying you?", widget: { type: "screen" } },
+  { id: "readings", label: "Readings", command: "/readings", icon: Activity, hint: "Hb, BP, weight, sugar", widget: { type: "readings" } },
+  { id: "meals", label: "Meals", command: "/meals", icon: Utensils, hint: "What you ate vs what you need", widget: { type: "meals" } },
+  { id: "summary", label: "Doctor summary", command: "/summary", icon: FileText, hint: "One page to print or show", widget: { type: "summary" } },
   { id: "week", label: "My week", command: "/week", icon: CalendarDays, hint: "Progress & milestones", widget: { type: "week" } },
   { id: "nutrition", label: "Nutrition", command: "/nutrition", icon: Apple, hint: "What to eat now", ask: { prompt: "What should I eat at my stage of pregnancy, and what should I avoid?", topic: "nutrition" } },
   { id: "ayurveda", label: "Ayurveda", command: "/ayurveda", icon: Sprout, hint: "Traditional guidance", ask: { prompt: "What does Ayurveda (Garbhini Paricharya) advise for my stage of pregnancy?", topic: "ayurveda" } },
@@ -103,7 +114,7 @@ const STARTER_QUESTIONS: { q: string; icon: React.ComponentType<{ className?: st
 ];
 
 /** Shown in the sidebar under "More" so the primary list stays short. */
-const PRIMARY_ACTION_IDS = new Set(["week", "nutrition", "ayurveda", "lifestyle"]);
+const PRIMARY_ACTION_IDS = new Set(["week", "plan", "checkin", "screen", "nutrition"]);
 
 const URGENT_STATUSES = new Set(["high_risk", "urgent_escalation"]);
 const CONVERSATION_STORAGE_KEY = "matriva.conversationId";
@@ -675,6 +686,7 @@ function ChatContent() {
                       {m.safetyStatus && URGENT_STATUSES.has(m.safetyStatus) && (
                         <div className="mb-4 flex items-start gap-3 border-l-2 border-blush-500 bg-blush-100 px-4 py-3">
                           <TriangleAlert className="h-4 w-4 shrink-0 text-blush-500" aria-hidden="true" />
+                          <div>
                           <p className="text-sm text-foreground/85">
                             This response indicates a concern that may need urgent care. Contact your
                             healthcare provider immediately. In India, call{" "}
@@ -683,10 +695,15 @@ function ChatContent() {
                             </a>{" "}
                             for emergencies (108 / 102 for an ambulance).
                           </p>
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            <button type="button" onClick={() => addWidget({ type: "screen" }, "/check")} className="eyebrow-sm min-h-9 border border-blush-500 px-3 text-blush-500 hover:bg-blush-500 hover:text-white">Quick safety check</button>
+                            <a href="https://www.google.com/maps/search/?api=1&query=hospital+near+me" target="_blank" rel="noreferrer" className="eyebrow-sm flex min-h-9 items-center border border-blush-500 px-3 text-blush-500 hover:bg-blush-500 hover:text-white">Find a hospital</a>
+                          </div>
+                          </div>
                         </div>
                       )}
 
-                      {m.widget && <ChatWidget spec={m.widget} pregnancy={pregnancy} onAsk={(q) => void submit(q)} />}
+                      {m.widget && <ChatWidget spec={m.widget} pregnancy={pregnancy} onAsk={(q) => void submit(q)} onOpen={(a) => addWidget({ type: a }, `/${a === "screen" ? "check" : a}`)} />}
 
                       {m.text ? (
                         <ChatAnswer text={m.text} sources={m.sources ?? []} citeId={`cite-${m.id}`} />
