@@ -260,3 +260,17 @@ export interface WellnessLog {
 export interface WellnessSummary {
   days: WellnessLog[];
 }
+
+export interface DocumentPreview {
+  document_id: string;
+  excerpt: string;
+  chunk_count: number;
+  truncated: boolean;
+  source_url: string | null;
+  authority: string | null;
+}
+
+export interface BulkApproveResult {
+  approved: string[];
+  skipped: Record<string, string>;
+}
