@@ -16,6 +16,10 @@ import yaml
 
 from app.rag.retrieval import tokenize
 
+# Same idea as retrieval.MIN_KEYWORD_RELEVANCE: one incidental shared word ("doctor") out of five
+# meaningful query words must not attach an unrelated video to an answer.
+_MIN_QUERY_OVERLAP = 0.3
+
 _LIBRARY_PATH = Path(__file__).resolve().parents[1] / "data" / "library.yaml"
 
 
@@ -59,8 +63,8 @@ def search_resources(
     """Filter by topic/type/stage/language, then rank by overlap with the query.
 
     With no query the original curated order is kept, so a bare topic filter
-    behaves like browsing a shelf. A query that overlaps nothing returns [] so
-    the chat never attaches unrelated links to an answer.
+    behaves like browsing a shelf. A query whose overlap is below the relevance floor
+    returns [] so the chat never attaches unrelated links to an answer.
     """
     stage = _stage_key(stage)
     q_tokens = tokenize(query) if query.strip() else set()
@@ -76,10 +80,9 @@ def search_resources(
             continue
         score = 0.0
         if q_tokens:
-            overlap = len(q_tokens & item["_tokens"])
-            if overlap == 0:
+            score = len(q_tokens & item["_tokens"]) / len(q_tokens)
+            if score < _MIN_QUERY_OVERLAP:
                 continue
-            score = overlap / len(q_tokens)
         scored.append((score, index, item))
     scored.sort(key=lambda row: (-row[0], row[1]))
     return [{k: v for k, v in item.items() if not k.startswith("_")} for _, _, item in scored[:limit]]

@@ -34,3 +34,10 @@ def test_stage_filter_excludes_other_stages() -> None:
     for item in search_resources(topic="labour", stage="1", limit=20):
         assert "all" in item["stages"] or "1" in item["stages"]
 
+
+
+def test_single_incidental_word_does_not_match() -> None:
+    # "doctor" appears in several titles, but one shared word out of five is not relevance.
+    hits = search_resources(query="which signs mean i should call my doctor right away", limit=10)
+    assert all("warning" in h["title"].lower() or "signs" in h["about"].lower() for h in hits)
+    assert not any("Garbhsanskar" in h["title"] for h in hits)
