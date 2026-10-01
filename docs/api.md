@@ -153,6 +153,65 @@ Administrator-only routes are under `/admin`: document upload/review/reindex/bul
 lifestyle records, Ayurveda provenance, guideline registry, safety rules, safety events, and
 audit logs. Staff routes under `/evaluation` run and retrieve evaluation reports.
 
+## Examples
+
+Sign up, send a message, and read what the guard rails did. Replace the host with yours.
+
+```bash
+# 1. Register (returns access_token)
+curl -s localhost:8000/auth/register -H 'content-type: application/json' \
+  -d '{"email":"asha@example.com","password":"StrongPass123","full_name":"Asha"}'
+
+TOKEN=...   # the access_token from above
+
+# 2. Give consent and a condition, then your week
+curl -s -X PUT localhost:8000/profile -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"consent":true,"consent_version":"v1.0","diet_type":"vegetarian","known_conditions":["high blood pressure"]}'
+curl -s -X PUT localhost:8000/care/dating -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"current_week":21}'
+
+# 3. Ask a medicine question
+curl -s localhost:8000/chat -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+  -d '{"message":"Can I take ibuprofen for backache?"}'
+```
+
+The medicine question is refused: `safety_status` is `high_risk`, `sources` and `citations` are empty because nothing was retrieved, and the rule that fired is in `evidence.guardrails`:
+
+```json
+{
+  "safety_status": "high_risk",
+  "answer": "Doctors usually advise avoiding ibuprofen in pregnancy (NSAID pain relievers can harm the baby's kidneys ...). I can't advise on medicines: only your doctor can decide ...",
+  "evidence": {
+    "safety_reason": "Matched guard-rail rule: Ibuprofen",
+    "guardrails": [{
+      "id": "med-ibuprofen", "kind": "medication", "action": "block", "title": "Ibuprofen", "matched": "ibuprofen",
+      "sources": [{"key": "nhs-medicines", "name": "NHS - Medicines in pregnancy", "url": "https://www.nhs.uk/pregnancy/keeping-well/medicines/"}]
+    }]
+  }
+}
+```
+
+```bash
+# 4. What to eat this month, for iron
+curl -s "localhost:8000/care/food-guide?need=iron" -H "authorization: Bearer $TOKEN"
+```
+
+```json
+{
+  "week": 21, "month": 5, "diet": "vegetarian",
+  "traditional": {
+    "evidence_level": "traditional",
+    "foods": [{"authority": "Caraka and Vagbhata I", "text": "Ghrta prepared with butter extracted from milk.", "page": 136, "paraphrased": false}]
+  },
+  "modern": {
+    "need": {"id": "iron", "label": "Iron", "unit": "mg", "daily_allowance": 27},
+    "foods": [{"name": "Soybeans", "category": "legume", "serving_g": 150, "amount": 7.7, "percent": 29}]
+  }
+}
+```
+
+(Both responses are shortened.) An unknown `need` returns `422 {"detail": "Unknown need: nope"}`; no token returns `401`.
+
 ## Errors and limits
 
 - `401`: missing/invalid authentication
