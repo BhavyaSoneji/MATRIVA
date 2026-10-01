@@ -1,5 +1,7 @@
 # RAG / AI / Testing / Review Workflow — Neev
 
+> **Historical:** this is the original sprint plan. Everything here has shipped; for current status see [`PROGRESS.md`](../PROGRESS.md) and the README.
+
 Step-wise execution order for all `rag-ai`, `testing`, `review`, and `safety` issues
 (assignee `@neevmodh`). Work top to bottom. Don't start a step until its "Depends on" column is
 actually done — check [`PROGRESS.md`](../PROGRESS.md) for real status before jumping ahead.

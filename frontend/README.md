@@ -1,8 +1,9 @@
 # MATRIVA Frontend
 
-Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS frontend for MATRIVA, a pregnancy-guidance
-web app that combines modern medical evidence with traditional/Ayurvedic knowledge behind a safety-first
-chat and recommendation experience.
+Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS frontend for MATRIVA, an evidence-first pregnancy
+companion that combines modern medical guidance with traditional/Ayurvedic knowledge behind a safety-first
+chat. The product is **one chat workspace** (slash commands such as `/plan`, `/checkin`, `/check`, `/readings`,
+`/meals`, `/summary`, `/book`, `/map`) plus landing, signup/login, onboarding, settings and admin pages.
 
 ## Development
 
@@ -12,11 +13,20 @@ cp .env.example .env.local   # set NEXT_PUBLIC_API_URL to your backend
 npm run dev
 ```
 
-Useful scripts: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run test:e2e`.
+Useful scripts: `npm run build`, `npm run lint`, `npm run typecheck`, `npm run test:e2e` (Playwright, mocked API, 9 tests).
+
+## Layout
+
+- `app/` — routes: `chat` (the companion), `onboarding`, `settings`, `login`, `signup`, `admin/*`
+- `components/care/` — plan, check-in, readings, meals, summary and safety-check widgets
+- `components/` — chat answer, book and map widgets, voice, retrieval trace, resource cards
+- `lib/` — API client and helpers; `tests/e2e/` — Playwright specs
+
+> This project uses a recent Next.js with breaking changes; see `AGENTS.md` before writing code.
 
 ## Environment variables
 
-- `NEXT_PUBLIC_API_URL` — base URL of the MATRIVA backend API (default `http://localhost:8000`).
+- `NEXT_PUBLIC_API_URL` — base URL of the MATRIVA backend API (default `http://localhost:8000`; the README's local `uvicorn` example runs on `8010`, so set it in `.env.local`).
 
 ## Deployment
 

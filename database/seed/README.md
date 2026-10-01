@@ -9,5 +9,6 @@ python ../database/seed/seed.py
 
 The script is idempotent and creates three clearly marked demo users, staff accounts, synthetic
 ANC/nutrition/traditional source cards, and a few food/lifestyle records. It is for local
-development only. Replace every demo source with current, clinically reviewed material before
+development only. For the real knowledge base (Prasuti Tantra, guidelines, foods) use
+`backend/scripts/ingest_real_knowledge.py` instead (see the main README). Replace every demo source with current, clinically reviewed material before
 using the application for real users.

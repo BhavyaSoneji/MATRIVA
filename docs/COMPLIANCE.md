@@ -81,6 +81,16 @@ should never be relaxed for UX reasons (e.g. never let generation "sound like" a
 
 ---
 
+## Status against these items (Oct 2026)
+
+| Item | Status |
+|---|---|
+| Consent at collection, export, deletion | **Built**: consent-gated profile and care data, `/privacy/consent`, `/privacy/export`, purge on withdrawal and account deletion |
+| ANC schedule, PMSMA, danger signs cited to source | **Built** in `care_rules.yaml`, each rule with its source; still `pending_clinical_review` |
+| Persistent "guidance, not a diagnosis" notice | **Built** in the chat footer, triage and doctor-summary disclaimers |
+| LLM prompt forbids therapeutic claims for traditional content | Prompt in place for the optional external engine; the default engine only quotes approved passages |
+| Legal review (DPDP), clinical sign-off, native-speaker review of Hindi/Gujarati | **Open** |
+
 ## Open items before any real-user launch (not just Round 1 demo)
 
 1. Legal review of DPDP Act obligations for health-data collection — consent flow, retention policy,
@@ -89,6 +99,6 @@ should never be relaxed for UX reasons (e.g. never let generation "sound like" a
    primary MoHFW/FOGSI/Charaka Samhita sources, not secondhand summaries.
 3. Confirm no wording in LLM-generated Ayurvedic content could be read as a therapeutic claim under
    the Drugs and Magic Remedies Act.
-4. Add a persistent AI-disclosure element to the chat UI.
-5. Decide (with legal input) whether consent-at-signup needs to move from "deferred" into MVP scope
-   given DPDP applies from first data collection, not from a later "privacy features" milestone.
+4. ~~Add a persistent AI-disclosure element to the chat UI.~~ Done (chat footer); keep the wording under review.
+5. ~~Decide whether consent-at-signup moves into MVP scope.~~ Done: consent is captured and
+   enforced; legal still needs to confirm retention policy and breach process.

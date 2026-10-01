@@ -9,6 +9,18 @@ medical-review patterns. A match short-circuits normal generation and returns a 
 care/emergency escalation message. Safety rules are stored in `safety_rules`, versioned,
 reviewed, and manageable by administrators.
 
+The pre-check understands English, Hindi, Hinglish and Gujarati red-flag phrases. The Hindi and
+Gujarati wording still needs native-speaker review.
+
+## Structured screening
+
+Separately from chat, `/care/screening` asks about 20 yes/no questions filtered by the week of
+pregnancy and returns an **emergency / urgent / soon** outcome with the source of each question
+(WHO, FOGSI, NHS), one-tap 112, the mother's emergency contact and a hospital map link. A daily
+check-in answer that is a danger sign triggers the same card. Reading thresholds (Hb < 11 g/dL,
+BP 140/90 and 160/110) are applied by rules, never by a model. All of it is in
+`backend/app/data/care_rules.yaml`, marked `pending_clinical_review`.
+
 ## Post-check
 
 Generated text is rejected or replaced when it:

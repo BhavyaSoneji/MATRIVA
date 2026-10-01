@@ -19,6 +19,16 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-01 — @neevmodh — Documentation refresh
+
+- Brought `docs/api.md` (care, wellness, resources, stream, book/graph routes), `architecture.md`
+  (local engine, care services, migrations), `rag.md`, `safety.md`, `deployment.md`,
+  `care-features.md`, `FEATURES.md` (care section, single-workspace note), `SUBMISSION.md`,
+  `COMPLIANCE.md` (status table) and `frontend/README.md` in line with the code.
+- Marked the three `WORKFLOW_*.md` sprint plans as historical.
+- Verified: backend 378 passing; Playwright 9 specs.
+- Status: done. Notes: clinical review, native-speaker review and branch protection are still open.
+
 ### 2026-09-24 — @neevmodh — Fixed the hallucination suite's real limitation (#19)
 
 - **Root cause confirmed:** the 3/11 pass rate documented earlier was caused by the suite running

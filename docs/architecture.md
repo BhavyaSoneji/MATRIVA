@@ -15,6 +15,7 @@ FastAPI middleware (CORS, request ID, rate limit, security headers, metrics)
    │                                  └── approved chunks   └── post-check/citations
    ├── knowledge / sources / guidelines
    ├── recommendations / food / lifestyle
+   ├── care (dating, plan, check-ins, readings, meals, screening, summary)
    └── admin / evaluation / audit
              │
              ▼
@@ -22,6 +23,23 @@ FastAPI middleware (CORS, request ID, rate limit, security headers, metrics)
              │
       PostgreSQL + pgvector
 ```
+
+## Retrieval engines
+
+`RAG_ENGINE=local` (default) runs a fully offline hybrid engine in `backend/app/rag/local/`
+(BM25, character n-grams, concepts, LSA, structure, graph activation, pseudo-relevance
+feedback, weighted RRF, rerank, MMR, a sufficiency gate and an extractive composer). It needs no
+API key and cannot add a claim that is not in an approved passage. `RAG_ENGINE=external`
+re-enables the Groq + Gemini pipeline. Details: [`local-rag.md`](./local-rag.md).
+
+## Care services
+
+`backend/app/services/care/` holds the deterministic engines behind the care features:
+`dating` (week from last period or due date), `plan`, `tracking` (check-ins, reminders),
+`screening` (red-flag triage), `readings` (validation, sourced flags, report parsing), `meals`
+(USDA per-100 g nutrients, daily gaps), `summary`, and `privacy` (purge/export). Thresholds
+and schedules live in `backend/app/data/care_rules.yaml`, not in code. See
+[`care-features.md`](./care-features.md).
 
 ## Trust boundaries
 
@@ -38,6 +56,8 @@ FastAPI middleware (CORS, request ID, rate limit, security headers, metrics)
 
 ## Database
 
+Migrations: `0001` initial schema, `0002` RAG vector index, `0003` daily wellness logs,
+`0004` care features (dating, check-ins, readings, meals, screening, emergency contact).
 The initial migration creates users, consent and profile tables, conversations/messages,
 knowledge sources/documents/chunks, evidence and guideline metadata, Ayurveda provenance,
 food/lifestyle records, recommendations, feedback, safety rules/events, audit logs, and

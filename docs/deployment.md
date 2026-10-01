@@ -24,6 +24,15 @@ python ../database/seed/seed.py  # optional synthetic demo data
 uvicorn app.main:app --reload
 ```
 
+## Retrieval engine and optional tools
+
+- The default `RAG_ENGINE=local` needs no provider keys. Set `RAG_ENGINE=external` plus
+  `LLM_API_KEY` / `EMBEDDING_API_KEY` to use Groq and Gemini.
+- Photo import of lab reports needs `tesseract` on the backend host (`apt install tesseract-ocr`).
+- Load the real knowledge with `python scripts/ingest_real_knowledge.py` and
+  `python scripts/build_book_index.py`, then approve documents in *Admin → Documents*.
+- The frontend ships its own Docker image; see [`frontend/README.md`](../frontend/README.md).
+
 ## Production checklist
 
 - Use `docker-compose.prod.yml` or an orchestrator with secret management.

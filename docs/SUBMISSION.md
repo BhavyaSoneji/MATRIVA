@@ -5,7 +5,11 @@
 **Use case:** Patient Education & Digital Engagement
 **Repo:** https://github.com/BhavyaSoneji/MATRIVA
 
-> Status: The system, demo, and write-up are complete and verified live (see Demo below). Two
+> Status (updated Oct 2026): the system has grown beyond this Round 1 write-up. It now runs an
+> offline RAG engine by default and includes a care companion (plan, check-ins, red-flag triage,
+> readings, meals, doctor summary). The README is the current description; the screenshots in
+> [`docs/screenshots/`](./screenshots/) numbered 10+ are the up-to-date UI, while 01-07 below are from
+> the original Round 1 build. Two
 > items remain genuinely open and are marked [TODO] below rather than filled in with placeholders:
 > the Clinical Lead's name/credentials (#75, needs a real named reviewer's sign-off) and the exact
 > academic citations for the RAG-safety literature (do not paste an unverified reference). Confirm
@@ -81,11 +85,12 @@ widens in scope without rework:
 | Sprint 2+ | Personalization engine, recommendation engine, multi-domain query decomposition, admin/review tooling, full product frontend, deployment hardening | **Already done, ahead of schedule** — full FastAPI backend + full Next.js frontend (auth, onboarding, dashboard, chat, nutrition/lifestyle/ayurveda/guidance, recommendations, sources explorer, settings/privacy, admin dashboards) all built and wired end-to-end |
 
 The original plan staged this over 60–90 days; the actual build moved faster than planned, so what
-follows describes the **current, working state**, not a projection. Remaining open items are
-tracked honestly rather than glossed over: a retrieval-precision gap in the hallucination test
-suite when running without live embedding credentials (issue #19, fixed when live keys are
-available — see Limitations in the main [README](../README.md)), and the process items in
-[Team](#team) below (Clinical Lead sign-off, branch protection).
+follows describes the **current, working state**, not a projection. The retrieval-precision gap
+once noted in the hallucination suite (#19) is closed: the default engine is now offline and is
+measured on held-out question sets with an ablation (see [`local-rag.md`](./local-rag.md)).
+Remaining open items are tracked honestly rather than glossed over: the process items in
+[Team](#team) below (Clinical Lead sign-off, branch protection) and the limits listed in the
+README's *Honest limits*.
 
 We are not building a general-purpose medical chatbot or attempting diagnosis — scope is
 intentionally narrow (education + safe escalation) so the 60–90 day window is spent on evidence

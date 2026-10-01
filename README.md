@@ -316,6 +316,7 @@ matriva/
 | [🛡️ Safety](./docs/safety.md) · [⚖️ Compliance](./docs/COMPLIANCE.md) | Safety model and policy alignment |
 | [🏛️ Architecture](./docs/architecture.md) · [🔌 API](./docs/api.md) · [🚢 Deployment](./docs/deployment.md) | Engineering reference |
 | [📋 Features](./docs/FEATURES.md) · [🗓️ Progress log](./PROGRESS.md) | Scope and history |
+| [🏆 Submission](./docs/SUBMISSION.md) · [🖥️ Frontend](./frontend/README.md) · [🌱 Seed data](./database/seed/README.md) | Round 1 write-up, frontend setup, demo seed |
 
 ---
 

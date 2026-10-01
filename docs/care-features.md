@@ -1,5 +1,7 @@
 # Care features
 
+Endpoints are listed in [`api.md`](./api.md#care-features-care-authenticated); the safety side is in [`safety.md`](./safety.md).
+
 What MATRIVA asks for, how a mother uses it, and what she gets back. All of it is reachable from the chat (slash commands or the sidebar); there are no extra pages.
 
 | Command | Input | What she gets |
@@ -10,6 +12,8 @@ What MATRIVA asks for, how a mother uses it, and what she gets back. All of it i
 | `/readings` | Hb, BP, weight, sugar by hand, pasted report text, or a photo (needs `tesseract` on the server) | Trend chart and sourced flags (WHO Hb < 11; BP 140/90 and 160/110). Parsed values are shown for confirmation before saving |
 | `/meals` | Free text: "2 roti, 1 katori dal, curd" | Approximate nutrients vs a pregnancy day, and vegetarian/allergy-aware foods to close gaps |
 | `/summary` | None (built from the above) | One printable page for the doctor, with questions she may want to ask |
+| `/book` | A term, e.g. *stanya* | The Prasuti Tantra by chapter, authorities cited, bilingual glossary |
+| `/map` | The last question asked | How the topics in the answer connect |
 
 Saying "my Hb is 9.8" or "I ate 2 roti and dal" in plain chat records it too (requires consent; questions are never recorded).
 

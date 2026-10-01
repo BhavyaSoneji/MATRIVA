@@ -5,6 +5,11 @@ Full functionality scope derived from `Master Prompt.txt`. Each section maps to 
 `M1: Foundation + RAG Core`, `M2: Personalization + Safety + Domain Engines`,
 `M3: Frontend + Admin + Evaluation + Deploy`.
 
+> **Status (Oct 2026):** sections 1-13 are built. The product has since grown a **care companion**
+> (section 14) and an **offline RAG engine** (section 4 note), and the 17 separate pages in section 12
+> were consolidated into **one chat workspace** with slash commands, plus landing, auth,
+> onboarding, settings and admin. See [`care-features.md`](./care-features.md) and the README.
+
 ## 1. User & Account
 - Sign up / login (JWT auth)
 - Structured onboarding (profile, pregnancy, health, lifestyle, culture)
@@ -35,7 +40,8 @@ Full functionality scope derived from `Master Prompt.txt`. Each section maps to 
   quality check → embed → index)
 - Semantic chunking (300–700 tokens, structure-preserving)
 - Duplicate detection (hash + semantic similarity)
-- Embedding pipeline (Gemini) + pgvector storage, with re-indexing on document change
+- Offline hybrid engine, the default (`RAG_ENGINE=local`): BM25, n-gram, concept, LSA, structure, graph and PRF signals, fused and gated, with an extractive composer — no API key ([`local-rag.md`](./local-rag.md))
+- Embedding pipeline (Gemini, optional) + pgvector storage, with re-indexing on document change
 - Hybrid retrieval (vector search + metadata filters + keyword search)
 - Reranking (relevance, stage, evidence level, region, source quality)
 - Context packet construction for the LLM
@@ -109,6 +115,19 @@ Knowledge management · Evaluation dashboard
 - Observability: latency, retrieval count, safety classification, error rate, token usage tracking
 - Error handling with graceful degradation for every external dependency (LLM, DB, vector DB,
   embeddings)
+
+## 14. Care companion (added after the original scope)
+- Dating from last period, due date or week; the week advances on its own
+- `/plan`: visit calendar (FOGSI, PMSMA on the 9th), iron-folic-acid course, weekly tasks
+- `/checkin`: mood, symptoms, movement, iron tablet; streaks and rule-based reminders
+- `/check`: structured red-flag screening with emergency / urgent / soon triage, 112, emergency contact
+- `/readings`: Hb, BP, weight, sugar; typed, pasted report or photo (OCR); sourced flags and trend
+- `/meals`: free-text meal log, USDA nutrients vs a pregnancy day, diet/allergy-aware suggestions
+- `/summary`: printable one-page doctor summary
+- `/book` and `/map`: Prasuti Tantra browser and concept graph
+- Chat records readings and meals from plain statements (with consent)
+- English / हिन्दी / ગુજરાતી, voice in and out, mobile-first
+- All care data is consent-gated, exportable and purged on consent withdrawal or deletion
 
 ## Ownership (see `.github/CODEOWNERS`)
 | Area | Owner |
