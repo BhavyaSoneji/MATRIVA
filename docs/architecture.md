@@ -164,7 +164,7 @@ provider availability as clinical approval.
 | What fails | What happens |
 |---|---|
 | The safety classifier | `503` and a safe message; never an unrestricted answer |
-| A guard-rail rule file is invalid | The backend refuses to load it, so the problem shows at start-up and in the tests, not in front of a patient |
+| A guard-rail rule file is invalid | The backend refuses to start (the registry loads at boot) and the tests fail, so the problem never reaches a patient |
 | Retrieval finds too little | The fixed "no reviewed source" answer, with `insufficient_information` |
 | The output check rejects an answer | The answer is replaced whole with a safe message |
 | The external LLM or embedding provider fails | The grounded local answer; never a guess |
