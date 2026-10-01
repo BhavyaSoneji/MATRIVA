@@ -1,0 +1,384 @@
+# Public-health guidance entries, paraphrased from the cited primary sources.
+#
+# Same schema as seed.yaml. Every entry is PENDING_SOURCE_VERIFICATION: the wording is a
+# short paraphrase written for this project, it has NOT been checked line-by-line by a
+# clinician, and the ingestion script loads it as review_status=pending. Nothing here
+# reaches chat answers until a reviewer approves it in the admin screen
+# (POST /admin/documents/{id}/approve). `url` points at the primary source to verify against.
+#
+# Topic names deliberately avoid the substring "anc": the ingestion script uses it to
+# decide when to create a structured Guideline row.
+
+- document_id: guide-who-iron-folate-001
+  title: "WHO: Daily Iron and Folic Acid Supplementation in Pregnancy"
+  content: >
+    WHO's antenatal-care recommendations advise daily oral iron and folic acid for pregnant
+    women, at 30-60 mg of elemental iron and 400 micrograms (0.4 mg) of folic acid, to
+    prevent maternal anaemia, low birth weight and preterm birth. Dose and duration should be
+    set by the woman's own care provider, especially if she is already anaemic.
+  domain: MODERN_MEDICAL
+  subdomain: supplements
+  source_id: who-antenatal-2016
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/publications/i/item/9789241549912
+  publication_date: "2016"
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: all
+  topic: iron_folate_supplements
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-who-calcium-001
+  title: "WHO: Calcium Supplementation to Reduce Pre-eclampsia Risk"
+  content: >
+    WHO recommends calcium supplementation (1.5-2.0 g of elemental calcium per day) for
+    pregnant women in populations where dietary calcium intake is low, to reduce the risk of
+    pre-eclampsia. Calcium supplements are not a substitute for a calcium-containing diet
+    such as milk, curd, ragi and leafy greens, and should be started on a provider's advice.
+  domain: MODERN_MEDICAL
+  subdomain: supplements
+  source_id: who-antenatal-2016
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/publications/i/item/9789241549912
+  publication_date: "2016"
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: all
+  topic: calcium_supplements
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-who-caffeine-001
+  title: "WHO: Limiting Caffeine in Pregnancy"
+  content: >
+    WHO recommends that pregnant women with a high daily caffeine intake, more than 300 mg a
+    day, lower it to reduce the risk of pregnancy loss and low birth weight. Caffeine is
+    found in coffee, tea, cola drinks, energy drinks and chocolate.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: who-antenatal-2016
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/publications/i/item/9789241549912
+  publication_date: "2016"
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: all
+  topic: caffeine_limit
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-who-activity-001
+  title: "WHO: Physical Activity for Pregnant Women"
+  content: >
+    WHO's physical-activity guidelines advise that pregnant women without a medical or
+    obstetric reason to avoid it should do regular physical activity, including at least 150
+    minutes of moderate-intensity aerobic activity spread across the week, together with
+    gentle strength and stretching work. Anyone with a complication, bleeding or other
+    concern should check with their provider before starting or continuing exercise.
+  domain: LIFESTYLE
+  subdomain: exercise
+  source_id: who-physical-activity
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/news-room/fact-sheets/detail/physical-activity
+  publication_date: "2020"
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: all
+  topic: weekly_activity_target
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [consult_provider_if_complications]
+
+- document_id: guide-who-anaemia-001
+  title: "WHO: Anaemia in Pregnancy - Definition and Why It Matters"
+  content: >
+    WHO defines anaemia in pregnancy as a haemoglobin concentration below 11 g/dL. Anaemia is
+    common in pregnancy, most often from iron deficiency, and is associated with fatigue and
+    with higher risks for mother and baby. Iron-rich foods (legumes, leafy greens, jaggery,
+    meat and fish where eaten) combined with vitamin C sources help absorption; supplements
+    and treatment are decided by a provider after a blood test.
+  domain: MODERN_MEDICAL
+  subdomain: anaemia
+  source_id: who-anaemia-factsheet
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/news-room/fact-sheets/detail/anaemia
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: all
+  topic: haemoglobin_threshold
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-who-breastfeeding-001
+  title: "WHO: Exclusive Breastfeeding for the First Six Months"
+  content: >
+    WHO recommends starting breastfeeding within the first hour after birth, exclusive
+    breastfeeding for the first 6 months of life, and continued breastfeeding with
+    appropriate complementary foods up to 2 years of age or beyond. Preparing in the third
+    trimester - learning positioning and latch, and knowing where to get lactation support -
+    helps many mothers.
+  domain: MODERN_MEDICAL
+  subdomain: postpartum
+  source_id: who-breastfeeding-factsheet
+  source_type: international_guideline
+  authority: World Health Organization
+  url: https://www.who.int/news-room/fact-sheets/detail/breastfeeding
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: Global
+  pregnancy_stage: third_trimester
+  topic: breastfeeding_recommendation
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-food-safety-001
+  title: "NHS: Foods to Avoid or Limit in Pregnancy"
+  content: >
+    NHS advice is to avoid alcohol; unpasteurised milk and products made from it; mould-ripened
+    soft cheeses such as brie and camembert and soft blue cheeses unless cooked until steaming
+    hot; raw or undercooked meat; liver and liver products, because of high vitamin A; and
+    fish high in mercury such as shark, swordfish and marlin. Oily fish is encouraged but
+    limited to two portions a week. Wash fruit, vegetables and salad well, and cook meat, eggs
+    and ready meals thoroughly to reduce the risk of listeria, toxoplasma and salmonella.
+  domain: MODERN_MEDICAL
+  subdomain: food_safety
+  source_id: nhs-foods-to-avoid
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/foods-to-avoid/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: foods_to_avoid
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-vitamins-001
+  title: "NHS: Folic Acid and Vitamin D in Pregnancy"
+  content: >
+    NHS advice is to take 400 micrograms of folic acid daily from before conception until
+    week 12 of pregnancy, to lower the risk of neural tube defects such as spina bifida, and
+    to take 10 micrograms of vitamin D daily through pregnancy and breastfeeding. Women with
+    diabetes, epilepsy, obesity or a previous affected pregnancy may be advised a higher
+    folic acid dose by their doctor.
+  domain: MODERN_MEDICAL
+  subdomain: supplements
+  source_id: nhs-have-a-healthy-diet
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/have-a-healthy-diet/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: first_trimester
+  topic: folic_acid_vitamin_d
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-preeclampsia-001
+  title: "NHS: Warning Signs of Pre-eclampsia"
+  content: >
+    Pre-eclampsia is a pregnancy condition involving high blood pressure, usually after
+    week 20. NHS lists severe headache, vision problems such as blurring or flashing, pain
+    just below the ribs, vomiting, and sudden swelling of the face, hands or feet as signs
+    that need urgent assessment. These symptoms should be reported to a midwife or doctor
+    straight away rather than waited out, and regular blood-pressure and urine checks at
+    antenatal visits are how it is usually found.
+  domain: MODERN_MEDICAL
+  subdomain: warning_signs
+  source_id: nhs-pre-eclampsia
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/conditions/pre-eclampsia/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: preeclampsia_signs
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [urgent_symptoms]
+
+- document_id: guide-nhs-movements-001
+  title: "NHS: Your Baby's Movements"
+  content: >
+    Most women first feel their baby move between about 16 and 24 weeks. There is no set
+    number of movements to expect; what matters is knowing your baby's usual pattern. NHS
+    advises contacting your midwife or maternity unit immediately if you notice your baby's
+    movements slowing down or stopping - not waiting until the next day - and not using
+    home dopplers or phone apps to check the baby is well.
+  domain: MODERN_MEDICAL
+  subdomain: warning_signs
+  source_id: nhs-baby-movements
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/your-babys-movements/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: fetal_movement_changes
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [urgent_symptoms]
+
+- document_id: guide-nhs-exercise-001
+  title: "NHS: Exercise in Pregnancy"
+  content: >
+    NHS encourages staying active in pregnancy: gentle activities such as walking, swimming,
+    prenatal yoga or pilates classes, and pelvic floor exercises every day. Avoid contact
+    sports and activities with a high risk of falling, and avoid scuba diving. Stop and seek
+    advice if you have pain, dizziness, vaginal bleeding or shortness of breath. You should
+    be able to hold a conversation while exercising.
+  domain: LIFESTYLE
+  subdomain: exercise
+  source_id: nhs-exercise
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/exercise/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: safe_exercise
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [consult_provider_if_complications]
+
+- document_id: guide-nhs-gdm-001
+  title: "NHS: Gestational Diabetes - Testing and Diet"
+  content: >
+    Gestational diabetes is diabetes that develops in pregnancy and usually settles after the
+    baby is born. Women at higher risk are offered an oral glucose tolerance test, usually
+    between 24 and 28 weeks. Management centres on healthy eating, regular activity and
+    monitoring blood glucose, with medication if needed; a dietitian or diabetes team
+    guides the plan.
+  domain: MODERN_MEDICAL
+  subdomain: complications
+  source_id: nhs-gestational-diabetes
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/conditions/gestational-diabetes/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: second_trimester
+  topic: gestational_diabetes_screening
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [requires_clinical_review]
+
+- document_id: guide-in-pmsma-001
+  title: "India: Pradhan Mantri Surakshit Matritva Abhiyan (PMSMA) - Free Monthly Check-up"
+  content: >
+    Under PMSMA, run by India's Ministry of Health and Family Welfare, pregnant women can
+    get a free antenatal check-up from a doctor (obstetrician, gynaecologist or physician) at
+    government health facilities on the 9th of every month, for those in the second and
+    third trimesters. It adds to routine antenatal visits and is meant to catch high-risk
+    pregnancies early. Visit your nearest government health facility to confirm timings.
+  domain: MODERN_MEDICAL
+  subdomain: antenatal_schemes
+  source_id: mohfw-pmsma
+  source_type: government_scheme
+  authority: Ministry of Health and Family Welfare, Government of India
+  url: https://www.nhm.gov.in/index1.php?lang=1&level=2&sublinkid=822&lid=218
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: pmsma_monthly_checkup
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-in-pmmvy-001
+  title: "India: Pradhan Mantri Matru Vandana Yojana (PMMVY) - Maternity Cash Benefit"
+  content: >
+    PMMVY is a Government of India maternity benefit scheme that gives eligible pregnant and
+    lactating women a conditional cash transfer in instalments, linked to registering the
+    pregnancy, attending antenatal check-ups and registering the birth and first
+    immunisations. Eligibility rules and amounts have been revised over time, so check the
+    scheme portal or your Anganwadi / ASHA worker for the current terms before applying.
+  domain: MODERN_MEDICAL
+  subdomain: antenatal_schemes
+  source_id: wcd-pmmvy
+  source_type: government_scheme
+  authority: Ministry of Women and Child Development, Government of India
+  url: https://pmmvy.wcd.gov.in/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  pregnancy_stage: all
+  topic: pmmvy_cash_benefit
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
