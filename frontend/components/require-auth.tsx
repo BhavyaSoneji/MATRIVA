@@ -17,7 +17,7 @@ export function RequireAuth({
 
   React.useEffect(() => {
     if (!loading && !user) router.replace("/login");
-    if (!loading && user && adminOnly && user.role !== "admin") router.replace("/dashboard");
+    if (!loading && user && adminOnly && user.role !== "admin") router.replace("/chat");
   }, [loading, user, adminOnly, router]);
 
   if (loading || !user || (adminOnly && user.role !== "admin")) {
