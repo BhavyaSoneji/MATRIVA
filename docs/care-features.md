@@ -18,6 +18,19 @@ What MATRIVA asks for, how a mother uses it, and what she gets back. All of it i
 
 Saying "my Hb is 9.8" or "I ate 2 roti and dal" in plain chat records it too (requires consent; questions are never recorded).
 
+## A typical journey
+
+| When | What she does | What happens |
+|---|---|---|
+| Day 1 | Signs up, gives her week (or last period, or due date), accepts consent | `/plan` shows the exact week and day, the due date and her visit calendar. Her week then moves on by itself |
+| Daily, 20 seconds | `/checkin`: mood, symptoms, baby movement, iron tablet | Streaks and reminders. A danger-sign answer turns into an emergency or urgent card with 112 and her contact |
+| After a clinic visit | Types or pastes a reading, or photographs the report: `/readings` | The value is shown for confirmation, then saved. Flags cite their source (WHO Hb below 11; BP 140/90 and 160/110) |
+| At meals | `/meals`, or just says "I ate 2 roti and dal" in chat | Approximate nutrients against a pregnancy day, and foods that fit her diet and allergies to close the gaps |
+| Not sure what to eat | `/foods` | The book's regimen for her month (traditional) and the foods richest in the nutrient she picks |
+| Something worries her | `/check`, or asks in plain words | Emergency, urgent or soon, and always somewhere to go. Medicine questions are refused and she is sent to her doctor |
+| Before a visit | `/summary` | One printable page: week, readings, iron adherence, symptoms, conditions, medicines, questions to ask |
+| Whenever she wants | Settings | Export everything, withdraw consent, delete her profile or account |
+
 ## Your safety profile
 In Settings, you can tell MATRIVA your health conditions, the medicines you take now, allergies, pregnancy history (twins, previous caesarean, preterm birth, miscarriage or stillbirth), age and blood group. All optional. MATRIVA uses them only to warn you better: see [`guardrails.md`](./guardrails.md). The medicines and conditions also appear on the summary for your doctor.
 
