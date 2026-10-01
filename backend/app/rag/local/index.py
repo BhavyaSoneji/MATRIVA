@@ -13,6 +13,7 @@ from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.rag.local.semantic import SemanticSpace
 from app.rag.local.text import char_ngrams, tokens
 
 K1 = 1.4
@@ -62,6 +63,19 @@ class LocalIndex:
             for gram, w in weights.items():
                 self._gram_postings[gram].append((i, w / norm))
 
+        # ---- structure: each section (or, for flat documents, the document itself) is a node with its own title words
+        self._sections: dict[tuple[str, str], list[int]] = defaultdict(list)
+        for i, p in enumerate(passages):
+            self._sections[(str(p.meta.get("document_id", "")), str(p.meta.get("section") or ""))].append(i)
+        self._section_tokens: dict[tuple[str, str], frozenset[str]] = {}
+        for key, members in self._sections.items():
+            first = passages[members[0]].meta
+            title = " ".join(str(first.get(f) or "") for f in ("section", "chapter_title", "title"))
+            self._section_tokens[key] = frozenset(tokens(title))
+
+        # ---- latent semantic space (offline "embeddings" learned from these passages)
+        self.semantic = SemanticSpace([p.tokens for p in passages], {t: self.idf(t) for t in self.df})
+
     # ------------------------------------------------------------------ scoring
     def idf(self, term: str) -> float:
         d = self.df.get(term, 0)
@@ -92,6 +106,28 @@ class LocalIndex:
                 if allowed is None or i in allowed:
                     scores[i] += (w / norm) * dw
         return scores
+
+    def structure_scores(self, query_terms: set[str], allowed: set[int] | None = None, floor: float = 0.34) -> dict[int, float]:
+        """Passages inherit the score of the section / document title they sit under.
+
+        A question about "monthwise dietary regimen" matches the section titled exactly that, so every passage in it
+        scores -- even a passage whose own OCR text is too damaged to match the words.
+        """
+        if not query_terms:
+            return {}
+        total = sum(self.idf(t) for t in query_terms) or 1.0
+        out: dict[int, float] = {}
+        for key, title_tokens in self._section_tokens.items():
+            hit = query_terms & title_tokens
+            if not hit:
+                continue
+            score = sum(self.idf(t) for t in hit) / total
+            if score < floor:
+                continue
+            for i in self._sections[key]:
+                if allowed is None or i in allowed:
+                    out[i] = max(out.get(i, 0.0), score)
+        return out
 
     def containing(self, terms: set[str]) -> dict[int, int]:
         """{passage index: how many of `terms` it contains} for passages with at least one."""
