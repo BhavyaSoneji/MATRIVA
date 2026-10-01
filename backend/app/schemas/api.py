@@ -478,6 +478,25 @@ class WellnessSummaryResponse(APIModel):
     days: list[WellnessLogResponse]
 
 
+class ResourceResponse(APIModel):
+    id: str
+    type: str
+    topic: str
+    stages: list[str]
+    language: str
+    title: str
+    publisher: str
+    url: str
+    thumbnail: str | None = None
+    about: str
+
+
+class ResourceLibraryResponse(APIModel):
+    verified_on: str | None
+    topics: dict[str, str]
+    resources: list[ResourceResponse]
+
+
 class DeleteResponse(APIModel):
     message: str
 
