@@ -12,6 +12,7 @@ import sys
 from pathlib import Path
 
 import pytest
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -27,6 +28,10 @@ from app.models import (
 )
 
 
+# seed.yaml (8: FOGSI ANC, 2 Garbhini Paricharya, 5 IFCT foods) + guidelines.yaml
+EXPECTED_SEED_DOCS = 8 + len(yaml.safe_load(ingest_module.GUIDELINES_YAML_PATH.read_text(encoding="utf-8")))
+
+
 @pytest.fixture(autouse=True)
 def _mock_embeddings(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(ingest_module, "embed_text", lambda text, api_key=None: [0.1, 0.2, 0.3])
@@ -37,15 +42,15 @@ def test_seed_yaml_ingests_all_documents_as_pending(client) -> None:
         ingest_module.ingest_seed_yaml(db, api_key="fake-key", dry_run=False)
 
         sources = db.query(KnowledgeSource).all()
-        assert len(sources) == 8
+        assert len(sources) == EXPECTED_SEED_DOCS
         assert all(s.review_status == "pending" for s in sources)
 
         documents = db.query(KnowledgeDocument).all()
-        assert len(documents) == 8
+        assert len(documents) == EXPECTED_SEED_DOCS
         assert all(d.review_status == "pending" and d.active is False for d in documents)
 
         chunks = db.query(KnowledgeChunk).all()
-        assert len(chunks) == 8
+        assert len(chunks) == EXPECTED_SEED_DOCS
         assert all(c.embedding == [0.1, 0.2, 0.3] for c in chunks)
 
 
@@ -68,8 +73,8 @@ def test_seed_yaml_ingestion_is_idempotent(client) -> None:
     with SessionLocal() as db:
         ingest_module.ingest_seed_yaml(db, api_key="fake-key", dry_run=False)
         ingest_module.ingest_seed_yaml(db, api_key="fake-key", dry_run=False)
-        assert db.query(KnowledgeSource).count() == 8
-        assert db.query(KnowledgeDocument).count() == 8
+        assert db.query(KnowledgeSource).count() == EXPECTED_SEED_DOCS
+        assert db.query(KnowledgeDocument).count() == EXPECTED_SEED_DOCS
 
 
 def test_pregnancy_stage_all_is_stored_as_null_not_literal_string(client) -> None:
@@ -123,3 +128,20 @@ def test_book_ingestion_is_idempotent(client, tmp_path, monkeypatch) -> None:
         ingest_module.ingest_book(db, api_key="fake-key", dry_run=False)
         ingest_module.ingest_book(db, api_key="fake-key", dry_run=False)
         assert db.query(KnowledgeSource).filter_by(name="prasuti-tantra-premvati-tiwari").count() == 1
+
+
+def test_guideline_entries_are_pending_with_source_urls_and_safe_topics(client) -> None:
+    """Paraphrased WHO/NHS/MoHFW entries must stay pending, cite a primary URL, and not
+    trip the 'anc' substring check that auto-creates a Guideline row."""
+    entries = yaml.safe_load(ingest_module.GUIDELINES_YAML_PATH.read_text(encoding="utf-8"))
+    assert len(entries) >= 12
+    for entry in entries:
+        assert entry["review_status"] == "PENDING_SOURCE_VERIFICATION"
+        assert entry["url"].startswith("https://")
+        assert "anc" not in entry["topic"]
+    with SessionLocal() as db:
+        ingest_module.ingest_seed_yaml(db, api_key="fake-key", dry_run=False)
+        assert db.query(Guideline).count() == 1  # still only the FOGSI ANC entry
+        who = db.query(KnowledgeSource).filter(KnowledgeSource.name == "guide-who-iron-folate-001").one()
+        assert who.url and who.authority == "World Health Organization"
+        assert who.review_status == "pending"
