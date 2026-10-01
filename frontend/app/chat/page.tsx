@@ -443,8 +443,8 @@ function ChatContent() {
             suggestions: data.suggestions,
             streaming: false,
           });
-          // Don't distract from an urgent-care answer with links.
-          if (!URGENT_STATUSES.has(safety)) void attachResources(data.message_id, trimmed, opts?.topic);
+          // No links on an urgent-care answer, and none when the answer found no evidence at all.
+          if (!URGENT_STATUSES.has(safety) && data.sources.length > 0) void attachResources(data.message_id, trimmed, opts?.topic);
         },
         onError: (message) => {
           patchMessage(assistantId, { text: message, streaming: false, failed: true });

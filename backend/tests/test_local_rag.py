@@ -275,3 +275,11 @@ def test_knowledge_graph_endpoint_shows_only_what_approved_passages_support(clie
 def test_trace_carries_the_quoted_sentences(engine: Engine) -> None:
     trace = compose(engine, search(engine, "how much iron and folic acid")).trace
     assert any("30-60 mg" in q for p in trace["passages"] for q in p["quotes"])
+
+
+def test_no_recommendations_attach_to_an_answer_with_no_evidence(client: TestClient, admin_headers, auth_headers) -> None:
+    client.put("/profile", headers=auth_headers, json={"consent": True, "consent_version": "v1.0"})
+    client.put("/pregnancy", headers=auth_headers, json={"current_week": 22, "first_pregnancy": True})
+    _approve_seed(client, admin_headers)
+    res = client.post("/chat", headers=auth_headers, json={"message": "What is the best programming language?"}).json()
+    assert res["citations"] == [] and res["recommendations"] == []

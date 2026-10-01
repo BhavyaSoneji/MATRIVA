@@ -420,7 +420,7 @@ function MapWidget({ q, onAsk }: { q?: string; onAsk?: (question: string) => voi
   const presentTypes = Array.from(new Set(graph.nodes.map((n) => n.type)));
   return (
     <WidgetFrame title="Knowledge map">
-      <svg viewBox="0 0 640 400" role="img" aria-label="Map of related topics" className="w-full">
+      <svg viewBox="0 0 640 400" role="img" aria-label="Map of related topics" className="mx-auto max-h-[420px] w-full">
         {graph.edges.map((e) => {
           const a = pos[e.source];
           const b = pos[e.target];

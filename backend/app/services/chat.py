@@ -331,7 +331,7 @@ def process_chat(
         sources=[item.model_dump(mode="json") for item in sources],
     )
 
-    if user is not None and stage and action is None:
+    if user is not None and stage and action is None and safety_status != SafetyStatus.INSUFFICIENT_INFORMATION:
         recommendations = generate_recommendations(db, user, intent=intent, limit=3)
 
     evidence = {
@@ -537,7 +537,7 @@ def stream_chat(
         sources=[item.model_dump(mode="json") for item in sources],
     )
 
-    if user is not None and stage and action is None:
+    if user is not None and stage and action is None and safety_status != SafetyStatus.INSUFFICIENT_INFORMATION:
         recommendations = generate_recommendations(db, user, intent=intent, limit=3)
 
     evidence = {
