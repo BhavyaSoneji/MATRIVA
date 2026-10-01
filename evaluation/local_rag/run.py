@@ -25,7 +25,8 @@ for p in (_REPO / "backend", _REPO / "ingestion"):
     if str(p) not in sys.path:
         sys.path.insert(0, str(p))
 
-from pipelines.ocr_english import build_sections  # noqa: E402
+from pipelines.book_structure import build_outline, section_for  # noqa: E402
+from pipelines.ocr_english import chunk_paragraphs, extract_paragraphs, split_pages  # noqa: E402
 
 from app.rag.local.composer import compose  # noqa: E402
 from app.rag.local.corpus import Engine  # noqa: E402
@@ -59,19 +60,27 @@ def build_passages(include_book: bool = True) -> list[Passage]:
             )
         )
     if include_book and BOOK.exists():
-        for section in build_sections(BOOK.read_text(encoding="utf-8")):
-            doc_id = f"book-{section.page_start}-{section.page_end}"
-            for i, chunk in enumerate(section.chunks):
+        raw = BOOK.read_text(encoding="utf-8")
+        pages = dict(split_pages(raw))
+        chapters, _ = build_outline(raw)
+        for ch in chapters:
+            paras = []
+            for page in range(ch.scan_start, ch.scan_end + 1):
+                paras += extract_paragraphs(page, pages.get(page, ""))
+            for i, chunk in enumerate(chunk_paragraphs(paras)):
+                sec = section_for(ch, chunk.page_start)
+                title = f"Prasuti Tantra - Chapter {ch.number}: {ch.title_en}"
                 passages.append(
                     Passage(
-                        id=f"{doc_id}-{i}",
+                        id=f"book-ch{ch.number}-{i}",
                         text=chunk.text,
-                        tokens=tokens(f"{chunk.text} {section.title}"),
+                        tokens=tokens(f"{chunk.text} {title} {sec.title_en if sec else ''} {ch.title_en}"),
                         meta={
-                            "title": section.title, "document_id": doc_id, "source_id": "prasuti-tantra",
+                            "title": title, "document_id": f"book-ch{ch.number}", "source_id": "prasuti-tantra",
                             "domain": "ayurveda", "stage": None, "region": "IN", "evidence_level": "traditional",
-                            "source_type": "traditional", "readability": chunk.quality,
-                            "locator": f"scanned p. {chunk.page_start}",
+                            "source_type": "traditional", "readability": chunk.quality, "chapter": ch.number,
+                            "section": sec.title_en if sec else None,
+                            "locator": f"Ch. {ch.number} \u203a {sec.title_en if sec else ''} \u00b7 scanned p. {chunk.page_start}",
                         },
                     )
                 )
