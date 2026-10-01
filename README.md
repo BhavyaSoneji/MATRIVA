@@ -536,15 +536,17 @@ The full list, with the reasoning, is in [`docs/roadmap.md`](./docs/roadmap.md).
 
 ---
 
-## 👥 Team
+## 👥 Team and contributing
 
 | | Workstream | Owner |
 |---|---|---|
-| 🧠 | RAG · AI · Safety · Testing · Review | [@neevmodh](https://github.com/neevmodh) |
+| 🧠 | RAG · AI · Safety · Guard rails · Testing · Review | [@neevmodh](https://github.com/neevmodh) |
 | ⚙️ | Backend · Database · API | [@BhavyaSoneji](https://github.com/BhavyaSoneji) |
 | 🎨 | Frontend · UI | [@Rajodedra](https://github.com/Rajodedra) |
 
-Ownership routing lives in [`.github/CODEOWNERS`](./.github/CODEOWNERS). After every meaningful change, add a line to [`PROGRESS.md`](./PROGRESS.md).
+Ownership routing lives in [`.github/CODEOWNERS`](./.github/CODEOWNERS). To help, read [`CONTRIBUTING.md`](./CONTRIBUTING.md): it covers setup, how to add a guard rail, and what a pull request needs. After every meaningful change, add an entry to [`PROGRESS.md`](./PROGRESS.md). To report a vulnerability, see [`SECURITY.md`](./SECURITY.md).
+
+**Licence:** none has been chosen yet, so by default all rights are reserved. Pick one before sharing the code.
 
 ---
 
