@@ -260,6 +260,21 @@ How the rules work, what they contain and where they stop: [`docs/guardrails.md`
 
 ---
 
+## 🔐 Your privacy
+
+| | |
+|---|---|
+| **Consent first** | Health details, readings, meals and your safety profile are stored only after explicit consent, with a consent version on record |
+| **Your safety profile stays rules-side** | Conditions, medicines, allergies, age and blood group are used by the guard rails inside the backend. They are never sent to an AI model |
+| **Export** | `GET /privacy/export` returns everything stored about you as JSON |
+| **Delete** | Withdrawing consent, deleting your profile or deleting your account removes your health and care data |
+| **Logs** | Request logs carry metadata and hashes, not your questions, answers, tokens or health fields |
+| **Questions are not recorded as readings** | Only plain statements ("my Hb is 9.8"), and only with consent |
+
+The full data map and what is and is not stored: [`docs/privacy.md`](./docs/privacy.md).
+
+---
+
 ## 🏗️ Architecture
 
 ```mermaid
