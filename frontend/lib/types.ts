@@ -299,6 +299,9 @@ export interface TracePassage {
   matched_terms: string[];
   matched_concepts: string[];
   quotes: string[];
+  chapter?: number | null;
+  section?: string | null;
+  original_hi?: string | null;
   source: string | null;
   url: string | null;
 }
@@ -336,4 +339,45 @@ export interface KnowledgeGraphResponse {
   types: Record<string, string>;
   focus: string[];
   stats: { concepts: number; concepts_found: number; edges: number; passages: number };
+}
+
+export interface BookSection {
+  title_en: string;
+  title_hi: string;
+  printed_page: number;
+  scan_page: number;
+}
+
+export interface BookChapter {
+  number: number;
+  title_en: string;
+  title_hi: string;
+  scan_start: number;
+  scan_end: number;
+  english_chunks: number;
+  english_words: number;
+  sections: BookSection[];
+  concepts: { id: string; label: string; count: number }[];
+  authorities: Record<string, number>;
+  key_terms: string[];
+}
+
+export interface BookOutline {
+  available: boolean;
+  title?: string;
+  author?: string;
+  publisher?: string;
+  source?: string;
+  chapters: BookChapter[];
+  authorities: Record<string, number>;
+  stats: Record<string, number>;
+  /** chapter number (as a string key) -> review status of that chapter's text */
+  review?: Record<string, string>;
+}
+
+export interface GlossaryEntry {
+  hi: string;
+  en: string;
+  count: number;
+  source: "contents" | "body";
 }
