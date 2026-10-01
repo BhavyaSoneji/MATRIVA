@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   output: "standalone",
+  // Old per-feature pages now live inside the chat; keep bookmarks working.
+  async redirects() {
+    return ["dashboard", "nutrition", "ayurveda", "lifestyle", "guidance", "sources", "recommendations"].map(
+      (page) => ({ source: `/${page}`, destination: "/chat", permanent: false })
+    );
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
