@@ -41,6 +41,16 @@ Modern guidelines and classical Ayurveda, reconciled week by week. Every answer 
 
 ---
 
+## 👋 What is MATRIVA?
+
+MATRIVA is a pregnancy companion for India that lives in a single chat window. A mother can ask a question in English, Hindi, Hinglish or Gujarati, log how she feels, record a haemoglobin reading or a meal, see her visit calendar, and get one printable page for her doctor, without hunting through menus.
+
+It is built for **mothers, and for the ANM, ASHA or doctor who looks after them**. What it gives back is always one of three things: an answer quoted from a reviewed source with the source named, a plain "I don't have a reviewed source for that", or a push towards a real person (112, a doctor, a helpline).
+
+It is **not** a doctor. It does not diagnose, prescribe, dose, or tell anyone to start, stop or change a medicine.
+
+---
+
 ## ✨ What it does
 
 Everything lives in **one chat window**. Ask in your own words, tap a sidebar shortcut, or type `/` for commands. There are no feature pages to hunt through.
