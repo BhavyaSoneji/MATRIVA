@@ -69,14 +69,17 @@ answer.
 
 ## Privacy and abuse controls
 
-- Explicit consent is required before profile/pregnancy data is stored.
-- Consent withdrawal deletes the associated profile data.
+- Explicit consent is required before profile, pregnancy, care and safety-profile data is stored.
+- Consent withdrawal deletes the associated profile data; deleting the profile also deletes all care data; deleting the account also deletes chat history ([`privacy.md`](./privacy.md) has the full map, including the one gap).
 - Account export and deletion are available to the account owner.
+- The safety profile (conditions, current medicines, allergies, age, blood group) is read only by the guard rails inside the backend and is never sent to a model.
 - Chat session context is separate from permanent profile records.
-- Raw health text, passwords, JWTs, and generated answers are excluded from normal logs.
-- Rate limits apply to auth, chat, and public knowledge routes.
+- Raw health text, passwords, JWTs, and generated answers are excluded from normal logs; safety events store a hash of the question.
+- Rate limits apply to the auth, chat and knowledge routes (the care, profile and privacy routes are not yet limited; see [`roadmap.md`](./roadmap.md)).
 - Uploads are extension/MIME/size checked, hashed, reviewed, and indexed before activation.
 - Audit records cover document decisions, safety-rule changes, exports, deletions, and consent.
 
-Clinical thresholds and wording require qualified medical review. Engineering tests cannot
-certify clinical correctness or replace a clinical governance process.
+Clinical thresholds, medicine rules and wording require qualified medical review, and the Hindi
+and Gujarati text needs native-speaker review. Engineering tests cannot certify clinical
+correctness or replace a clinical governance process. [`clinical-review.md`](./clinical-review.md)
+says what a reviewer has to check.
