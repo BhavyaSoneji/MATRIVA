@@ -494,14 +494,26 @@ Start with [`docs/README.md`](./docs/README.md), the index. The most useful page
 
 ## ⚠️ Honest limits
 
-- **Not clinically reviewed.** Every threshold, schedule and screening question cites a source (WHO, FOGSI, ICMR-NIN, NHS) and is marked `pending_clinical_review` in [`care_rules.yaml`](./backend/app/data/care_rules.yaml). A clinician must review it before real use. The Hindi and Gujarati warning phrases need native-speaker review.
-- **The guard rails are not clinically verified.** The 1,231 rules were written from public pregnancy-safety knowledge and each names the reference it is consistent with; nobody has yet checked each rule line by line against its reference, and no clinician or pharmacist has signed them off. They err towards "ask your doctor". Unlisted brand names, heavy misspelling, and a medicine described without a name are not recognised. See [`docs/guardrails.md`](./docs/guardrails.md#honest-limits).
+**Clinical review: nothing has been signed off**
+
+- **Care rules.** Every threshold, schedule and screening question cites a source (WHO, FOGSI, ICMR-NIN, NHS) and is marked `pending_clinical_review` in [`care_rules.yaml`](./backend/app/data/care_rules.yaml). A clinician must review it before real use.
+- **Guard rails.** The 1,231 rules were written from public pregnancy-safety knowledge and each names the reference it is consistent with. Nobody has checked each rule line by line against its reference, and no clinician or pharmacist has signed them off. They err towards "ask your doctor". See [`docs/guardrails.md`](./docs/guardrails.md#honest-limits).
+- **Hindi and Gujarati.** The warning phrases, refusals and emergency messages need native-speaker review.
 - **Approved on instruction, not by a reviewer.** The book and seeded guidelines were approved so answers could flow; they are flagged as not clinically reviewed.
-- **The book OCR is imperfect.** Only English prose is used and damaged passages are not quoted.
-- **Nutrient numbers are estimates** — USDA per-100g data and everyday portions (a *katori*, a roti).
-- **Reminders show only while the app is open.** There is no push or SMS channel yet.
-- **Retrieval has known weak spots:** paraphrases with no shared vocabulary, and the occasional rare-word out-of-scope question that slips through. Measured, not hidden — see [`docs/local-rag.md`](./docs/local-rag.md).
-- **Branch protection is not enabled** on `main`.
+- **Traditional content** (the book's regimen) is classical knowledge, not modern evidence, and is labelled as such.
+
+**What the data can and cannot do**
+
+- **The book OCR is imperfect.** Only English prose is used and damaged passages are not quoted. Four food-guide entries had to be restated.
+- **Nutrient numbers are estimates:** USDA per-100 g values for 67 foods and everyday portions (a *katori*, a roti), not a full Indian food table.
+- **The brand list is incomplete.** An unlisted medicine brand is recognised only if its generic name is typed; heavy misspelling and "the white tablet my aunt gave me" are not recognised.
+
+**What the software does not do yet**
+
+- **Reminders show only while the app is open.** There is no push or SMS channel.
+- **Answers are in English.** Questions in Hindi and Gujarati are understood and refusals are translated, but retrieved answers are not.
+- **Retrieval has known weak spots:** paraphrases with no shared vocabulary, and the occasional rare-word out-of-scope question that slips through. Measured, not hidden: see [`docs/local-rag.md`](./docs/local-rag.md).
+- **Branch protection is not enabled** on `main`, and there is no licence file yet.
 
 ---
 
