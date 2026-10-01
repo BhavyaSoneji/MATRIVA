@@ -215,25 +215,37 @@ A scanned, bilingual copy of **Prasuti Tantra** was OCR'd, its English prose ext
 
 ## 🛡️ Safety by design
 
-**1,231 guard-rail rules**, each with a source, in English, Hinglish, हिन्दी and ગુજરાતી: 918 medicines (including Indian brand names and typos), 205 herbs, foods and exposures, 44 rules tied to your own conditions, 28 warning signs, 15 standing reminders, 9 request rules and 12 checks on the bot's own answer. Tell MATRIVA your conditions, medicines, allergies, age and blood group in Settings and the warnings become personal: a headache is an emergency if you have high blood pressure; a penicillin allergy is called out. Nothing is sent to an AI model.
+Safety is its own layer, written as plain rules that behave the same way every time. It is never delegated to a language model, and if it fails, MATRIVA fails closed.
+
+| Layer | What it does |
+|---|---|
+| **Emergency pre-check** | Red-flag terms in English, Hindi, Hinglish and Gujarati short-circuit to 112 before anything else runs |
+| **Guard rails** (1,231 rules) | Medicines, herbs, foods, exposures, warning signs and risky requests, each with a source. Escalate, refuse, or add a caution |
+| **Your own profile** | With consent, your conditions, medicines, allergies, history, age and blood group make warnings personal |
+| **Retrieval gate** | Only approved, active documents can ground an answer; too little evidence means no answer |
+| **Output check** | Any answer that gives a dose, calls a medicine safe, diagnoses or falsely reassures is replaced whole |
+| **Screening and thresholds** | 20 sourced questions and WHO, FOGSI and ICMR-NIN reading thresholds, outside any model |
 
 ```mermaid
 flowchart TB
     subgraph Rules["Independent of any LLM"]
       A[Red-flag terms<br/>EN · हिन्दी · Hinglish · ગુજરાતી]
+      G[Guard rails<br/>1,231 sourced rules]
       B[Structured screening<br/>20 sourced questions]
       C[Reading thresholds<br/>WHO · FOGSI · ICMR-NIN]
+      O[Output check on the answer]
     end
     Rules --> D{{Fail closed}}
     D --> E[Never an unrestricted medical answer]
 ```
 
 - 🔒 **Medicine questions are never answered.** Not even paracetamol; not a dose, not "safe to take". Cautions go in front of an ordinary answer, and the rule behind each one is one click away with its source.
-- 🚫 Safety is its **own module**, never delegated to a language model; if it fails, the system **fails closed**.
 - 🏷️ Ayurvedic content is always labelled *traditional* and never presented as modern evidence.
 - 🧱 Retrieved text is **data, never instructions** (prompt-injection defence).
-- 🔐 Health data is **consent-gated**; withdrawing consent, deleting the profile or the account **purges** it; `/privacy/export` includes it.
-- 🧾 Only **approved, active** documents can ground an answer — approving a document is a deliberate human step.
+- 🧾 Only **approved, active** documents can ground an answer: approving a document is a deliberate human step.
+- 🔐 Health data is **consent-gated**; see [Your privacy](#-your-privacy).
+
+How the rules work, what they contain and where they stop: [`docs/guardrails.md`](./docs/guardrails.md). The rules are **not yet clinically verified**.
 
 ---
 
