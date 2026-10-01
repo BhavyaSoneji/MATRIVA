@@ -1,16 +1,23 @@
-"""Hybrid retrieval over the local index -- the middle of the RAG pipeline.
+"""Advanced hybrid retrieval over the local index -- the middle of the RAG pipeline.
 
-    query
-      -> analyse   (stemmed tokens, corpus synonyms, concepts found, related concepts)
-      -> filter    (pregnancy stage, region, domain)
-      -> retrieve  (BM25 | character-n-gram TF-IDF | concept match -- three independent rankings)
-      -> fuse      (reciprocal rank fusion)
-      -> rerank    (query coverage, term proximity, concept coverage, evidence strength, text quality,
-                    stage fit, diet fit)
-      -> diversify (maximal marginal relevance + per-source / per-document caps)
-      -> judge     (confidence, and whether the evidence is sufficient to answer at all)
+    question
+      -> understand   intent (definition / quantity / safety / how-to / list / comparison), authorities named,
+                      compound questions split when their halves are never discussed together
+      -> analyse      stemmed tokens, corpus synonyms, concepts found, related concepts (knowledge graph)
+      -> filter       region and domain (pregnancy stage is a preference, applied in the rerank)
+      -> retrieve     seven independent signals, each its own ranking:
+                        BM25 (words) | character n-gram TF-IDF (OCR / spelling tolerant) | concept match |
+                        latent semantic analysis (same meaning, different words) |
+                        structure (section / chapter titles) | graph activation (personalised PageRank over the
+                        concept graph: multi-hop) | pseudo-relevance feedback (vocabulary the best passages use)
+      -> fuse         weighted reciprocal rank fusion
+      -> rerank       coverage, term proximity, concept coverage, title match, semantic similarity, evidence strength,
+                      text quality, stage fit, diet fit, authority named in the question
+      -> diversify    maximal marginal relevance + per-source / per-document caps
+      -> judge        idf-weighted sufficiency gate: answer, or refuse
 
-Nothing here calls a model or the network.
+Every signal can be switched off through `Config`, which is how the ablation study in evaluation/local_rag measures what
+each one contributes. Nothing here calls a model or the network.
 """
 
 from __future__ import annotations
@@ -20,9 +27,12 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from app.rag.local import authorities as authority_lexicon
+from app.rag.local import feedback
 from app.rag.local.corpus import Engine
 from app.rag.local.index import K1
 from app.rag.local.text import sentences, tokens
+from app.rag.local.understanding import QueryPlan, analyze
 
 RRF_K = 60
 CANDIDATES = 50
@@ -52,6 +62,27 @@ MIN_UNION_COVERAGE = 0.50
 TOP_FOR_EVIDENCE = 5
 
 
+@dataclass(frozen=True)
+class Config:
+    """Which retrieval signals are on. The defaults are the production pipeline; the ablation study flips them."""
+
+    bm25: bool = True
+    ngram: bool = True
+    concept: bool = True
+    semantic: bool = True  # latent semantic analysis
+    structure: bool = True  # section / chapter titles
+    graph: bool = True  # personalised PageRank over the concept graph
+    feedback: bool = True  # pseudo-relevance feedback
+    authority: bool = True
+    decompose: bool = True
+
+
+DEFAULT = Config()
+
+# weight of each signal's ranking in the fusion
+SIGNAL_WEIGHT = {"bm25": 1.0, "ngram": 0.7, "concept": 0.7, "semantic": 0.4, "structure": 0.8, "graph": 0.3, "feedback": 0.5}
+
+
 @dataclass
 class Hit:
     idx: int
@@ -62,10 +93,15 @@ class Hit:
     bm25: float = 0.0
     ngram: float = 0.0
     concept: float = 0.0
+    semantic: float = 0.0
+    structure: float = 0.0
+    graph: float = 0.0
     coverage: float = 0.0
     proximity: float = 0.0
+    covered: frozenset[str] = frozenset()  # question terms the passage covers, literally or through a concept
     matched_terms: list[str] = field(default_factory=list)
     matched_concepts: list[str] = field(default_factory=list)
+    authorities: list[str] = field(default_factory=list)  # authorities named in the question that this passage cites
 
 
 @dataclass
@@ -89,6 +125,12 @@ class Retrieval:
     sentence_coverage: float = 0.0
     union_coverage: float = 0.0
     quantity_intent: bool = False  # "how much / how many / dose": prefer sentences that state a number
+    intent: str = "general"
+    authorities: list[str] = field(default_factory=list)  # authorities named in the question
+    feedback_terms: list[str] = field(default_factory=list)  # words the best passages added to the search
+    activated: list[str] = field(default_factory=list)  # concepts reached by graph activation (beyond those asked)
+    sub_queries: list[str] = field(default_factory=list)
+    signals: list[str] = field(default_factory=list)  # which retrieval signals contributed candidates
 
 
 _QUANTITY_RE = re.compile(r"\bhow (?:much|many|often|long)\b|\bdose\b|\bdosage\b|\bamount\b|\bquantit|\bportions?\b|\bper day\b|\bhow big\b", re.IGNORECASE)
@@ -127,15 +169,48 @@ def _jaccard(a: frozenset[str], b: frozenset[str]) -> float:
 
 
 def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k: int = 6,
-           domains: set[str] | None = None) -> Retrieval:
+           domains: set[str] | None = None, config: Config = DEFAULT) -> Retrieval:
+    """Retrieve for `query`. Compound questions whose halves are never discussed together are retrieved part by part
+    and merged round-robin, so neither half drowns the other."""
+    plan = analyze(query, engine.graph, decompose=config.decompose)
+    if len(plan.sub_queries) >= 2:
+        subs = [_search_one(engine, q, plan, profile, max(2, math.ceil(k / len(plan.sub_queries))), domains, config)
+                for q in plan.sub_queries]
+        merged: list[Hit] = []
+        seen: set[str] = set()
+        for rank in range(max(len(r.hits) for r in subs)):
+            for r in subs:
+                if rank < len(r.hits) and r.hits[rank].id not in seen:
+                    seen.add(r.hits[rank].id)
+                    merged.append(r.hits[rank])
+        if merged and any(r.sufficient for r in subs):
+            best = max(subs, key=lambda r: r.confidence)
+            best_tokens = list(dict.fromkeys(t for r in subs for t in r.query_tokens))
+            return Retrieval(
+                merged[:k], best_tokens, list(dict.fromkeys(c for r in subs for c in r.concepts)), best.expanded,
+                round(sum(r.confidence for r in subs) / len(subs), 3), True, "enough evidence (each part of the question answered separately)",
+                best.pool, best.sentence_coverage, best.union_coverage, wants_quantity(query), plan.intent,
+                plan.authorities, [t for r in subs for t in r.feedback_terms], [c for r in subs for c in r.activated],
+                plan.sub_queries, best.signals,
+            )
+    return _search_one(engine, query, plan, profile, k, domains, config)
+
+
+def _search_one(engine: Engine, query: str, plan: QueryPlan, profile: UserProfile | None, k: int,
+                domains: set[str] | None, config: Config) -> Retrieval:
     profile = profile or UserProfile()
     index, graph = engine.index, engine.graph
     q_tokens = list(dict.fromkeys(tokens(query)))
     if not q_tokens or index.size == 0:
-        return Retrieval([], q_tokens, [], {}, 0.0, False, "empty query or empty knowledge base")
+        return Retrieval([], q_tokens, [], {}, 0.0, False, "empty query or empty knowledge base", intent=plan.intent)
 
-    concepts = graph.detect(q_tokens)
+    spans = graph.detect_spans(q_tokens)
+    concepts = list(spans)
     expanded = graph.expand(concepts)
+    q_concepts = set(concepts)
+    qset = set(q_tokens)
+    # "...in Ayurveda" names the kind of source wanted; it is not a word the passage has to contain
+    content = (qset - TRADITIONAL_CUES) or qset
 
     # ---- filters. Region and domain are hard filters; pregnancy stage is only a preference (see the rerank):
     # morning sickness is "first trimester" content, but a woman in week 22 may still ask about it.
@@ -148,65 +223,113 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
     if not allowed:  # never let a filter silently return nothing when the unfiltered corpus has candidates
         allowed = set(range(index.size))
 
-    # ---- three independent retrievals
+    # ---- signal 1-3: BM25, character n-grams, concept match
     weights: dict[str, float] = {t: 1.0 for t in q_tokens}
     for cid, w in expanded.items():  # related concepts add a quieter signal
         for term in (graph.concepts[cid].phrases[0] if graph.concepts[cid].phrases else ()):
             weights.setdefault(term, 0.0)
             weights[term] = max(weights[term], 0.35 * w)
-    bm25 = index.bm25(weights, allowed)
-    ngram = index.ngram_cosine(query, allowed)
-    q_concepts = set(concepts)
+    bm25 = index.bm25(weights, allowed) if config.bm25 else {}
+    ngram = index.ngram_cosine(query, allowed) if config.ngram else {}
     concept_score: dict[int, float] = {}
-    total_w = len(q_concepts) + 0.5 * sum(1 for _ in expanded) or 1.0
-    for i in allowed:
-        present = graph.passage_concepts[i]
-        s = len(q_concepts & present) + 0.5 * sum(1 for cid in expanded if cid in present)
-        if s:
-            concept_score[i] = s / total_w
+    if config.concept:
+        total_w = len(q_concepts) + 0.5 * sum(1 for _ in expanded) or 1.0
+        for i in allowed:
+            present = graph.passage_concepts[i]
+            s = len(q_concepts & present) + 0.5 * sum(1 for cid in expanded if cid in present)
+            if s:
+                concept_score[i] = s / total_w
 
-    ranks = [_rank(bm25), _rank(ngram), _rank(concept_score)]
-    fused: dict[int, float] = {}
-    for r in ranks:
-        for i, rank in r.items():
-            fused[i] = fused.get(i, 0.0) + 1.0 / (RRF_K + rank)
+    # ---- signal 4: latent semantic analysis
+    semantic = index.semantic.scores(q_tokens, allowed) if config.semantic else {}
+
+    # ---- signal 5: structure (section / chapter / document titles)
+    structure = index.structure_scores(qset, allowed) if config.structure else {}
+
+    # ---- signal 6: graph activation (multi-hop over the concept graph)
+    graph_score: dict[int, float] = {}
+    activated: list[str] = []
+    if config.graph and q_concepts:
+        activation = graph.activation({c: 1.0 for c in q_concepts})
+        activated = [c for c, a in sorted(activation.items(), key=lambda kv: -kv[1]) if c not in q_concepts and a > 0.02][:6]
+        for i in allowed:
+            present = graph.passage_concepts[i]
+            if present:
+                a = sum(activation.get(c, 0.0) for c in present)
+                if a > 0:
+                    graph_score[i] = a / math.sqrt(len(present))
+
+    # ---- first fusion, then signal 7: pseudo-relevance feedback from the passages that fused best
+    signals = {"bm25": bm25, "ngram": ngram, "concept": concept_score, "semantic": semantic,
+               "structure": structure, "graph": graph_score}
+
+    def fuse(sig: dict[str, dict[int, float]]) -> dict[int, float]:
+        out: dict[int, float] = {}
+        for name, scores in sig.items():
+            for i, rank in _rank(scores).items():
+                out[i] = out.get(i, 0.0) + SIGNAL_WEIGHT[name] / (RRF_K + rank)
+        return out
+
+    fused = fuse(signals)
+    feedback_terms: list[str] = []
+    if config.feedback and fused and config.bm25:
+        first = sorted(fused.items(), key=lambda kv: -kv[1])
+        extra = feedback.expansion_terms(index, first, qset)
+        if extra:
+            feedback_terms = list(extra)
+            signals["feedback"] = index.bm25({**weights, **{t: w for t, w in extra.items() if t not in weights}}, allowed)
+            fused = fuse(signals)
     if not fused:
-        return Retrieval([], q_tokens, concepts, expanded, 0.0, False, "nothing matched the question", len(allowed))
+        return Retrieval([], q_tokens, concepts, expanded, 0.0, False, "nothing matched the question", len(allowed), intent=plan.intent)
     top_fused = max(fused.values())
     max_bm25 = sum(w * index.idf(t) * (K1 + 1) for t, w in weights.items()) or 1.0
+    max_sem = max(semantic.values(), default=1.0) or 1.0
+    asked_authorities = set(plan.authorities) if config.authority else set()
 
     # ---- rerank on interpretable features
-    qset = set(q_tokens)
     hits: list[Hit] = []
     for i, f in fused.items():
         p = index.passages[i]
-        matched = qset & p.token_set
-        coverage = len(matched) / len(qset)
+        matched = content & p.token_set
+        # a term is also covered when the passage mentions the concept that term named ("kicks" ~ "baby's movements")
+        covered = frozenset(matched | {t for c in q_concepts & graph.passage_concepts[i] for t in spans[c] if t in content})
+        coverage = len(matched) / len(content)  # ranking stays literal; concept-level coverage only decides sufficiency
         concept_cov = len(q_concepts & graph.passage_concepts[i]) / len(q_concepts) if q_concepts else 0.0
         prox = _proximity(p.tokens, matched)
         evidence = EVIDENCE_WEIGHT.get(str(p.meta.get("evidence_level", "")).lower(), 0.5)
         quality = float(p.meta.get("readability", 1.0))
         passage_stage = p.meta.get("stage")
         stage_fit = 1.0 if profile.stage and passage_stage == profile.stage else 0.0
-        title_cov = len(qset & frozenset(tokens(str(p.meta.get("title", ""))))) / len(qset)
+        title_cov = len(content & frozenset(tokens(str(p.meta.get("title", ""))))) / len(content)
+        sem = semantic.get(i, 0.0) / max_sem
+        struct = structure.get(i, 0.0)
         score = (
-            0.42 * f / top_fused
-            + 0.20 * coverage
-            + 0.10 * prox
+            0.36 * f / top_fused
+            + 0.17 * coverage
+            + 0.08 * prox
             + 0.10 * concept_cov
-            + 0.08 * title_cov
+            + 0.06 * title_cov
+            + 0.05 * sem
+            + 0.07 * struct
             + 0.04 * evidence
             + 0.03 * quality
-            + 0.03 * stage_fit
+            + 0.02 * stage_fit
         )
         if profile.stage and passage_stage not in (None, "all", profile.stage):
             score *= 0.93  # written for another stage: still reachable, just less preferred
-        if p.meta.get("topic") == "nutrient_profile" and not any(
-            graph.concepts[c].type == "food" for c in q_concepts
-        ):
+        if p.meta.get("topic") == "nutrient_profile" and not any(graph.concepts[c].type == "food" for c in q_concepts):
             score *= 0.7  # "how much iron do I need?" is about intake guidance, not about one food's label
-        if qset & TRADITIONAL_CUES and not (p.meta.get("domain") == "ayurveda" or p.meta.get("source_type") == "traditional"):
-            score *= 0.65
+        traditional = p.meta.get("domain") == "ayurveda" or p.meta.get("source_type") == "traditional"
+        if qset & TRADITIONAL_CUES:
+            if not traditional:
+                score *= 0.65
+        elif traditional:
+            # Nobody asked for the classical view. The book is 85% of all passages and its OCR is full of everyday
+            # words, so without this prior it would out-rank modern guidance on questions like "constipation".
+            score *= 0.6 + 0.15 * quality
+        cited = [a for a in asked_authorities if a in p.meta.get("authorities", {})]
+        if asked_authorities:
+            score *= 1.25 if cited else 0.85  # "what does Caraka say": prefer passages that cite him
         if profile.diet in {"vegetarian", "vegan"} and (graph.passage_concepts[i] & _ANIMAL_CONCEPTS) and not (
             q_concepts & _ANIMAL_CONCEPTS
         ):
@@ -215,8 +338,10 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
             Hit(
                 idx=i, id=p.id, meta=p.meta, text=p.text, score=score,
                 bm25=bm25.get(i, 0.0) / max_bm25, ngram=ngram.get(i, 0.0), concept=concept_cov,
-                coverage=coverage, proximity=prox,
+                semantic=sem, structure=struct, graph=graph_score.get(i, 0.0),
+                coverage=coverage, proximity=prox, covered=covered,
                 matched_terms=sorted(matched), matched_concepts=sorted(q_concepts & graph.passage_concepts[i]),
+                authorities=cited,
             )
         )
     hits.sort(key=lambda h: -h.score)
@@ -248,31 +373,41 @@ def search(engine: Engine, query: str, *, profile: UserProfile | None = None, k:
         tables += best.meta.get("topic") == "nutrient_profile"
 
     # ---- judge
+    contributing = [name for name, sc in signals.items() if sc]
     if not chosen:
-        return Retrieval([], q_tokens, concepts, expanded, 0.0, False, "no passage survived filtering", len(allowed))
+        return Retrieval([], q_tokens, concepts, expanded, 0.0, False, "no passage survived filtering", len(allowed), intent=plan.intent)
     top = chosen[0]
     max_idf = math.log(1 + (index.size + 0.5) / 0.5)
 
     def weight(term: str) -> float:  # a word that appears nowhere in the corpus is maximally informative -- and unmatched
         return index.idf(term) if index.df.get(term) else max_idf
 
-    total = sum(weight(t) for t in q_tokens) or 1.0
+    total = sum(weight(t) for t in content) or 1.0
     best_sentence, union = 0.0, set()
     for hit in chosen[:TOP_FOR_EVIDENCE]:
-        union |= qset & index.passages[hit.idx].token_set
+        union |= hit.covered
         for sent in sentences(hit.text) or [hit.text]:
-            best_sentence = max(best_sentence, sum(weight(t) for t in qset & set(tokens(sent))) / total)
+            sent_tokens = tokens(sent)
+            sent_covered = content & set(sent_tokens)
+            for cid in set(graph.detect(sent_tokens)) & q_concepts:  # same concept, different words
+                sent_covered |= spans[cid] & content
+            best_sentence = max(best_sentence, sum(weight(t) for t in sent_covered) / total)
     union_cov = sum(weight(t) for t in union) / total
-    confidence = round(min(1.0, 0.40 * min(best_sentence / 0.8, 1.0) + 0.35 * union_cov + 0.25 * top.coverage), 3)
+    top_covered = len(top.covered) / len(content)
+    confidence = round(min(1.0, 0.40 * min(best_sentence / 0.8, 1.0) + 0.35 * union_cov + 0.25 * top_covered), 3)
     sufficient = (
-        top.coverage >= MIN_COVERAGE and best_sentence >= MIN_SENTENCE_COVERAGE and union_cov >= MIN_UNION_COVERAGE
+        top_covered >= MIN_COVERAGE and best_sentence >= MIN_SENTENCE_COVERAGE and union_cov >= MIN_UNION_COVERAGE
     )
     reason = (
         "enough evidence"
         if sufficient
         else (
             f"the closest passages match only part of the question (best sentence {best_sentence:.0%}, "
-            f"passages together {union_cov:.0%}, best passage {top.coverage:.0%}); not enough to answer reliably"
+            f"passages together {union_cov:.0%}, best passage {top_covered:.0%}); not enough to answer reliably"
         )
     )
-    return Retrieval(chosen, q_tokens, concepts, expanded, confidence, sufficient, reason, len(allowed), round(best_sentence, 3), round(union_cov, 3), wants_quantity(query))
+    return Retrieval(
+        chosen, q_tokens, concepts, expanded, confidence, sufficient, reason, len(allowed),
+        round(best_sentence, 3), round(union_cov, 3), wants_quantity(query), plan.intent, plan.authorities,
+        feedback_terms, activated, [], contributing,
+    )
