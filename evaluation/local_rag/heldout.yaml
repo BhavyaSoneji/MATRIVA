@@ -1,0 +1,37 @@
+# HELD-OUT questions for the offline RAG engine.
+#
+# Written after the engine was tuned on questions.yaml, in everyday wording that deliberately avoids the vocabulary of
+# the source documents (paraphrases, synonyms, compound and definition questions, questions about a named authority).
+# The engine was never tuned on these: run once, report whatever comes out. Expectations come from what the sources say.
+
+in_scope:
+  - {q: "I feel sick every morning, what can I do about it?", expect_docs: [guide-nhs-morning-sickness-001]}
+  - {q: "Is it okay to have a cup of chai every day?", expect_docs: [guide-who-caffeine-001, guide-nin-dos-donts-001]}
+  - {q: "My face and hands are swollen and I have a pounding headache, could it be serious?", expect_docs: [guide-nhs-preeclampsia-001]}
+  - {q: "How much weight should I put on during pregnancy?", expect_docs: [guide-nin-extra-food-001]}
+  - {q: "Do I need iron tablets and when should I begin them?", expect_docs: [guide-nin-iron-001, guide-who-iron-folate-001]}
+  - {q: "What can I eat to stop constipation?", expect_docs: [guide-nin-balanced-plate-001, guide-nhs-healthy-diet-001]}
+  - {q: "Which fish should I stay away from?", expect_docs: [guide-nhs-food-safety-001, guide-nhs-healthy-diet-001]}
+  - {q: "Are there any government benefits for expecting mothers in India?", expect_docs: [guide-in-pmmvy-001, guide-in-pmsma-001]}
+  - {q: "Do I need a tetanus injection while pregnant?", expect_docs: [guide-nin-dos-donts-001, guide-nhs-vaccines-001]}
+  - {q: "How can a vegetarian absorb more iron from food?", expect_docs: [guide-nin-iron-001]}
+  - {q: "How will I know labour has started?", expect_docs: [guide-nhs-labour-signs-001]}
+  - {q: "How many extra calories does an expecting mother need each day?", expect_docs: [guide-nin-extra-food-001]}
+  - {q: "Is jaggery good during pregnancy?", expect_docs: [guide-who-anaemia-001, seed-ifct-palak-001]}
+  - {q: "How much vitamin C do oranges have?", expect_docs: [food-usda-169097]}
+  - {q: "Can I eat papaya?", expect_docs: [food-usda-169926]}
+  - {q: "What should a pregnant woman know about smoking and tobacco?", expect_docs: [guide-nhs-smoking-001, guide-nin-dos-donts-001]}
+  - {q: "What is stanya?", expect_text: [stanya]}
+  - {q: "What is garbhasrava?", expect_text: [garbhasrava, abortion]}
+  - {q: "What does the Prasuti Tantra say about the five mahabhutas in the fetus?", expect_text: [mahabh]}
+  - {q: "Which classical authorities discuss the qualities of a wet nurse?", expect_text: [wet-nurse, wetnurse, wet nurse, dhatri]}
+
+out_of_scope:
+  - "Who is the prime minister of India?"
+  - "How do I lose weight fast on a keto diet?"
+  - "Explain how machine learning works"
+  - "What is the best smartphone to buy?"
+  - "How do I treat a cold in a newborn baby?"
+  - "Is it safe to travel by aeroplane in the last month?"
+  - "What does a doula do during birth?"
+  - "How can I invest in mutual funds?"

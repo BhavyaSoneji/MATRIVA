@@ -31,7 +31,8 @@ from pipelines.ocr_english import chunk_paragraphs, extract_paragraphs, split_pa
 from app.rag.local.composer import compose  # noqa: E402
 from app.rag.local.corpus import Engine  # noqa: E402
 from app.rag.local.index import Passage  # noqa: E402
-from app.rag.local.retriever import search  # noqa: E402
+from app.rag.local.retriever import DEFAULT as DEFAULT_CONFIG  # noqa: E402
+from app.rag.local.retriever import Config, search  # noqa: E402
 from app.rag.local.text import tokens  # noqa: E402
 
 QUESTIONS = Path(__file__).with_name("questions.yaml")
@@ -87,15 +88,16 @@ def build_passages(include_book: bool = True) -> list[Passage]:
     return passages
 
 
-def evaluate(include_book: bool = True, k: int = 5) -> dict:
-    engine = Engine(build_passages(include_book))
-    spec = yaml.safe_load(QUESTIONS.read_text(encoding="utf-8"))
+def evaluate(include_book: bool = True, k: int = 5, questions: Path = QUESTIONS, config: Config = DEFAULT_CONFIG,
+             engine: Engine | None = None) -> dict:
+    engine = engine or Engine(build_passages(include_book))
+    spec = yaml.safe_load(questions.read_text(encoding="utf-8"))
     cases, ranks = [], []
     answered = 0
     for item in spec["in_scope"]:
         if item.get("expect_text") and not item.get("expect_docs") and not include_book:
             continue
-        r = search(engine, item["q"], k=k)
+        r = search(engine, item["q"], k=k, config=config)
         found_rank = None
         for rank, hit in enumerate(r.hits[:k], start=1):
             doc_ok = hit.id in item.get("expect_docs", [])
@@ -109,7 +111,7 @@ def evaluate(include_book: bool = True, k: int = 5) -> dict:
                       "confidence": r.confidence, "top": [h.id for h in r.hits[:3]]})
     refusals = []
     for q in spec["out_of_scope"]:
-        r = search(engine, q, k=k)
+        r = search(engine, q, k=k, config=config)
         refusals.append({"question": q, "refused": not r.sufficient, "confidence": r.confidence,
                          "reason": r.reason, "top": [h.id for h in r.hits[:2]]})
 
@@ -130,7 +132,20 @@ def evaluate(include_book: bool = True, k: int = 5) -> dict:
             "metrics": metrics, "in_scope_cases": cases, "out_of_scope_cases": refusals}
 
 
+HELDOUT = Path(__file__).with_name("heldout.yaml")
+
+
 def main() -> int:
+    if any(a in sys.argv for a in ("--heldout", "--heldout2", "--heldout3")):
+        which = HELDOUT.with_name("heldout3.yaml") if "--heldout3" in sys.argv else HELDOUT.with_name("heldout2.yaml") if "--heldout2" in sys.argv else HELDOUT
+        report = evaluate(questions=which)
+        print(json.dumps(report["metrics"], indent=2))
+        for c in report["in_scope_cases"]:
+            print(f"  {'ok  ' if c['found_rank'] else 'MISS'} rank={c['found_rank']} sufficient={c['sufficient']} {c['question']} -> {c['top']}")
+        for c in report["out_of_scope_cases"]:
+            print(f"  {'refused ' if c['refused'] else 'ANSWERED'} {c['question']} -> {c['top']}")
+        (REPORT.parent / f"local_rag_{which.stem}_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        return 0
     report = evaluate(include_book="--no-book" not in sys.argv)
     m = report["metrics"]
     print(json.dumps(m, indent=2))

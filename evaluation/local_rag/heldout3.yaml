@@ -1,0 +1,27 @@
+# THIRD held-out set -- the only clean test. Written after the engine was tuned on questions.yaml and after
+# heldout.yaml / heldout2.yaml had been used to diagnose problems, and run exactly once at the end of this round of work.
+# Everyday phrasing, paraphrases, Hinglish-flavoured English, compound questions.
+
+in_scope:
+  - {q: "What should I eat to have enough calcium if I do not like milk?", expect_docs: [guide-nin-balanced-plate-001, guide-who-calcium-001, seed-ifct-ragi-001, guide-nhs-healthy-diet-001]}
+  - {q: "Is it dangerous to eat raw or undercooked meat while expecting?", expect_docs: [guide-nhs-food-safety-001, guide-nhs-healthy-diet-001]}
+  - {q: "How do I get relief from lower back ache in the later months?", expect_docs: [guide-nhs-back-pain-001]}
+  - {q: "Which flu or whooping cough shots should I get?", expect_docs: [guide-nhs-vaccines-001]}
+  - {q: "Where can I get a free check-up from a government doctor?", expect_docs: [guide-in-pmsma-001, guide-in-pmmvy-001]}
+  - {q: "What iron dose does the Indian guideline suggest and for how many days?", expect_docs: [guide-nin-iron-001]}
+  - {q: "I have been told my haemoglobin is low, what foods help?", expect_docs: [guide-who-anaemia-001, guide-nin-iron-001, guide-nin-balanced-plate-001]}
+  - {q: "Can pregnant women do yoga, swimming or walking?", expect_docs: [guide-nhs-exercise-001, guide-who-activity-001]}
+  - {q: "Should I take vitamin D in pregnancy?", expect_docs: [guide-nhs-vitamins-001]}
+  - {q: "Is high blood pressure in pregnancy dangerous?", expect_docs: [guide-nhs-preeclampsia-001, guide-who-calcium-001]}
+  - {q: "How much protein is there in chickpeas and which is better, chana or rajma?", expect_docs: [food-usda-173757, food-usda-173735]}
+  - {q: "What did Caraka advise for the first three months of pregnancy?", expect_text: [first month, first to third month, third month]}
+  - {q: "What is dohada?", expect_text: [dauhrda, dohada, longing]}
+  - {q: "What is said in the book about breast milk becoming abnormal?", expect_text: [milk]}
+
+out_of_scope:
+  - "How do I apply for a driving licence?"
+  - "What is the weather like in Mumbai in July?"
+  - "Recommend a good laptop for students"
+  - "How many players are there in a football team?"
+  - "What is a good diet for my dog?"
+  - "How does a car engine work?"
