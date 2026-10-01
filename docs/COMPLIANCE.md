@@ -91,6 +91,21 @@ should never be relaxed for UX reasons (e.g. never let generation "sound like" a
 | LLM prompt forbids therapeutic claims for traditional content | Prompt in place for the optional external engine; the default engine only quotes approved passages |
 | Legal review (DPDP), clinical sign-off, native-speaker review of Hindi/Gujarati | **Open** |
 
+## Where each requirement is enforced in the code
+
+| Requirement | Where | How |
+|---|---|---|
+| Not telemedicine: no diagnosis, no prescribing | `safety/guardrails` (`requests.yaml`, `output.yaml`) | Refuses to act as a doctor, to prescribe, to dose, or to say start, stop or change; the output check replaces any answer that diagnoses or calls a medicine safe |
+| Pre-Natal Diagnostic Techniques Act, 1994 | `requests.yaml` (`req-sex-determination`), `output.yaml` | Refuses to find out or predict the baby's sex, in four languages, and names the law |
+| Medical Termination of Pregnancy Act, 1971 (2021) | `requests.yaml` (`req-home-abortion`), `medications.yaml` (mifepristone, misoprostol) | Refuses home methods; states the weeks the law allows and where safe care is; gives 112 and the Women Helpline 181 |
+| Drugs and Magic Remedies (Objectionable Advertisements) Act, 1954 | `output.yaml` (`out-guarantee`) | Replaces any answer that promises a cure, a guarantee, "no risk" or a "miracle" |
+| Traditional is not "safe" | `herbs.yaml`, `food_guide.yaml`, evidence labels | Herbs and Ayurvedic products are treated as medicines; the book's regimen is labelled traditional and its medicated preparations are never shown as food |
+| DPDP Act, 2023: consent, access, erasure | `services/profile.py`, `api/privacy.py`, `services/care/privacy.py` | Consent-gated storage with a version, JSON export, deletion of profile or account ([`privacy.md`](./privacy.md), including the chat-history gap) |
+| AI disclosure | Chat footer, triage and summary disclaimers | "MATRIVA is guidance, not a diagnosis" is shown in the chat |
+| Emergency handling | `symptoms.yaml`, `messages.yaml` | 112, 102, Tele-MANAS 14416 and Women Helpline 181 in English, Hindi and Gujarati |
+
+None of this is a legal opinion. [`clinical-review.md`](./clinical-review.md) lists what still needs a clinician, a pharmacist and a lawyer.
+
 ## Open items before any real-user launch (not just Round 1 demo)
 
 1. Legal review of DPDP Act obligations for health-data collection — consent flow, retention policy,
