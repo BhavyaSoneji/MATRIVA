@@ -40,7 +40,8 @@ def answer_local(
     if not retrieval.sufficient:
         trace = {"engine": "local", "confidence": retrieval.confidence, "reason": retrieval.reason,
                  "concepts": [engine.graph.concepts[c].label for c in retrieval.concepts],
-                 "query_terms": retrieval.query_tokens, "passages": [], "passages_searched": retrieval.pool}
+                 "query_terms": retrieval.query_tokens, "passages": [], "passages_searched": retrieval.pool,
+                 "intent": retrieval.intent, "signals": retrieval.signals}
         return GenerationResult(text="", citation_ids=[], trace=trace), []
 
     composed = compose(engine, retrieval, user)

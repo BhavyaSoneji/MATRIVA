@@ -20,7 +20,9 @@ from dataclasses import dataclass, field
 
 from app.rag.local.corpus import Engine
 from app.rag.local.retriever import TRADITIONAL_CUES, Hit, Retrieval, UserProfile
+from app.rag.local import authorities as authority_lexicon
 from app.rag.local.text import is_prose, sentences, tokens
+from app.rag.local.understanding import DEFINITION_PATTERN
 
 MODERN_SECTION = "MODERN MEDICAL INFORMATION"
 TRADITIONAL_SECTION = "TRADITIONAL/AYURVEDIC INFORMATION"
@@ -90,7 +92,8 @@ def _shorten(sentence: str) -> str:
 
 
 def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str], engine: Engine,
-                    title_tokens: frozenset[str] = frozenset(), quantity: bool = False) -> float:
+                    title_tokens: frozenset[str] = frozenset(), quantity: bool = False,
+                    definition: bool = False, authorities: tuple[str, ...] = ()) -> float:
     toks = set(tokens(sentence))
     if not toks:
         return 0.0
@@ -105,6 +108,10 @@ def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str
     base = (0.6 * overlap + 0.25 * concept_cov) * length_fit + 0.15 * overlap
     if quantity and re.search(r"\d", sentence) and re.search(r"\b(mg|g|kg|mcg|micrograms?|kcal|calories|%|glasses?|portions?|weeks?|months?|days?|hours?|ml)\b", sentence, re.I):
         base += 0.25 * min(overlap * 2, 1.0)  # a stated amount, in a sentence that is on topic
+    if definition and overlap > 0 and DEFINITION_PATTERN.search(sentence):
+        base += 0.15  # "what is X": prefer the sentence that says what X is
+    if authorities and any(a in authority_lexicon.detect(sentence) for a in authorities):
+        base += 0.2  # "what does Caraka say": prefer the sentence that names him
     return base
 
 
@@ -123,7 +130,8 @@ def _pick(engine: Engine, retrieval: Retrieval, hits: list[Hit]) -> list[Picked]
         trust = 0.5 + 0.5 * (hit.score / top_score if top_score else 0.0)  # sentences inherit their passage's rank
         title_tokens = frozenset(tokens(str(hit.meta.get("title", ""))))
         scored = sorted(
-            ((trust * _score_sentence(s, q_idf, concept_ids, engine, title_tokens, retrieval.quantity_intent), s, n) for n, s in enumerate(sentences(hit.text)) if is_prose(s) and _clean_enough(s, hit, engine)),
+            ((trust * _score_sentence(s, q_idf, concept_ids, engine, title_tokens, retrieval.quantity_intent,
+                                                  retrieval.intent == "definition", tuple(retrieval.authorities)), s, n) for n, s in enumerate(sentences(hit.text)) if is_prose(s) and _clean_enough(s, hit, engine)),
             key=lambda t: -t[0],
         )
         if scored:
@@ -266,6 +274,12 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
         "concepts": [engine.graph.concepts[c].label for c in retrieval.concepts],
         "related_concepts": [engine.graph.concepts[c].label for c in list(retrieval.expanded)[:5]],
         "query_terms": retrieval.query_tokens,
+        "intent": retrieval.intent,
+        "authorities_asked": retrieval.authorities,
+        "sub_queries": retrieval.sub_queries,
+        "expanded_with": retrieval.feedback_terms[:6],
+        "reached_through_graph": [engine.graph.concepts[c].label for c in retrieval.activated[:4]],
+        "signals": retrieval.signals,
         "passages_searched": retrieval.pool,
         "passages": [
             {
@@ -276,6 +290,10 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
                 "score": round(h.score, 3),
                 "bm25": round(h.bm25, 3),
                 "ngram": round(h.ngram, 3),
+                "semantic": round(h.semantic, 3),
+                "structure": round(h.structure, 3),
+                "graph": round(h.graph, 3),
+                "authorities": h.authorities,
                 "coverage": round(h.coverage, 3),
                 "matched_terms": h.matched_terms[:8],
                 "matched_concepts": [engine.graph.concepts[c].label for c in h.matched_concepts],
