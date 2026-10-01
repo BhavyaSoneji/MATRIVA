@@ -15,6 +15,7 @@ same order, so the numbers line up with the citation list shown under the answer
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 
 from app.rag.local.corpus import Engine
@@ -48,6 +49,28 @@ class Composed:
     trace: dict = field(default_factory=dict)
 
 
+MIN_CORPUS_FOR_RARITY = 200
+MAX_RARE_RATIO = 0.12  # OCR garbage is made of words that appear nowhere else in the corpus
+
+
+def _clean_enough(sentence: str, hit: Hit, engine: Engine) -> bool:
+    """Extra scrutiny for scanned text: reject sentences full of one-off 'words' or stray glyphs."""
+    if not _is_traditional(hit):
+        return True
+    if any(ch in sentence for ch in "$&|~^_{}[]\\") and not sentence.rstrip().endswith("]"):
+        return False
+    if sentence.count("(") != sentence.count(")") or sentence.rstrip(" .").endswith(("-", "—", "(", ",")):
+        return False  # cut off mid-phrase by the scan or the sentence splitter
+    toks = tokens(sentence)
+    if not toks:
+        return False
+    if engine.index.size < MIN_CORPUS_FOR_RARITY:
+        return True  # in a tiny corpus every word is rare; the signal only means something at scale
+    df = engine.index.df
+    rare = sum(1 for t in toks if df.get(t, 0) <= 1) / len(toks)
+    return rare <= MAX_RARE_RATIO
+
+
 def _is_traditional(hit: Hit) -> bool:
     return hit.meta.get("domain") == "ayurveda" or hit.meta.get("source_type") == "traditional"
 
@@ -66,7 +89,7 @@ def _shorten(sentence: str) -> str:
 
 
 def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str], engine: Engine,
-                    title_tokens: frozenset[str] = frozenset()) -> float:
+                    title_tokens: frozenset[str] = frozenset(), quantity: bool = False) -> float:
     toks = set(tokens(sentence))
     if not toks:
         return 0.0
@@ -78,7 +101,10 @@ def _score_sentence(sentence: str, q_idf: dict[str, float], concept_ids: set[str
     concept_cov = len(concept_ids & set(concepts)) / len(concept_ids) if concept_ids else 0.0
     n = len(sentence.split())
     length_fit = 1.0 if 8 <= n <= 70 else (0.7 if n < 8 else max(0.6, 1 - (n - 70) / 120))  # list-style sentences are fine
-    return (0.6 * overlap + 0.25 * concept_cov) * length_fit + 0.15 * overlap
+    base = (0.6 * overlap + 0.25 * concept_cov) * length_fit + 0.15 * overlap
+    if quantity and re.search(r"\d", sentence) and re.search(r"\b(mg|g|kg|mcg|micrograms?|kcal|calories|%|glasses?|portions?|weeks?|months?|days?|hours?|ml)\b", sentence, re.I):
+        base += 0.25 * min(overlap * 2, 1.0)  # a stated amount, in a sentence that is on topic
+    return base
 
 
 def _pick(engine: Engine, retrieval: Retrieval, hits: list[Hit]) -> list[Picked]:
@@ -96,7 +122,7 @@ def _pick(engine: Engine, retrieval: Retrieval, hits: list[Hit]) -> list[Picked]
         trust = 0.5 + 0.5 * (hit.score / top_score if top_score else 0.0)  # sentences inherit their passage's rank
         title_tokens = frozenset(tokens(str(hit.meta.get("title", ""))))
         scored = sorted(
-            ((trust * _score_sentence(s, q_idf, concept_ids, engine, title_tokens), s, n) for n, s in enumerate(sentences(hit.text)) if is_prose(s)),
+            ((trust * _score_sentence(s, q_idf, concept_ids, engine, title_tokens, retrieval.quantity_intent), s, n) for n, s in enumerate(sentences(hit.text)) if is_prose(s) and _clean_enough(s, hit, engine)),
             key=lambda t: -t[0],
         )
         if scored:
@@ -139,6 +165,11 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
     picked = _pick(engine, retrieval, hits)
     modern = [p for p in picked if not _is_traditional(p.hit)]
     traditional = [p for p in picked if _is_traditional(p.hit)]
+    asked_for_traditional = bool(set(retrieval.query_tokens) & TRADITIONAL_CUES)
+    if traditional and not asked_for_traditional and modern:
+        # Modern sources already answer it, and nobody asked for the classical view: leave scanned text out.
+        picked = modern
+        traditional = []
 
     # A question that asks for the Ayurvedic view leads with the traditional section; the sections stay separate.
     traditional_first = bool(set(retrieval.query_tokens) & TRADITIONAL_CUES)
@@ -194,7 +225,7 @@ def compose(engine: Engine, retrieval: Retrieval, profile: UserProfile | None = 
         "This is educational information, not a diagnosis or a substitute for your maternity-care professional.",
     ]
 
-    used = order + [h for h in retrieval.hits if all(h.id != o.id for o in order)]
+    used = order  # sources shown are exactly the sources cited, in citation order
     quotes: dict[str, list[str]] = {}
     for p in picked:
         quotes.setdefault(p.hit.id, []).append(p.sentence)
