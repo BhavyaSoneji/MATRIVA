@@ -382,3 +382,141 @@
   reviewed_by: null
   reviewed_at: null
   safety_tags: []
+
+- document_id: guide-nhs-morning-sickness-001
+  title: "NHS: Morning Sickness - What Helps and When to Get Help"
+  content: >
+    Nausea and vomiting in early pregnancy is very common and usually clears up by weeks 16 to 20, without raising the baby's risk. NHS suggests resting, avoiding foods or smells that trigger it, eating dry toast or a plain biscuit in the morning, eating small frequent plain meals high in carbohydrate and low in fat, choosing cold foods if the smell of hot food is a problem, sipping fluids often, and trying ginger or wrist acupressure (there is some evidence for both; check with a pharmacist before taking ginger supplements). Contact a midwife or doctor if you cannot keep food or fluids down for 24 hours, have very dark urine or have not passed urine for 8 hours, feel faint, have tummy pain or a fever, vomit blood, or are losing weight, as this may be severe sickness (hyperemesis gravidarum) needing treatment.
+  domain: MODERN_MEDICAL
+  subdomain: symptoms
+  source_id: nhs-morning-sickness
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/common-symptoms/vomiting-and-morning-sickness/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: first_trimester
+  topic: morning_sickness_care
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-back-pain-001
+  title: "NHS: Back Pain in Pregnancy"
+  content: >
+    Back pain is common in pregnancy because ligaments soften and stretch, straining the lower back and pelvis. NHS suggests bending the knees and keeping the back straight when lifting, avoiding heavy lifting, not twisting the spine, wearing flat shoes, supporting the back when sitting, resting, a warm bath or massage, a supportive mattress and back-care classes. Paracetamol can be used unless a doctor or midwife says otherwise. In the second or third trimester, back pain can be a sign of early labour; contact a doctor or midwife urgently if it comes with fever, vaginal bleeding, pain when passing urine, or pain under the ribs. Loss of feeling in the legs, buttocks or genitals is an emergency.
+  domain: MODERN_MEDICAL
+  subdomain: symptoms
+  source_id: nhs-back-pain
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/common-symptoms/back-pain/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: back_pain_care
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-vaccines-001
+  title: "NHS: Vaccinations in Pregnancy"
+  content: >
+    NHS recommends the inactivated flu vaccine and the whooping cough vaccine in pregnancy (whooping cough ideally from 16 to 32 weeks, usually at 20 weeks, so antibodies pass to the baby), and an RSV vaccine from about 28 weeks. Tetanus vaccine is safe if needed. Live vaccines such as MMR are usually delayed until after the birth because of a theoretical risk to the baby, though no live vaccine has been shown to cause birth defects. Schedules differ between countries; in India the antenatal tetanus-diphtheria (Td) doses are given under the national programme, so ask your doctor or ANM which vaccines you need and when.
+  domain: LIFESTYLE
+  subdomain: lifestyle
+  source_id: nhs-vaccinations
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/vaccinations/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: vaccines_overview
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [consult_provider]
+
+- document_id: guide-nhs-labour-signs-001
+  title: "NHS: Signs That Labour Has Begun and When to Call"
+  content: >
+    Signs labour may be starting include contractions or tightenings, a 'show' (the mucus plug coming away), backache, an urge to go to the toilet, and the waters breaking. Practice (Braxton Hicks) tightenings are usually painless, short, infrequent and do not build up, whereas labour contractions become longer, stronger and more frequent. NHS advises calling the midwife or maternity unit if you think you are in labour or contractions come every 5 minutes or more often. Call urgently, even at night, if your waters break, you have vaginal bleeding, the baby is moving less than usual, you are less than 37 weeks, any contraction lasts over 2 minutes, or you have 6 or more contractions in 10 minutes. Call for an ambulance if you feel a strong urge to push.
+  domain: MODERN_MEDICAL
+  subdomain: labour
+  source_id: nhs-labour-signs
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/labour-and-birth/signs-that-labour-has-begun/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: third_trimester
+  topic: labour_signs_when_to_call
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [urgent_symptoms]
+
+- document_id: guide-nhs-mental-health-001
+  title: "NHS: Mental Health in Pregnancy"
+  content: >
+    Depression and anxiety can start or return during pregnancy. NHS advice is to eat a balanced diet, talk about feelings with someone you trust or a midwife or doctor, make time for something enjoyable, stay active, attend antenatal classes, and be honest with your care team about how you really feel. Talking therapies such as CBT often help, and medicine may be offered at the lowest effective dose if needed. If you already take prescribed medicine, do not stop it without speaking to your doctor. Speak to your doctor or maternity unit if you are worried about your mental health, and seek urgent help in a crisis.
+  domain: MODERN_MEDICAL
+  subdomain: mental
+  source_id: nhs-mental-health-pregnancy
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/mental-health-in-pregnancy-and-after-the-birth/mental-health/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: antenatal_mental_health
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: [requires_clinical_review]
+
+- document_id: guide-nhs-smoking-001
+  title: "NHS: Stopping Smoking in Pregnancy"
+  content: >
+    NHS advises that smoking in pregnancy harms the baby by restricting oxygen supply, and that stopping reduces the risk of pregnancy and birth complications, stillbirth, premature birth, low birth weight and sudden infant death syndrome. It is never too late to quit, and stopping even in the last weeks helps. Secondhand smoke from a partner or household member also harms the baby. Nicotine replacement can be used in pregnancy if you cannot stop without it and is much better than smoking; stop-smoking tablets such as varenicline and bupropion are not recommended in pregnancy.
+  domain: LIFESTYLE
+  subdomain: lifestyle
+  source_id: nhs-stop-smoking
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/stop-smoking/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null          # null = applies in every region (retrieval treats NULL as universal)
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: stop_smoking_benefits
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
