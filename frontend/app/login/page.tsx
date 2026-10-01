@@ -20,7 +20,7 @@ export default function LoginPage() {
   const [loading, setLoading] = React.useState(false);
 
   React.useEffect(() => {
-    if (user) router.replace("/dashboard");
+    if (user) router.replace("/chat");
   }, [user, router]);
 
   const onSubmit = async (e: React.FormEvent) => {
@@ -29,7 +29,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/dashboard");
+      router.push("/chat");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
