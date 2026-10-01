@@ -50,6 +50,20 @@ GLOSSARY: dict[str, str] = {
     "તપાસ": "antenatal checkup",
 }
 _NORMALISED = {unicodedata.normalize("NFKC", k).lower(): v for k, v in GLOSSARY.items()}
+_book_merged = False
+
+
+def _terms() -> dict[str, str]:
+    """The hand-written glossary plus Hindi terms the book itself pairs with English (its bilingual contents),
+    merged once. Hand-written entries win on conflict."""
+    global _book_merged
+    if not _book_merged:
+        from app.rag.local.book import hindi_terms_to_english
+
+        for hi, en in hindi_terms_to_english().items():
+            _NORMALISED.setdefault(unicodedata.normalize("NFKC", hi).lower(), en)
+        _book_merged = True
+    return _NORMALISED
 _MAX_QUERY_CHARS = 300
 
 
@@ -64,10 +78,11 @@ def glossary_translate(text: str) -> str | None:
     """
     haystack = unicodedata.normalize("NFKC", text).lower()
     found: list[str] = []
-    for term in sorted(_NORMALISED, key=len, reverse=True):
+    terms = _terms()
+    for term in sorted(terms, key=len, reverse=True):
         if term in haystack:
             haystack = haystack.replace(term, " ")
-            for word in _NORMALISED[term].split():
+            for word in terms[term].split():
                 if word not in found:
                     found.append(word)
     return " ".join(found) if found else None
