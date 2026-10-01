@@ -520,3 +520,141 @@
   reviewed_by: null
   reviewed_at: null
   safety_tags: []
+
+- document_id: guide-nin-extra-food-001
+  title: "ICMR-NIN: Extra Food and Nutrients During Pregnancy"
+  content: >
+    ICMR-NIN's Dietary Guidelines for Indians say a pregnant woman needs extra food, because pregnancy is a nutritionally demanding period. Her daily diet should contain an additional 350 calories, plus 0.5 g of extra protein in the first trimester, 6.9 g in the second trimester and 22.7 g in the third trimester. Healthy weight gain over pregnancy is about 10-12 kg, and a well-fed mother usually gains around 10 kg. Folic acid, iron, calcium, iodine, vitamin A, vitamin C and vitamin B12 are the nutrients that need special attention. There is no need to change the usual dietary pattern; the quantity and frequency of foods should simply increase.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nin-dietary-guidelines
+  source_type: government_guideline
+  authority: ICMR-National Institute of Nutrition, India
+  url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  jurisdiction: India (ICMR-NIN)
+  pregnancy_stage: all
+  topic: nin_extra_food
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nin-balanced-plate-001
+  title: "ICMR-NIN: What to Eat in Pregnancy - a Balanced Indian Plate"
+  content: >
+    ICMR-NIN advises a pregnant woman to eat a wide variety of foods every day so that both her own needs and her baby's are met. About 60% of her energy can come from rice, wheat and millets, and cooking oil adds energy and essential fats. Good-quality protein comes from milk, fish, meat, poultry and eggs, and a combination of cereals, pulses and nuts also gives adequate protein for vegetarians. Seasonal vegetables, especially green leafy vegetables, milk and fresh fruits supply the vitamins and minerals. Milk is the best source of well-absorbed calcium. Sprouted and fermented grams, and foods rich in vitamin C such as citrus fruits, improve iron absorption. Choose fibre-rich foods such as whole grains, pulses and vegetables to avoid constipation, and drink plenty of fluids, around 8-12 glasses of water a day.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nin-dietary-guidelines
+  source_type: government_guideline
+  authority: ICMR-National Institute of Nutrition, India
+  url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  jurisdiction: India (ICMR-NIN)
+  pregnancy_stage: all
+  topic: nin_plate
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nin-iron-001
+  title: "ICMR-NIN: Iron in Pregnancy - Foods, Absorption and Supplements"
+  content: >
+    ICMR-NIN explains that iron is needed to make haemoglobin, and that iron deficiency in pregnancy raises the risk of maternal death and low-birth-weight babies. Green leafy vegetables, legumes and dry fruits contain iron, and meat, fish and poultry also provide it; iron is poorly absorbed from plant foods but well absorbed from animal foods. Vitamin C-rich fruits such as amla (gooseberry), guava and citrus improve absorption of iron from plant foods. Tea binds iron, so it should be avoided before, during or soon after a meal. Commonly eaten plant-based Indian diets provide roughly 18 mg of iron a day against a recommended intake of 35 mg, so ICMR-NIN recommends iron supplementation of 100 mg elemental iron with 0.5 mg folic acid for 100 days of pregnancy from the 16th week onwards.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nin-dietary-guidelines
+  source_type: government_guideline
+  authority: ICMR-National Institute of Nutrition, India
+  url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  jurisdiction: India (ICMR-NIN)
+  pregnancy_stage: all
+  topic: nin_iron
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nin-folic-001
+  title: "ICMR-NIN: Folic Acid and Folate-Rich Foods"
+  content: >
+    ICMR-NIN notes that folic acid is essential for making haemoglobin and that pregnant women need more of it. Green leafy vegetables, legumes, nuts and liver are good sources of folate. Folic acid supplements increase birth weight and reduce congenital anomalies such as neural tube defects. A dose of 0.5 mg of folic acid is advised before conception and throughout pregnancy for women with a history of congenital anomalies such as neural tube defects or cleft palate.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nin-dietary-guidelines
+  source_type: government_guideline
+  authority: ICMR-National Institute of Nutrition, India
+  url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  jurisdiction: India (ICMR-NIN)
+  pregnancy_stage: all
+  topic: nin_folic
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nin-dos-donts-001
+  title: "ICMR-NIN: Pregnancy Do's and Don'ts - Habits, Check-ups and Medicines"
+  content: >
+    ICMR-NIN advises pregnant women to avoid alcohol, smoking and tobacco chewing, to take medicines only when prescribed by a doctor, and to avoid excess coffee and tea because caffeine can affect the baby's growth. They should have regular check-ups for weight gain, blood pressure and anaemia, and receive tetanus toxoid immunisation. Enough physical exercise with 2-3 hours of rest during the day is recommended. ICMR-NIN says wrong food beliefs and taboos should be discouraged, and that preventing food-borne illness by avoiding contaminated food is an important protective measure. Iron, folate and calcium supplements are advised regularly after 14-16 weeks of pregnancy and continued during breastfeeding.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nin-dietary-guidelines
+  source_type: government_guideline
+  authority: ICMR-National Institute of Nutrition, India
+  url: https://www.nin.res.in/downloads/DietaryGuidelinesforNINwebsite.pdf
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: IN
+  jurisdiction: India (ICMR-NIN)
+  pregnancy_stage: all
+  topic: nin_dos_donts
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
+
+- document_id: guide-nhs-healthy-diet-001
+  title: "NHS: Healthy Eating in Pregnancy"
+  content: >
+    NHS advises that you do not need a special diet in pregnancy and you do not need to eat for two, but you should eat a variety of foods every day and get the balance right over a week. Eat at least 5 portions of fruit and vegetables a day. Starchy foods such as bread, rice, potatoes, oats and millet should make up just over a third of what you eat, and wholegrain choices are better. Eat some protein every day, from beans, pulses, fish, eggs, poultry, nuts or lean meat, but avoid liver. Aim for 2 portions of fish a week, one of them oily, and no more than 2 portions of oily fish a week. Dairy foods such as milk, curd and yoghurt are important for calcium, and low-fat choices are best. Have foods high in fat or sugar less often and in small amounts, and cook meat, poultry and eggs thoroughly.
+  domain: MODERN_MEDICAL
+  subdomain: diet
+  source_id: nhs-healthy-diet
+  source_type: government_guideline
+  authority: NHS (UK)
+  url: https://www.nhs.uk/pregnancy/keeping-well/have-a-healthy-diet/
+  publication_date: null
+  version: "1.0"
+  language: en
+  region: null
+  jurisdiction: UK (NHS)
+  pregnancy_stage: all
+  topic: nhs_healthy_eating
+  evidence_level: SUPPORTED
+  review_status: PENDING_SOURCE_VERIFICATION
+  reviewed_by: null
+  reviewed_at: null
+  safety_tags: []
