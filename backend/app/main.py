@@ -14,6 +14,7 @@ from sqlalchemy import text
 from app.api import (
     admin,
     auth,
+    care,
     chat,
     demo,
     evaluations,
@@ -172,3 +173,4 @@ app.include_router(admin.router)
 app.include_router(evaluations.router)
 app.include_router(wellness.router)
 app.include_router(resources.router)
+app.include_router(care.router)
