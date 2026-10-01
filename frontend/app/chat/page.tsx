@@ -46,6 +46,7 @@ import {
   ClipboardPen,
   BookCheck,
   Network,
+  BookOpen,
 } from "lucide-react";
 
 interface ChatMessage {
@@ -90,6 +91,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   { id: "log", label: "Log today", command: "/log", icon: ClipboardPen, hint: "Water, sleep, activity", widget: { type: "log" } },
   { id: "library", label: "Library", command: "/library", icon: Library, hint: "Videos & articles", widget: { type: "library" } },
   { id: "map", label: "Knowledge map", command: "/map", icon: Network, hint: "How topics connect", widget: { type: "map" } },
+  { id: "book", label: "The book", command: "/book", icon: BookOpen, hint: "Prasuti Tantra, by chapter", widget: { type: "book" } },
   { id: "evidence", label: "Evidence", command: "/evidence", icon: BookCheck, hint: "Guidelines & research", widget: { type: "library", types: ["guideline", "research"] } },
 ];
 
@@ -750,6 +752,14 @@ function ChatContent() {
                                         <p key={qi}>&ldquo;{q}&rdquo;</p>
                                       ))}
                                     </blockquote>
+                                    {tp.original_hi && (
+                                      <details className="mt-2">
+                                        <summary className="cursor-pointer text-[11px] text-muted-foreground hover:text-accent">
+                                          Original text on the page (raw OCR, unverified)
+                                        </summary>
+                                        <p lang="hi" className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{tp.original_hi}</p>
+                                      </details>
+                                    )}
                                     {tp.matched_terms.length > 0 && (
                                       <p className="mt-1.5 text-[11px] text-muted-foreground">
                                         Matched: {tp.matched_terms.join(", ")}
