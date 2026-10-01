@@ -32,7 +32,7 @@ Every setting is an environment variable. The backend reads them (case-insensiti
 | `MAX_UPLOAD_BYTES` | `10000000` | Largest admin document upload |
 | `RATE_LIMIT_AUTH_PER_MINUTE` | `20` | Sign-up and login attempts per client |
 | `RATE_LIMIT_CHAT_PER_MINUTE` | `30` | Chat messages per client |
-| `RATE_LIMIT_GENERAL_PER_MINUTE` | `120` | Everything else |
+| `RATE_LIMIT_GENERAL_PER_MINUTE` | `120` | The knowledge, sources, pregnancy, guidelines and Ayurveda routes. The care, profile, privacy and resources routes are **not** rate limited today |
 
 ### Which engine answers
 

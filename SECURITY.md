@@ -27,7 +27,7 @@ Out of scope: findings that need a modified client with a stolen token, volumetr
 | Tokens | HMAC-signed JWT, 30-minute default life, issuer and audience checked, no profile or health data inside |
 | Production start-up | Refuses the development JWT secret; `DEMO_MODE=false` removes the unauthenticated chat and demo routes |
 | Input | Validation and length limits on every body; uploads checked by extension, type and size, hashed and reviewed before use |
-| Rate limits | Separate limits for auth, chat and general routes, with a local fallback if Redis is down |
+| Rate limits | Separate limits for auth, chat, and the knowledge, sources, pregnancy, guidelines and Ayurveda routes, with a local fallback if Redis is down |
 | Headers | CORS from an exact origin list; security headers on the API and the web app |
 | Health data | Consent-gated, filtered by the signed-in user on every route, exportable and deletable ([`docs/privacy.md`](./docs/privacy.md)) |
 | Retrieved text | Treated as data, never as instructions |
@@ -38,6 +38,7 @@ Out of scope: findings that need a modified client with a stolen token, volumetr
 ## Known gaps
 
 - Branch protection on `main` is not enabled yet.
+- The care, profile, privacy and resources routes have no rate limit (only auth, chat and the knowledge routes do).
 - Chat history is removed with the account but not with the profile ([`docs/privacy.md`](./docs/privacy.md#a-gap-to-know-about)).
 - There is no external penetration test, and no clinical or legal review.
 - `RAG_ENGINE=external` sends the question and a short profile summary to a third-party provider; do not use it for real patients without an agreement with that provider.
