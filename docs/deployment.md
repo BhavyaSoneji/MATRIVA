@@ -1,5 +1,23 @@
 # Deployment
 
+## What runs
+
+| Service | Image | Host port | Notes |
+|---|---|---|---|
+| `db` | `pgvector/pgvector:pg16` | `POSTGRES_PORT` (5432) | PostgreSQL with pgvector. Health check: `pg_isready` |
+| `redis` | `redis:7-alpine` | `REDIS_PORT` (6379) | Rate limiting. The production file requires a password and persists to disk |
+| `backend` | built from `backend/Dockerfile` (Python 3.11-slim, non-root user) | `BACKEND_PORT` (8000) | Runs `alembic upgrade head`, then Uvicorn. Health check: `GET /health` every 30 s |
+| `frontend` | built from `frontend/Dockerfile` (Next.js standalone) | `FRONTEND_PORT` (3000) | `NEXT_PUBLIC_API_URL` is baked in at build time |
+
+Two switches in the backend entrypoint:
+
+| Variable | Default | What it does |
+|---|---|---|
+| `RUN_MIGRATIONS` | `true` | Run `alembic upgrade head` at start. Set `false` on all but one replica, or run migrations as a release step |
+| `FORWARDED_ALLOW_IPS` | `*` | Which proxies Uvicorn trusts for `X-Forwarded-*`. **Set it to your proxy's address in production** |
+
+`docker-compose.prod.yml` differs from the development file: it sets `ENVIRONMENT=production`, `DEBUG=false`, `DEMO_MODE=false` and `AUTO_CREATE_TABLES=false`, **refuses to start unless** `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`, `REDIS_PASSWORD`, `DATABASE_URL`, `REDIS_URL`, `JWT_SECRET`, `CORS_ORIGINS` and `NEXT_PUBLIC_API_URL` are set, only exposes the backend inside the network (put TLS and a reverse proxy in front), and installs the optional provider packages by default (`INSTALL_OPTIONAL=true`).
+
 ## Local Docker stack
 
 1. Copy `.env.example` to `.env` and set a unique `JWT_SECRET`.
