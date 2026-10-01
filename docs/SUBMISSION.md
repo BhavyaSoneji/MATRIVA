@@ -17,6 +17,21 @@
 
 ---
 
+## What changed since this write-up
+
+This document describes the Round 1 build. The project has moved on; the README is the current description.
+
+| | Round 1 | Now |
+|---|---|---|
+| Answers | Retrieval plus a hosted language model (Groq) | An offline engine that quotes approved passages, no key needed. The hosted model is optional |
+| Safety | A short list of danger-sign phrases | 1,231 sourced guard-rail rules, personal to the user's conditions and medicines, plus a check on the answer itself, in four languages |
+| Medicines | Not handled | Never advised: refused with the reason, and the user sent to a doctor |
+| Interface | A dashboard and separate pages | One chat workspace with cards: plan, check-in, readings, meals, food guide, summary |
+| Tracking | None | Dating, daily check-ins, readings with sourced flags, a meal log, a printable doctor summary |
+| Food | Seed food entries | The Prasuti Tantra's month-wise regimen (quoted, traditional) and nutrient food lists |
+| Tests | Demo scenario | 513 backend, 43 ingestion, 36 evaluation, 12 end-to-end |
+| Clinical review | Pending | **Still pending**, for everything |
+
 ## Problem
 
 Pregnant women navigating nutrition, lifestyle, and traditional-practice questions turn to generic
