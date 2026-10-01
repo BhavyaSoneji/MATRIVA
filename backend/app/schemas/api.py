@@ -480,6 +480,18 @@ class WellnessSummaryResponse(APIModel):
     days: list[WellnessLogResponse]
 
 
+class FeedbackReviewItem(APIModel):
+    feedback_id: str
+    rating: int
+    comment: str | None
+    created_at: datetime
+    question: str | None
+    answer: str | None
+    safety_status: str | None
+    source_count: int
+    had_evidence: bool
+
+
 class BulkApproveRequest(APIModel):
     ids: list[str] = Field(min_length=1, max_length=200)
 
