@@ -286,3 +286,54 @@ export interface FeedbackReviewItem {
   source_count: number;
   had_evidence: boolean;
 }
+
+export interface TracePassage {
+  citation: number | null;
+  title: string | null;
+  domain: string | null;
+  locator: string | null;
+  score: number;
+  bm25: number;
+  ngram: number;
+  coverage: number;
+  matched_terms: string[];
+  matched_concepts: string[];
+  quotes: string[];
+  source: string | null;
+  url: string | null;
+}
+
+/** What the offline RAG engine reports about how it found an answer. */
+export interface RetrievalTrace {
+  engine: "local";
+  confidence: number;
+  concepts: string[];
+  related_concepts?: string[];
+  query_terms: string[];
+  passages_searched: number;
+  reason?: string;
+  passages: TracePassage[];
+}
+
+export interface GraphNode {
+  id: string;
+  label: string;
+  type: string;
+  focus: boolean;
+  passages: number;
+}
+
+export interface GraphEdge {
+  source: string;
+  target: string;
+  weight: number;
+  passages: number;
+}
+
+export interface KnowledgeGraphResponse {
+  nodes: GraphNode[];
+  edges: GraphEdge[];
+  types: Record<string, string>;
+  focus: string[];
+  stats: { concepts: number; concepts_found: number; edges: number; passages: number };
+}
