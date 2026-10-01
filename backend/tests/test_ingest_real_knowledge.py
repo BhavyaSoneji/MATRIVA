@@ -167,3 +167,32 @@ def test_usda_food_entries_are_pending_cited_and_numeric(client) -> None:
         assert "protein" in entry["content"] and "iron" in entry["content"]
     liver = next(e for e in entries if "liver" in e["title"].lower())
     assert "avoiding liver" in liver["content"] and "avoid_in_pregnancy" in liver["safety_tags"]
+
+
+_ENGLISH_PAGE = (
+    "The pregnant woman should take milk and ghee regularly because it nourishes the mother and supports "
+    "the growth of the fetus during the later months of pregnancy according to the classical text. "
+)
+
+
+def test_book_sections_are_pending_paged_and_scored(client, tmp_path, monkeypatch) -> None:
+    fixture = tmp_path / "book.txt"
+    pages = "".join(
+        f"\n---\n## Scanned page {n:03d}\n\nदेवनागरी पाठ जो हटाया जाएगा\n\n{_ENGLISH_PAGE * 3}\n" for n in range(1, 31)
+    )
+    fixture.write_text("# header\n" + pages, encoding="utf-8")
+    monkeypatch.setattr(ingest_module, "BOOK_PATH", fixture)
+
+    with SessionLocal() as db:
+        ingest_module.ingest_book_sections(db, dry_run=False)
+        source = db.query(KnowledgeSource).filter_by(name=ingest_module.BOOK_SECTIONS_SOURCE).one()
+        assert source.review_status == "pending" and source.evidence_level == "traditional"
+        docs = db.query(KnowledgeDocument).filter_by(source_id=source.id).all()
+        assert len(docs) == 3  # 30 pages / 12 per section
+        assert all(d.review_status == "pending" and d.active is False and d.domain == "ayurveda" for d in docs)
+        chunks = db.query(KnowledgeChunk).filter_by(source_id=source.id).all()
+        assert chunks and all("scanned p" in c.extra_metadata["page_or_section"] for c in chunks)
+        assert all("readability" in c.extra_metadata["ocr_quality"] for c in chunks)
+        assert not any("देवनागरी" in c.content for c in chunks)  # Devanagari OCR is excluded
+        ingest_module.ingest_book_sections(db, dry_run=False)  # idempotent
+        assert db.query(KnowledgeDocument).filter_by(source_id=source.id).count() == 3

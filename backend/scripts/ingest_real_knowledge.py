@@ -59,6 +59,7 @@ for path in (_BACKEND_DIR, _INGESTION_DIR):
 
 from google.api_core.exceptions import ResourceExhausted
 from pipelines.chunker import _group_blocks
+from pipelines.ocr_english import build_sections
 from pipelines.parser import clean_text
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -285,6 +286,97 @@ def ingest_book(db: Session, *, api_key: str | None, dry_run: bool) -> None:
     )
 
 
+BOOK_SECTIONS_SOURCE = "prasuti-tantra-english-sections"
+
+
+def ingest_book_sections(db: Session, *, dry_run: bool) -> None:
+    """Ingest the book's readable English passages as reviewable sections (see
+    ingestion/pipelines/ocr_english.py). One source, one document per ~12 scanned pages, every
+    chunk carrying its scanned-page span and an OCR-quality score. Everything is pending: a reviewer
+    approves section by section in Admin -> Documents, so the whole 4 MB scan is never approved blind.
+    """
+    raw = BOOK_PATH.read_text(encoding="utf-8")
+    sections = build_sections(raw)
+    total_chunks = sum(len(sec.chunks) for sec in sections)
+    print(f"[book] {len(sections)} reviewable sections, {total_chunks} English chunks")
+    if dry_run:
+        print("[book] --dry-run: not writing to the database")
+        return
+    if db.execute(select(KnowledgeSource).where(KnowledgeSource.name == BOOK_SECTIONS_SOURCE)).scalar_one_or_none():
+        print(f"[book] source '{BOOK_SECTIONS_SOURCE}' already ingested -- skipping")
+        return
+
+    ingestion_user = _get_or_create_ingestion_user(db)
+    source = KnowledgeSource(
+        name=BOOK_SECTIONS_SOURCE,
+        title="Prasuti Tantra evam Stri Roga (Vol. 1) - English passages",
+        source_type="traditional",
+        authority="Dr. Premvati Tiwari; Chaukhambha Orientalia, Varanasi",
+        jurisdiction="India",
+        topic="prasuti_tantra",
+        review_status=ReviewStatus.PENDING.value,
+        evidence_level="traditional",
+        description=(
+            "Classical Ayurveda obstetrics textbook. Only the English-translation paragraphs of a raw OCR "
+            "scan are used (Sanskrit/Hindi text is excluded because OCR mangles it). Passages are cleaned, "
+            "never rewritten, and keep their scanned-page numbers so they can be checked against the PDF. "
+            "NOT clinically reviewed; traditional knowledge, not modern medical evidence."
+        ),
+        extra_metadata={"real_data": True, "ocr_source": True, "pending_reason": "clinical_review"},
+    )
+    db.add(source)
+    db.flush()
+    db.add(
+        EvidenceMetadata(
+            source_id=source.id,
+            evidence_level="traditional",
+            evidence_label="Classical text (English passages from OCR), unreviewed",
+            review_status=ReviewStatus.PENDING.value,
+            notes="Review each section against the scanned pages before approving.",
+        )
+    )
+    for section in sections:
+        content = "\n\n".join(chunk.text for chunk in section.chunks)
+        document = KnowledgeDocument(
+            source_id=source.id,
+            title=section.title,
+            domain="ayurveda",
+            subdomain="prasuti_tantra",
+            language="en",
+            region="IN",
+            pregnancy_stage=None,
+            review_status=ReviewStatus.PENDING.value,
+            index_status="indexed",
+            content_hash=str(hash(content)),
+            file_name=f"prasuti-tantra-pages-{section.page_start}-{section.page_end}.txt",
+            mime_type="text/plain",
+            raw_content=content.encode("utf-8"),
+            active=False,
+            created_by=ingestion_user.id,
+        )
+        db.add(document)
+        db.flush()
+        for index, chunk in enumerate(section.chunks):
+            db.add(
+                KnowledgeChunk(
+                    document_id=document.id,
+                    source_id=source.id,
+                    chunk_index=index,
+                    content=chunk.text,
+                    embedding=None,
+                    extra_metadata={
+                        "page_or_section": f"scanned p. {chunk.page_start}"
+                        if chunk.page_start == chunk.page_end
+                        else f"scanned pp. {chunk.page_start}-{chunk.page_end}",
+                        "ocr_quality": {"readability": chunk.quality},
+                        "real_data": True,
+                    },
+                )
+            )
+    db.commit()
+    print(f"[book] stored {len(sections)} pending sections ({total_chunks} chunks) -- review in Admin -> Documents")
+
+
 def _ingest_seed_document(db: Session, entry: dict, *, api_key: str | None, ingestion_user: User) -> None:
     name = entry["document_id"]
     existing = db.execute(select(KnowledgeSource).where(KnowledgeSource.name == name)).scalar_one_or_none()
@@ -423,6 +515,7 @@ def main() -> None:
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--book-only", action="store_true")
+    parser.add_argument("--whole-book", action="store_true", help="Legacy: ingest the raw OCR as ONE document (not recommended)")
     parser.add_argument("--seed-only", action="store_true")
     parser.add_argument("--dry-run", action="store_true", help="Parse/chunk only, don't write to the database")
     args = parser.parse_args()
@@ -433,7 +526,10 @@ def main() -> None:
 
     with SessionLocal() as db:
         if not args.seed_only:
-            ingest_book(db, api_key=api_key, dry_run=args.dry_run)
+            if args.whole_book:
+                ingest_book(db, api_key=api_key, dry_run=args.dry_run)
+            else:
+                ingest_book_sections(db, dry_run=args.dry_run)
         if not args.book_only:
             ingest_seed_yaml(db, api_key=api_key, dry_run=args.dry_run)
 
