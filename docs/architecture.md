@@ -125,10 +125,27 @@ For streaming, the notices and any replacement arrive in the `final` event with 
 5. **Sensitive data:** passwords are one-way hashes; health data is consent-gated; logs contain
    request metadata and hashes, not raw questions, answers, tokens, or profile fields.
 
+## Data model
+
+| Area | Tables |
+|---|---|
+| Accounts and consent | `users`, `consent_records` |
+| Profile | `health_profiles` (conditions, restrictions, allergies, **current medicines, risk factors, age, blood group**), `lifestyle_profiles`, `dietary_profiles`, `cultural_profiles`, `pregnancy_profiles` |
+| Care | `pregnancy_dating`, `emergency_contacts`, `daily_checkins`, `health_readings`, `meal_logs`, `screening_records`, `daily_wellness_logs` |
+| Conversations | `conversations`, `messages` |
+| Knowledge | `knowledge_sources`, `knowledge_documents`, `knowledge_chunks`, `evidence_metadata`, `guidelines`, `ayurvedic_sources` |
+| Food and lifestyle records | `food_regions`, `food_items`, `exercise_guidance` |
+| Recommendations | `recommendations`, `feedback` |
+| Safety and operations | `safety_rules`, `safety_events`, `audit_logs`, `evaluation_runs` |
+
+The guard-rail rules, the care rules, the food guide and the nutrient table are **not** in the database: they are reviewable files in `backend/app/data/`, loaded once and cached. Changing one means editing YAML and running the tests.
+
 ## Database
 
 Migrations: `0001` initial schema, `0002` RAG vector index, `0003` daily wellness logs,
-`0004` care features (dating, check-ins, readings, meals, screening, emergency contact).
+`0004` care features (dating, check-ins, readings, meals, screening, emergency contact),
+`0005` safety profile (current medicines, risk factors, age and blood group on the health profile).
+Every migration after `0001` checks what exists first, because `0001` builds the current model set on a fresh database; a fresh install and an older database both upgrade to head (tested in `tests/test_migrations.py`).
 The initial migration creates users, consent and profile tables, conversations/messages,
 knowledge sources/documents/chunks, evidence and guideline metadata, Ayurveda provenance,
 food/lifestyle records, recommendations, feedback, safety rules/events, audit logs, and
