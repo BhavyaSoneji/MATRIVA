@@ -96,6 +96,22 @@ re-enables the Groq + Gemini pipeline. Details: [`local-rag.md`](./local-rag.md)
 and schedules live in `backend/app/data/care_rules.yaml`, not in code. See
 [`care-features.md`](./care-features.md).
 
+## One chat request, step by step
+
+`POST /chat` (and `/chat/stream`, which runs the same steps) is orchestrated in `services/chat.py`.
+
+1. **Middleware** assigns a request id, applies the rate limit (auth, chat and knowledge routes) and, on the way out, adds security headers.
+2. **Safety pre-check** (`safety/classifier.py`): emergency terms, plus rules an admin has added. If the classifier itself errors the request fails with `503`; it never falls through.
+3. **Guard rails** (`safety/guardrails`): the question is matched against the registry using the person's week, conditions, medicines, allergies and risk factors (only with consent). The result is merged into the decision, and can only make it more severe. An `escalate` or `block` ends the request here with a fixed message and **no retrieval**.
+4. **Prepare the turn**: resolve a follow-up ("what about ragi?"), translate a Hindi, Gujarati or Hinglish question to an English search query, and record a plain statement such as "my Hb is 9.8" if consent allows and the question was safe.
+5. **Retrieve and judge** (`rag/local`): seven signals fused, reranked, and a sufficiency gate. Too little evidence means the fixed "no reviewed source" answer.
+6. **Compose** with numbered citations.
+7. **Output check** (`guardrails/output.py`): an answer that gives a dose, calls a medicine safe, diagnoses, predicts the baby's sex or falsely reassures is replaced whole. Then the **post-check** validates citations and escalation language.
+8. **Notices** from cautions are put in front of the answer, and the guard-rail rules that applied are returned in `evidence.guardrails` with their sources.
+9. **Persist** the conversation, and return the answer, citations, sources, suggestions and recommendations.
+
+For streaming, the notices and any replacement arrive in the `final` event with `corrected: true`, so the client discards what it streamed ([`api.md`](./api.md#streaming-chat)).
+
 ## Trust boundaries
 
 1. **Untrusted input:** HTTP bodies, uploads, query parameters, and chat text are validated
