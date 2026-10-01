@@ -115,6 +115,28 @@ and the curated video/article/paper library under `GET /resources`.
 Only approved/active knowledge is returned to ordinary users. Page/section locators are
 returned only when stored in the source record; the API does not invent them.
 
+## Streaming chat
+
+`POST /chat/stream` takes the same body as `/chat` and answers with server-sent events (`text/event-stream`). The safety pre-check, guard rails, retrieval, output check and post-check are exactly the ones `/chat` uses.
+
+| Event | Data | Meaning |
+|---|---|---|
+| `delta` | `{"text": "..."}` | Append to the displayed answer. Zero or more before `final`. A refusal, an emergency message, or a composed answer from the offline engine arrives as one delta |
+| `final` | `{"answer", "safety_status", "citations", "corrected"}` | Sent once, after validation. **If `corrected` is `true`, discard what you rendered from the deltas and show `answer`**: a caution notice was put in front, or the answer was replaced. If `false`, `answer` equals the deltas joined |
+| `done` | `{"conversation_id", "message_id", "sources", "evidence", "recommendations", "suggestions"}` | Sent last, once the conversation is saved. Metadata only |
+| `error` | `{"answer": "..."}` | Sent instead of the others if the safety layer is unavailable or the server fails after the stream began; the stream ends |
+
+```
+event: delta
+data: {"text": "Doctors usually advise avoiding ibuprofen in pregnancy ..."}
+
+event: final
+data: {"answer": "Doctors usually advise ...", "safety_status": "high_risk", "citations": [], "corrected": false}
+
+event: done
+data: {"conversation_id": "...", "message_id": "...", "sources": [], "evidence": {...}, "recommendations": [], "suggestions": []}
+```
+
 ## R0 demo endpoints
 
 When `DEMO_MODE=true`:
