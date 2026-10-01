@@ -243,7 +243,9 @@ def _finalize_generation_result(
             Citation(
                 source_id=item.source.id,
                 source_name=item.source.name,
-                locator=item.source.extra_metadata.get("page_or_section") if item.source.extra_metadata else None,
+                # chunk-level locator first ("Ch. 5 > Dauhrda, scanned p. 130"), then the source's own
+                locator=(item.chunk.extra_metadata or {}).get("page_or_section")
+                or (item.source.extra_metadata.get("page_or_section") if item.source.extra_metadata else None),
                 evidence_level=item.source.evidence_level,
             )
             for item in chunks[:4]
