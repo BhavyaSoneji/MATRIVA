@@ -11,6 +11,7 @@ from app.models import (
     FoodItem,
     Guideline,
 )
+from app.rag.local import book
 from app.rag.local.corpus import get_engine
 from app.rag.retrieval import retrieve_chunks
 from app.repositories.knowledge import get_source, source_payload
@@ -189,3 +190,29 @@ def knowledge_graph(
     result["focus"] = focus
     result["stats"] = graph.stats()
     return result
+
+
+@router.get("/knowledge/book")
+def book_outline(_: CurrentUser, db: DBSession) -> dict[str, object]:
+    """Outline of the Prasuti Tantra (chapters, sections, concepts, authorities) plus, per chapter, whether its
+    text has been reviewed and approved for use in answers."""
+    from app.models import KnowledgeDocument, KnowledgeSource
+
+    outline = book.outline()
+    review: dict[int, str] = {}
+    rows = db.execute(
+        select(KnowledgeDocument.title, KnowledgeDocument.review_status)
+        .join(KnowledgeSource, KnowledgeDocument.source_id == KnowledgeSource.id)
+        .where(KnowledgeSource.name == "prasuti-tantra-chapters")
+    ).all()
+    for title, status_value in rows:
+        marker = title.split("Chapter ", 1)
+        if len(marker) == 2 and marker[1].split(":", 1)[0].isdigit():
+            review[int(marker[1].split(":", 1)[0])] = status_value
+    return {**outline, "review": review}
+
+
+@router.get("/knowledge/book/glossary")
+def book_glossary(_: CurrentUser, q: str = Query(default="", max_length=80)) -> dict[str, object]:
+    """Hindi <-> English terms from the book (either script). Empty q lists nothing."""
+    return {"query": q, "results": book.search_glossary(q)}

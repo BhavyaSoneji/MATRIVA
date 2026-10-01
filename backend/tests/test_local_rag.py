@@ -283,3 +283,49 @@ def test_no_recommendations_attach_to_an_answer_with_no_evidence(client: TestCli
     _approve_seed(client, admin_headers)
     res = client.post("/chat", headers=auth_headers, json={"message": "What is the best programming language?"}).json()
     assert res["citations"] == [] and res["recommendations"] == []
+
+
+# ------------------------------------------------------------------ book knowledge representation
+def test_book_index_is_a_structured_outline() -> None:
+    from app.rag.local import book
+
+    idx = book.outline()
+    assert idx["available"] and len(idx["chapters"]) == 11
+    ch9 = idx["chapters"][8]
+    assert ch9["title_en"] == "Normal And Abnormal Puerperium" and ch9["scan_start"] == 297
+    assert idx["chapters"][4]["sections"] and idx["chapters"][4]["concepts"]
+    assert "dauhrda" in idx["chapters"][4]["key_terms"]  # the pregnancy chapter's distinctive Sanskrit term
+    assert idx["authorities"]["Vagbhata"] > idx["authorities"]["Harita"] > 0
+    assert "glossary" not in idx  # the outline is light; the glossary has its own endpoint
+
+
+def test_book_glossary_pairs_hindi_and_english() -> None:
+    from app.rag.local import book
+
+    assert any("weaning" in e["en"].lower() for e in book.search_glossary("अपनयन"))
+    assert any(e["hi"] for e in book.search_glossary("dauhrda"))
+    assert book.search_glossary("") == []
+
+
+def test_hindi_question_uses_book_terms_when_the_hand_glossary_misses(client: TestClient, auth_headers) -> None:
+    from app.rag.translate import glossary_translate
+
+    out = glossary_translate("दौहद क्या है")
+    assert out and "dauhrda" in out.lower()
+
+
+def test_book_endpoints_report_review_state(client: TestClient, admin_headers, auth_headers) -> None:
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+    import scripts.ingest_real_knowledge as ingest
+
+    body = client.get("/knowledge/book", headers=auth_headers).json()
+    assert body["available"] and len(body["chapters"]) == 11 and body["review"] == {}
+    with SessionLocal() as db:
+        ingest.ingest_book_chapters(db, dry_run=False)
+    review = client.get("/knowledge/book", headers=auth_headers).json()["review"]
+    assert {int(k) for k in review} == set(range(1, 12)) and set(review.values()) == {"pending"}
+    assert client.get("/knowledge/book/glossary?q=milk", headers=auth_headers).json()["results"] is not None
+    assert client.get("/knowledge/book").status_code in (401, 403)
