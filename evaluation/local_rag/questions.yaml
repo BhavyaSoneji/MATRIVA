@@ -1,0 +1,58 @@
+# Retrieval + sufficiency questions for the offline RAG engine (backend/app/rag/local).
+#
+# `expect_docs`  : at least one of these document ids must appear in the top-k hits.
+# `expect_text`  : (book questions) at least one top-k passage must contain one of these words, since book
+#                  sections have no stable ids. Expectations are written from what the SOURCE says, not tuned to
+#                  what the engine returns.
+# Out-of-scope questions must come back INSUFFICIENT (the engine has to refuse, not stretch a loose match).
+
+in_scope:
+  - {q: "How much iron and folic acid should pregnant women take every day?", expect_docs: [guide-who-iron-folate-001]}
+  - {q: "How much caffeine is safe during pregnancy?", expect_docs: [guide-who-caffeine-001]}
+  - {q: "Which foods should I avoid while pregnant?", expect_docs: [guide-nhs-food-safety-001]}
+  - {q: "Can I eat liver when I am pregnant?", expect_docs: [guide-nhs-food-safety-001, food-usda-173001]}
+  - {q: "How much exercise should I do each week during pregnancy?", expect_docs: [guide-who-activity-001, guide-nhs-exercise-001]}
+  - {q: "What are the warning signs of pre-eclampsia?", expect_docs: [guide-nhs-preeclampsia-001]}
+  - {q: "My baby is moving less than usual, what should I do?", expect_docs: [guide-nhs-movements-001]}
+  - {q: "What can I do about morning sickness and vomiting?", expect_docs: [guide-nhs-morning-sickness-001]}
+  - {q: "How do I ease back pain in pregnancy?", expect_docs: [guide-nhs-back-pain-001]}
+  - {q: "Which vaccines are recommended during pregnancy?", expect_docs: [guide-nhs-vaccines-001]}
+  - {q: "When should I call the midwife about contractions?", expect_docs: [guide-nhs-labour-signs-001]}
+  - {q: "How can I look after my mental health in pregnancy?", expect_docs: [guide-nhs-mental-health-001]}
+  - {q: "Does smoking harm my baby and should I quit?", expect_docs: [guide-nhs-smoking-001]}
+  - {q: "When am I tested for gestational diabetes?", expect_docs: [guide-nhs-gdm-001]}
+  - {q: "Is there a free monthly check-up scheme in India for pregnant women?", expect_docs: [guide-in-pmsma-001]}
+  - {q: "What is the PMMVY maternity cash benefit scheme?", expect_docs: [guide-in-pmmvy-001]}
+  - {q: "How long should I breastfeed exclusively?", expect_docs: [guide-who-breastfeeding-001]}
+  - {q: "What haemoglobin level counts as anaemia in pregnancy?", expect_docs: [guide-who-anaemia-001]}
+  - {q: "Does calcium supplementation reduce pre-eclampsia risk?", expect_docs: [guide-who-calcium-001]}
+  - {q: "When are antenatal care visits scheduled?", expect_docs: [seed-anc-fogsi-001]}
+  - {q: "How much folic acid and vitamin D should I take?", expect_docs: [guide-nhs-vitamins-001]}
+  - {q: "How much iron is in lentils?", expect_docs: [food-usda-172421]}
+  - {q: "How much calcium is in ragi?", expect_docs: [seed-ifct-ragi-001]}
+  - {q: "How much protein is in moong dal?", expect_docs: [seed-ifct-moong-dal-001, food-usda-174257]}
+  - {q: "Is guava a good source of vitamin C?", expect_docs: [food-usda-173044]}
+  - {q: "Is spinach rich in iron and folate?", expect_docs: [food-usda-168463, seed-ifct-palak-001]}
+  - {q: "What nutrients do almonds provide?", expect_docs: [food-usda-170567]}
+  - {q: "What does Ayurveda recommend for a pregnant woman month by month?", expect_docs: [seed-ayurveda-garbhini-001, seed-ayurveda-garbhini-002], expect_text: [month]}
+  - {q: "What is garbhini paricharya?", expect_docs: [seed-ayurveda-garbhini-001, seed-ayurveda-garbhini-002], expect_text: [garbhini, regimen]}
+  - {q: "How should milk and ghee be used for the pregnant woman in Ayurveda?", expect_text: [milk, ghee]}
+  - {q: "Which medicines are given in Ayurveda for pain and bleeding in pregnancy?", expect_text: [bleeding]}
+  - {q: "What does Ayurveda say about repeated abortions and stillbirths?", expect_text: [abortion, stillbirth, still birth]}
+  - {q: "What is the Ayurvedic view of the development of the fetus in the womb?", expect_text: [fetus, embryo]}
+  - {q: "What diet and regimen does Ayurveda give for the breastfeeding woman and wet nurse?", expect_text: [wet-nurse, breast, lactation, milk]}
+
+out_of_scope:
+  - "What is the genetic risk of Down syndrome screening in the first trimester?"
+  - "How does an epidural anesthesia procedure work during labor?"
+  - "What vaccines are recommended for newborns in the first month of life?"
+  - "What is the typical C-section recovery timeline?"
+  - "What is the best programming language for building a pregnancy tracking app?"
+  - "What are the tax filing deadlines this year?"
+  - "How do I train for a marathon?"
+  - "What is the capital of France?"
+  - "What dog breed is best for a family with young children?"
+  - "Give me a recipe for chocolate cake"
+  - "Explain how quantum computing works"
+  - "Who won the cricket world cup?"
+  - "How do I repair a car engine?"
