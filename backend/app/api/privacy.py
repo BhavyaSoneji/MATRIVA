@@ -16,6 +16,8 @@ from app.models import (
 )
 from app.schemas.api import ConsentRequest, DeleteResponse
 from app.services.audit import record_audit
+from app.services.care.privacy import export as care_export
+from app.services.care.privacy import purge as purge_care
 from app.services.profile import pregnancy_payload, profile_payload, set_consent
 
 router = APIRouter(prefix="/privacy", tags=["privacy"])
@@ -62,6 +64,7 @@ def export_data(user: CurrentUser, db: DBSession) -> dict[str, object]:
             "created_at": user.created_at.isoformat() if user.created_at else None,
         },
         "profile": profile_payload(db, user),
+        "care": care_export(db, user.id),
         "pregnancy": pregnancy_payload(pregnancy) if pregnancy else None,
         "conversations": [
             {
@@ -124,6 +127,7 @@ def export_data(user: CurrentUser, db: DBSession) -> dict[str, object]:
 def delete_account(user: CurrentUser, db: DBSession) -> DeleteResponse:
     target_id = user.id
     record_audit(db, actor_user_id=target_id, action="privacy.account_delete", resource_type="user", resource_id=target_id)
+    purge_care(db, target_id)
     db.delete(user)
     db.commit()
     return DeleteResponse(message="Account and associated personal data deleted")

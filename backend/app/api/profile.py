@@ -18,6 +18,8 @@ from app.schemas.api import (
     ProfileUpdateRequest,
 )
 from app.services.audit import record_audit
+from app.services.care.dating import refresh_profile as refresh_pregnancy_week
+from app.services.care.privacy import purge as purge_care_data
 from app.services.profile import (
     ConsentRequired,
     pregnancy_payload,
@@ -53,6 +55,7 @@ def delete_profile(user: CurrentUser, db: DBSession) -> DeleteResponse:
     for consent in db.query(ConsentRecord).filter(ConsentRecord.user_id == user.id).all():
         db.delete(consent)
     user.consent_version = None
+    purge_care_data(db, user.id)  # check-ins, readings, meals, dating, contacts: all health data goes
     record_audit(db, actor_user_id=user.id, action="profile.delete", resource_type="user", resource_id=user.id)
     db.commit()
     return DeleteResponse(message="Profile and health data deleted")
@@ -60,9 +63,11 @@ def delete_profile(user: CurrentUser, db: DBSession) -> DeleteResponse:
 
 @router.get("/pregnancy", response_model=PregnancyResponse)
 def get_pregnancy(user: CurrentUser, db: DBSession) -> PregnancyResponse:
+    refresh_pregnancy_week(db, user)  # roll the stored week forward to today when dates are known
     profile = db.execute(select(PregnancyProfile).where(PregnancyProfile.user_id == user.id)).scalar_one_or_none()
     if profile is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pregnancy profile not found")
+    db.commit()
     return PregnancyResponse.model_validate(pregnancy_payload(profile))
 
 

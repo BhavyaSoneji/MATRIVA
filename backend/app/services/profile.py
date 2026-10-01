@@ -165,6 +165,9 @@ def set_consent(db: Session, user: User, *, granted: bool, version: str) -> None
         row = _profile_for_user(db, model, user.id)
         if row:
             db.delete(row)
+    from app.services.care.privacy import purge  # lazy: care imports this module
+
+    purge(db, user.id)
     db.flush()
 
 
@@ -179,6 +182,17 @@ def update_pregnancy(db: Session, user: User, payload: PregnancyUpdateRequest) -
     profile.stage = stage.stage
     db.add(profile)
     db.flush()
+    # Also remember the dates, so the week keeps advancing on its own (lazy import: care.dating imports this module).
+    from app.services.care import dating as dating_module
+
+    try:
+        if payload.due_date:
+            dating_module.save(db, user, edd=payload.due_date)
+        else:
+            dating_module.save(db, user, week=payload.current_week)
+    except dating_module.DatingError:
+        dating_module.save(db, user, week=payload.current_week)  # an implausible due date: trust the week they gave
+    profile.first_pregnancy = payload.first_pregnancy
     return profile
 
 
