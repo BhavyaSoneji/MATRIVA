@@ -320,3 +320,16 @@ def test_stream_from_packet_propagates_a_mid_stream_failure() -> None:
     assert next(generator) == "partial "
     with pytest.raises(APIConnectionError):
         next(generator)
+
+
+def test_api_key_comes_from_settings_not_only_the_process_environment(monkeypatch) -> None:
+    """Regression: a key in backend/.env reaches Settings but not os.environ."""
+    from types import SimpleNamespace
+
+    import app.llm.groq_client as groq_client
+
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.setattr(groq_client, "get_settings", lambda: SimpleNamespace(llm_api_key="from-settings"))
+    assert groq_client._resolve_api_key(None) == "from-settings"
+    assert groq_client._resolve_api_key("explicit") == "explicit"

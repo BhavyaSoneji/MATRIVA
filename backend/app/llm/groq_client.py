@@ -29,6 +29,7 @@ except ImportError:  # optional provider; local/demo mode uses a grounded fallba
         def __init__(self, *_args, **_kwargs):
             raise RuntimeError("Groq client is not installed; install the optional provider dependencies")
 
+from app.core.config import get_settings
 from app.llm.prompts import SOURCE_GROUNDED_SYSTEM_PROMPT
 from app.rag.context_packet import ContextPacket
 from app.rag.multi_domain import MULTI_DOMAIN_PROMPT_ADDENDUM, requires_segmentation
@@ -55,7 +56,10 @@ class GenerationError(RuntimeError):
 
 
 def _resolve_api_key(api_key: str | None) -> str:
-    key = api_key or os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY")
+    # Settings first: pydantic loads backend/.env into Settings but does NOT export it to os.environ,
+    # so reading only the environment made the full pipeline fail silently whenever the key lived in .env
+    # (the chat then quietly fell back to the plain generator, with no personalisation or language).
+    key = api_key or get_settings().llm_api_key or os.environ.get("LLM_API_KEY") or os.environ.get("GROQ_API_KEY")
     if not key:
         raise RuntimeError("Groq API key not configured (set LLM_API_KEY or GROQ_API_KEY)")
     return key
