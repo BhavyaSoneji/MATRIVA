@@ -19,6 +19,8 @@ function OnboardingFlow() {
   const [currentWeek, setCurrentWeek] = React.useState(12);
   const [dietType, setDietType] = React.useState("vegetarian");
   const [language, setLanguage] = React.useState("en");
+  const [how, setHow] = React.useState<"week" | "lmp" | "edd">("week");
+  const [dateStr, setDateStr] = React.useState("");
   const [notFirst, setNotFirst] = React.useState(false);
   const [consent, setConsent] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -26,9 +28,11 @@ function OnboardingFlow() {
 
   const weekValid = Number.isInteger(currentWeek) && currentWeek >= 1 && currentWeek <= 42;
 
+  const datingValid = how === "week" ? weekValid : dateStr !== "";
+
   const handleFinish = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!consent || !weekValid) return;
+    if (!consent || !datingValid) return;
     setError(null);
     setLoading(true);
     try {
@@ -39,8 +43,13 @@ function OnboardingFlow() {
         language,
       };
       await api.put("/profile", profile);
-      const pregnancy: PregnancyUpdateRequest = { current_week: currentWeek, first_pregnancy: !notFirst };
-      await api.put("/pregnancy", pregnancy);
+      if (how === "week") {
+        const pregnancy: PregnancyUpdateRequest = { current_week: currentWeek, first_pregnancy: !notFirst };
+        await api.put("/pregnancy", pregnancy);
+      } else {
+        // exact dates give an exact week, visit calendar and reminders
+        await api.put("/care/dating", { [how === "lmp" ? "lmp_date" : "edd_date"]: dateStr, first_pregnancy: !notFirst });
+      }
       router.push("/chat");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong saving your details.");
@@ -71,6 +80,18 @@ function OnboardingFlow() {
 
         <div className="mt-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
+            <div className="flex flex-wrap gap-2" role="group" aria-label="How do you want to tell us?">
+              {([["week", "I know my week"], ["lmp", "Last period date"], ["edd", "Due date"]] as const).map(([k, l]) => (
+                <button key={k} type="button" aria-pressed={how === k} onClick={() => setHow(k)}
+                  className={`eyebrow-sm min-h-9 border px-3 ${how === k ? "border-accent text-accent" : "border-border text-muted-foreground"}`}>{l}</button>
+              ))}
+            </div>
+            {how !== "week" && (
+              <input type="date" aria-label={how === "lmp" ? "First day of your last period" : "Your due date"} value={dateStr} onChange={(e) => setDateStr(e.target.value)} className="h-11 border border-border bg-transparent px-3 text-base" />
+            )}
+          </div>
+
+          <div className={`flex flex-col gap-1.5 ${how !== "week" ? "hidden" : ""}`}>
             <Label htmlFor="week">How many weeks pregnant are you?</Label>
             <div className="flex items-center gap-4">
               <input
@@ -138,7 +159,7 @@ function OnboardingFlow() {
         </div>
 
         <div className="mt-8 flex justify-end">
-          <Button type="submit" size="lg" disabled={loading || !consent || !weekValid}>
+          <Button type="submit" size="lg" disabled={loading || !consent || !datingValid}>
             {loading ? "Saving…" : "Start chatting"}
           </Button>
         </div>
