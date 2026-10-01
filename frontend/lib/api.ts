@@ -105,6 +105,7 @@ export interface ChatStreamDone {
   sources: SourceResponse[];
   evidence: Record<string, unknown>;
   recommendations: RecommendationResponse[];
+  suggestions?: string[];
 }
 
 export interface ChatStreamHandlers {
@@ -115,7 +116,7 @@ export interface ChatStreamHandlers {
 }
 
 export async function streamChat(
-  payload: { message: string; conversation_id?: string },
+  payload: { message: string; conversation_id?: string; language?: string },
   handlers: ChatStreamHandlers,
   signal?: AbortSignal
 ): Promise<void> {
