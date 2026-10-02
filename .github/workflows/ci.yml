@@ -13,7 +13,7 @@ jobs:
         working-directory: backend
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       # requirements-dev.txt pins ruff and mypy, so CI and a laptop report the same findings.
@@ -35,7 +35,7 @@ jobs:
         working-directory: ingestion
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
@@ -49,7 +49,7 @@ jobs:
         working-directory: evaluation
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - run: pip install -r requirements.txt
