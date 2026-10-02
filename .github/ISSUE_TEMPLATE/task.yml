@@ -1,0 +1,18 @@
+name: Task
+description: A scoped piece of work (chore, refactor, docs, tests)
+labels: [task]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+    validations: {required: true}
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      placeholder: "- [ ] ...\n- [ ] ..."
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes / links

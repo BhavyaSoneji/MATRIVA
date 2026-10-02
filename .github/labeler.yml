@@ -1,0 +1,7 @@
+backend: [{changed-files: [{any-glob-to-any-file: ['backend/**']}]}]
+frontend: [{changed-files: [{any-glob-to-any-file: ['frontend/**']}]}]
+ingestion: [{changed-files: [{any-glob-to-any-file: ['ingestion/**']}]}]
+evaluation: [{changed-files: [{any-glob-to-any-file: ['evaluation/**']}]}]
+database: [{changed-files: [{any-glob-to-any-file: ['database/**', 'backend/alembic/**']}]}]
+docs: [{changed-files: [{any-glob-to-any-file: ['docs/**', '**/*.md']}]}]
+ci: [{changed-files: [{any-glob-to-any-file: ['.github/**', 'docker-compose*.yml', '**/Dockerfile']}]}]
