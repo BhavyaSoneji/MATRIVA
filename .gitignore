@@ -27,6 +27,9 @@ npm-debug.log*
 
 # Local data and generated reports
 *.db
+*.db-journal
+*.db-wal
+*.db-shm
 backend/storage/
 evaluation/reports/*.json
 

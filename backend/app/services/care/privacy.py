@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from sqlalchemy import delete
+from typing import cast
+
+from sqlalchemy import CursorResult, delete
 from sqlalchemy.orm import Session
 
 from app.models import (
@@ -21,7 +23,9 @@ CARE_MODELS = (PregnancyDating, EmergencyContact, DailyCheckin, HealthReading, M
 def purge(db: Session, user_id: str) -> int:
     n = 0
     for model in CARE_MODELS:
-        n += db.execute(delete(model).where(model.user_id == user_id)).rowcount or 0
+        # DML always returns a CursorResult; the ORM's Result type does not declare rowcount.
+        result = cast(CursorResult, db.execute(delete(model).where(model.user_id == user_id)))
+        n += result.rowcount or 0
     db.flush()
     return n
 

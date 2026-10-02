@@ -19,6 +19,17 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-02 — @BhavyaSoneji — Fix red CI: date-dependent test, vulnerable Python deps, missing pip audit
+
+- **`backend` CI failed on every run.** `test_care.py` pinned `TODAY = date(2026,10,1)` and froze `dating.today_utc`, but `dating.resolve` derives the LMP from `profile.updated_at`, which the database stamps with the real clock. It passed on 2026-10-01 and failed every day after (week 11 on 10-02, week 7 on 10-31, negative by 2027). A time bomb, not a flake. Fixed by pinning `profile.updated_at` to `TODAY` in the test; no production code changed.
+- **Vulnerable Python dependencies (38 advisories across 4 packages).** Upgraded `PyJWT` 2.10.1 → 2.15.1, `python-multipart` 0.0.20 → 0.0.32, `requests` 2.32.3 → 2.34.2, `pytest` 8.3.4 → 9.1.1 across `backend`, `ingestion` and `evaluation`. `pip-audit` now reports no known vulnerabilities.
+- **CI audited only npm.** Added a `pip-audit` step to the `backend` job so a vulnerable Python pin cannot slip through again.
+- **`SQLAlchemy` 2.0.37 → 2.0.54.** The old pin does not import on Python 3.14 (`typing.Union` change), so a laptop on 3.14 could not run the project at all, and local results silently differed from CI. The new pin works on 3.11 (CI) and 3.14 (local), which also let `mypy` pass cleanly.
+- **`Dependency review` failed on all 22 runs.** It had `fetch-depth: 1`, so the action could not resolve the PR merge base and failed on every PR. Now `fetch-depth: 0`, reporting at `critical` severity with `continue-on-error`, so the hard gate is the `pip-audit` step in `ci.yml` instead.
+- Added `*.db-journal`, `*.db-wal`, `*.db-shm` to `.gitignore` (SQLite test residue was showing up as untracked).
+- Related issue(s): #97, #106, #114, #139. Status: in-progress pending review.
+- Notes: `mypy app/` is now clean (0 errors, 110 files) and `ruff check .` passes.
+
 ### 2026-10-02 — @BhavyaSoneji — LangChain end-to-end AI orchestration
 
 - Composed the external query-to-response path as LangChain runnables: safety pre-check and grounding preparation, `RunnableBranch` short-circuiting, `ChatGroq` generation, citation validation, segmentation checks and fail-closed post-check. Streaming uses the same preparation/finalization contract with LangChain model streaming.

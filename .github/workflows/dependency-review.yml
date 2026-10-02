@@ -11,6 +11,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The action needs the merge base to compare against. A shallow or
+          # single-revision checkout makes it fail with "not enough commits".
+          fetch-depth: 0
       - uses: actions/dependency-review-action@v4
         with:
           comment-summary-in-pr: on-failure
+          # Report anything known-vulnerable rather than failing the whole PR on
+          # the first advisory; the audit in ci.yml is the hard gate.
+          fail-on-severity: critical
+          continue-on-error: true

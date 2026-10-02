@@ -23,6 +23,10 @@ jobs:
         if: always()
       - run: python scripts/secret_scan.py --root ..
         if: always()
+      # Issue #97: CI audited only npm, so vulnerable Python pins went unnoticed.
+      - run: pip install pip-audit
+      - run: pip-audit -r requirements.txt --progress-spinner off
+        if: always()
       - run: mypy app/
         if: always()
       - run: pytest
