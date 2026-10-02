@@ -1,0 +1,56 @@
+name: PR automation
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# pull_request_target runs with write access, so this workflow must NEVER check out or run PR code.
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          sync-labels: true
+
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const n = pr.additions + pr.deletions;
+            const size = n < 10 ? 'XS' : n < 50 ? 'S' : n < 250 ? 'M' : n < 1000 ? 'L' : 'XL';
+            const all = ['XS', 'S', 'M', 'L', 'XL'].map(s => `size/${s}`);
+            const color = {XS: '3fb950', S: '7ee787', M: 'd29922', L: 'db6d28', XL: 'f85149'};
+            for (const s of all) {
+              try { await github.rest.issues.createLabel({...context.repo, name: s, color: color[s.slice(5)]}); } catch (e) {}
+            }
+            const current = pr.labels.map(l => l.name).filter(l => all.includes(l) && l !== `size/${size}`);
+            for (const name of current) {
+              await github.rest.issues.removeLabel({...context.repo, issue_number: pr.number, name});
+            }
+            await github.rest.issues.addLabels({...context.repo, issue_number: pr.number, labels: [`size/${size}`]});
+
+  semantic-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            test
+            refactor
+            perf
+            chore
+            ci
+            build

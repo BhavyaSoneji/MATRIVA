@@ -1,0 +1,24 @@
+name: Stale
+
+on:
+  schedule:
+    - cron: "0 4 * * *"
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 30
+          days-before-close: 14
+          stale-issue-label: stale
+          stale-pr-label: stale
+          exempt-issue-labels: pinned,security,in-progress
+          exempt-pr-labels: pinned,security,in-progress
+          stale-issue-message: This issue has had no activity for 30 days and will close in 14 unless it is updated.
+          stale-pr-message: This PR has had no activity for 30 days and will close in 14 unless it is updated.
