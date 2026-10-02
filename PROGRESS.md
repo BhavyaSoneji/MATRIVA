@@ -19,6 +19,15 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-02 — @BhavyaSoneji — LangGraph orchestration and a runnable graph demo
+
+- Added `backend/app/rag/langgraph_flow.py`: the same pipeline stages as an explicit LangGraph `StateGraph` (`prepare` → `generate` → `finalize`, with a `complete` short-circuit node), selectable via `RAG_ORCHESTRATOR=langgraph`. Routing and traceability change; the safety, grounding, citation and post-check functions are the same ones the `langchain` and `native` modes call.
+- Streaming runs the real graph with `interrupt_after=["prepare"]`, so it shares the routing decision without generating tokens twice.
+- Added `backend/scripts/langgraph_demo.py`, which prints the response plus the executed node trace for all three routes (answer, urgent short-circuit, insufficient evidence) with a stub model — no API key, no network.
+- Pinned `langgraph==1.2.12` (previously only a transitive dependency of `langchain`). Tests: 11 new, covering routing, provider-never-constructed on short-circuit, fail-closed citations, mid-stream failure and graph reuse.
+- Related issue(s): #116. Status: done, pending review.
+- Note: `tests/test_care.py::test_a_dating_row_with_no_dates_falls_back_to_the_plain_week_instead_of_crashing` now fails for anyone running the suite after 2026-10-01 — it pins `today_utc` to 2026-10-01 but `dating.resolve` derives the LMP from the real clock via `profile.updated_at`. Pre-existing and unrelated to this work.
+
 ### 2026-10-02 — @BhavyaSoneji — LangChain end-to-end AI orchestration
 
 - Composed the external query-to-response path as LangChain runnables: safety pre-check and grounding preparation, `RunnableBranch` short-circuiting, `ChatGroq` generation, citation validation, segmentation checks and fail-closed post-check. Streaming uses the same preparation/finalization contract with LangChain model streaming.

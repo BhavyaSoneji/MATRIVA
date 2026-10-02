@@ -333,14 +333,22 @@ def answer_query(
 ) -> PipelineResult:
     """Run the full pipeline for one query.
 
-    Production orchestration uses LangChain runnables. ``RAG_ORCHESTRATOR=native``
-    keeps the original explicit Python sequence as a compatibility/rollback
-    seam. An injected Groq-compatible client remains supported in both modes
-    for deterministic tests without a live provider key.
+    Orchestration is selectable via ``RAG_ORCHESTRATOR``:
+
+    - ``langchain`` (default): the stages composed as one LCEL runnable chain.
+    - ``langgraph``: the same stages as an explicit LangGraph state graph.
+    - ``native``: the original explicit Python sequence, kept as a
+      compatibility/rollback seam.
+
+    All three run the same safety, grounding, citation and post-check
+    functions, so the choice affects control flow and traceability, never the
+    safety policy. An injected Groq-compatible client is supported in every
+    mode for deterministic tests without a live provider key.
     """
 
     settings = get_settings()
-    if getattr(settings, "rag_orchestrator", "native") == "langchain":
+    orchestrator = getattr(settings, "rag_orchestrator", "native")
+    if orchestrator == "langchain":
         return _langchain_answer_query(
             query,
             candidate_chunks=candidate_chunks,
@@ -350,6 +358,21 @@ def answer_query(
             client=client,
             k=k,
             settings=settings,
+        )
+    if orchestrator == "langgraph":
+        # Imported lazily: langgraph_flow imports this module for the shared
+        # prepare/finalize helpers, so a top-level import would be circular.
+        from app.rag.langgraph_flow import answer_query_graph
+
+        return answer_query_graph(
+            query,
+            settings=settings,
+            candidate_chunks=candidate_chunks,
+            candidate_scores=candidate_scores,
+            candidate_scoring_mode=candidate_scoring_mode,
+            profile=profile,
+            client=client,
+            k=k,
         )
 
     plan = _prepare_generation(

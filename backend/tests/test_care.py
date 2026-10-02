@@ -331,8 +331,10 @@ def test_without_consent_chat_does_not_store_health_numbers(client: TestClient, 
 
 def test_a_dating_row_with_no_dates_falls_back_to_the_plain_week_instead_of_crashing(client: TestClient, auth_headers) -> None:
     """A row with neither a last period nor a due date used to raise a TypeError (None minus a timedelta)."""
+    from datetime import datetime, timezone
+
     from app.core.db import SessionLocal
-    from app.models import PregnancyDating, User
+    from app.models import PregnancyDating, PregnancyProfile, User
 
     client.put("/profile", headers=auth_headers, json={"consent": True, "consent_version": "v1.0"})
     client.put("/pregnancy", headers=auth_headers, json={"current_week": 12, "first_pregnancy": True})
@@ -341,6 +343,13 @@ def test_a_dating_row_with_no_dates_falls_back_to_the_plain_week_instead_of_cras
         row = db.query(PregnancyDating).filter_by(user_id=user.id).one_or_none() or PregnancyDating(user_id=user.id, source="week")
         row.lmp_date = row.edd_date = None
         db.add(row)
+        # `resolve` reads `profile.updated_at` (not `today_utc`) to place the LMP when
+        # only a week number is known. The profile was created through the API, so that
+        # column carries the real system clock, which drifts away from the pinned TODAY
+        # and made this test fail on every run after 2026-10-01. Pin it to TODAY so the
+        # assertion is about the week-number fallback rather than the calendar.
+        profile = db.query(PregnancyProfile).filter_by(user_id=user.id).one()
+        profile.updated_at = datetime(TODAY.year, TODAY.month, TODAY.day, tzinfo=timezone.utc)
         db.commit()
         d = dating.resolve(db, user, TODAY)
         assert d is not None and d.week == 12

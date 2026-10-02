@@ -39,7 +39,7 @@ Every setting is an environment variable. The backend reads them (case-insensiti
 | Variable | Default | What it does |
 |---|---|---|
 | `RAG_ENGINE` | `local` | `local` is the offline pipeline: no model, no embeddings, no network. `external` is the Groq plus Gemini pipeline |
-| `RAG_ORCHESTRATOR` | `langchain` | `langchain` composes the complete external query-to-response path with LangChain runnables. `native` is an explicit rollback/compatibility escape hatch |
+| `RAG_ORCHESTRATOR` | `langchain` | How the external query-to-response path is orchestrated. `langchain` composes it as one LCEL runnable chain; `langgraph` runs the same stages as an explicit LangGraph state graph (see [rag.md](./rag.md#langgraph-orchestration)); `native` keeps the original explicit Python sequence as a rollback seam. All three share the same safety policy |
 | `LLM_PROVIDER` / `LLM_API_KEY` / `LLM_MODEL` | `groq` / empty / `openai/gpt-oss-120b` | Used only when `RAG_ENGINE=external` |
 | `EMBEDDING_PROVIDER` / `EMBEDDING_API_KEY` / `EMBEDDING_MODEL` | `gemini` / empty / `models/gemini-embedding-001` | Used only when `RAG_ENGINE=external` |
 | `TAVILY_API_KEY` | empty | Optional live web search for the external engine only. Web results are labelled as uncertain and never merged with reviewed sources |

@@ -30,9 +30,48 @@ chain by default (`RAG_ORCHESTRATOR=langchain`):
    safety post-check before a response can be returned.
 
 Streaming uses the same preparation and finalization stages and streams through LangChain's
-model streaming API. `RAG_ORCHESTRATOR=native` remains an explicit rollback seam; it does
-not change the safety policy or the local grounded fallback. Gemini embeddings use
-`GoogleGenerativeAIEmbeddings` from `langchain-google-genai` on the LangChain path.
+model streaming API. Gemini embeddings use `GoogleGenerativeAIEmbeddings` from
+`langchain-google-genai` on this path.
+
+## LangGraph orchestration
+
+`RAG_ORCHESTRATOR=langgraph` runs the *same* stages as an explicit LangGraph
+`StateGraph` (`backend/app/rag/langgraph_flow.py`) instead of a linear chain:
+
+```
+START -> prepare -> (short-circuit? -> complete -> END)
+                   -> generate -> finalize -> END
+```
+
+The difference is control flow and traceability, never policy:
+
+| | `langchain` | `langgraph` |
+|---|---|---|
+| Routing | implicit `RunnableBranch` | an explicit edge you can trace and assert |
+| Stages | anonymous lambdas | named nodes (`prepare`, `generate`, `finalize`, `complete`) |
+| Audit | follows the composition order | maps one-to-one onto the diagram above |
+| Safety / grounding / citations | identical functions | identical functions |
+
+Both modes call the same `_prepare_generation` and `_finalize_generation` helpers, so a
+stage cannot be skipped or relaxed in one orchestrator but not the other. Streaming runs
+the real graph with `interrupt_after=["prepare"]`, which shares the routing decision
+without generating tokens twice.
+
+To watch the graph execute:
+
+```bash
+cd backend
+python -m scripts.langgraph_demo "What should I eat in the first trimester?"
+python -m scripts.langgraph_demo "I have heavy bleeding"          # short-circuit route
+python -m scripts.langgraph_demo --weak-evidence "capital of France?"  # grounding route
+python -m scripts.langgraph_demo --stream "What should I eat in pregnancy?"
+```
+
+The demo uses a **stub model**, so it needs no API key and never contacts a provider. It
+is a control-flow demonstration, not a quality claim.
+
+`RAG_ORCHESTRATOR=native` remains an explicit rollback seam. All three modes share the
+same safety policy and the same local grounded fallback.
 
 ## The request path
 
