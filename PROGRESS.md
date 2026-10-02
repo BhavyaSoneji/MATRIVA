@@ -19,6 +19,14 @@ Paste your entry right below this line, above the older ones.
 
 <!-- NEW ENTRIES GO HERE -->
 
+### 2026-10-02 — @BhavyaSoneji — LangChain end-to-end AI orchestration
+
+- Composed the external query-to-response path as LangChain runnables: safety pre-check and grounding preparation, `RunnableBranch` short-circuiting, `ChatGroq` generation, citation validation, segmentation checks and fail-closed post-check. Streaming uses the same preparation/finalization contract with LangChain model streaming.
+- Replaced the live Gemini query/document embedding calls with `GoogleGenerativeAIEmbeddings`, while keeping the legacy provider path only as an explicit `RAG_ORCHESTRATOR=native` rollback seam. Added `RAG_ORCHESTRATOR` configuration and documentation.
+- Added LangChain provider adapters and regression coverage for blocking, streaming, DB-to-response, urgent short-circuit, insufficient evidence, and embeddings. Backend suite: 519 passed.
+- Related issue(s): #111, #112. Status: in-progress pending review/merge.
+- Notes: `RAG_ENGINE=local` remains the offline default; set `RAG_ENGINE=external`, `RAG_ORCHESTRATOR=langchain`, `LLM_API_KEY` and `EMBEDDING_API_KEY` for live providers.
+
 ### 2026-10-01 — @neevmodh — Documentation overhaul
 
 - README rebuilt section by section: what MATRIVA is and why, an at-a-glance table, commands grouped into plan and

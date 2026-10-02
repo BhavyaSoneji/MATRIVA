@@ -308,7 +308,7 @@ flowchart TB
 | Backend | Python 3.11, FastAPI, Pydantic, SQLAlchemy, Alembic |
 | Database | SQLite (dev) · PostgreSQL + pgvector (prod) |
 | Retrieval | Offline hybrid engine (default) · optional Gemini embeddings (`RAG_ENGINE=external`) |
-| Generation | Offline extractive composer (default) · optional Groq `openai/gpt-oss-120b` |
+| Generation | Offline extractive composer (default) · optional LangChain `ChatGroq` with `openai/gpt-oss-120b` |
 | OCR | Tesseract (local) for lab-report photos and the book |
 | Auth | JWT, consent versioning |
 | Safety | Rule engine with rules as YAML data: 1,231 rules, 40 named sources, English · Hinglish · Hindi · Gujarati |
@@ -392,16 +392,21 @@ Pasting the report text works without it.
 </details>
 
 <details>
-<summary><b>Optional: use Groq and Gemini instead of the offline engine</b></summary>
+<summary><b>Optional: use the LangChain Groq/Gemini path instead of the offline engine</b></summary>
 
 ```bash
 # backend/.env
 RAG_ENGINE=external
+RAG_ORCHESTRATOR=langchain
 LLM_PROVIDER=groq
 LLM_API_KEY=...            # never commit this
 EMBEDDING_PROVIDER=gemini
 EMBEDDING_API_KEY=...
 ```
+
+The external path uses `ChatGroq` and `GoogleGenerativeAIEmbeddings` through
+LangChain runnables. The safety pre-check, grounding gate, citation validation and
+post-check remain independent and fail closed.
 </details>
 
 <details>

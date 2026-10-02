@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     # no network). "external" = the Groq/Gemini pipeline (needs LLM_API_KEY / EMBEDDING_API_KEY).
     rag_engine: str = Field(default="local", pattern="^(local|external)$")
 
+    # External query orchestration. "langchain" is the production default and
+    # composes the existing safety/retrieval/grounding/citation stages as a
+    # LangChain runnable chain. "native" is an explicit compatibility escape
+    # hatch for rollback and deterministic legacy regression tests.
+    rag_orchestrator: str = Field(default="langchain", pattern="^(langchain|native)$")
+
     # Optional external providers (only used when rag_engine=external)
     llm_provider: str = "groq"
     llm_api_key: str = ""
