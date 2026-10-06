@@ -77,7 +77,9 @@ def resolve(db: Session, user: User, today: date | None = None) -> Dating | None
     if profile is None:
         return None
     # only a week number is known: assume it was true when it was last saved and move forward from there
-    saved = (profile.updated_at or profile.created_at or datetime.now(timezone.utc)).date()
+    saved = (profile.updated_at or profile.created_at or today).date()
+    if saved > today:
+        saved = today
     lmp = saved - timedelta(days=(profile.current_week - 1) * 7)
     return build(lmp, "week", today)
 
